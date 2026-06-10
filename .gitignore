@@ -1,0 +1,21 @@
+# Visual Basic 6.0 (VB6)
+
+# ไฟล์ที่ได้จากการ Compile (Build artifacts)
+*.exe
+*.dll
+*.ocx
+*.obj
+*.exp
+*.lib
+*.pdb
+
+# ไฟล์ Temporary และ Log
+*.tmp
+*.log
+
+# ไฟล์สถานะของ IDE (ไม่จำเป็นต้องแชร์)
+*.vbw
+
+# ไฟล์อื่นๆ
+*.scc
+*.user
