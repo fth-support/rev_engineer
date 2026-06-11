@@ -2,13 +2,15 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"time"
+
+	_ "github.com/denisenkom/go-mssqldb"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
@@ -44,33 +46,10 @@ func main() {
 	isRunning := false
 
 	// Config Inputs
-	dbPathEntry := widget.NewEntry()
-	dbPathEntry.SetText("C:\\POS\\LocalData.db")
-	
 	serverIPEntry := widget.NewEntry()
 	serverIPEntry.SetText("192.168.1.100")
-
-	// Browse Button
-	browseBtn := widget.NewButton("Browse...", func() {
-		fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
-			if err != nil {
-				dialog.ShowError(err, myWindow)
-				return
-			}
-			if reader == nil {
-				return
-			}
-			dbPathEntry.SetText(reader.URI().Path())
-		}, myWindow)
-		fd.Show()
-	})
-
-	// Layout for DB Settings
-	settingsForm := container.NewVBox(
-		widget.NewLabelWithStyle("Database Configuration", fyne.TextAlignLeading, fyne.TextStyle{Bold: true}),
-		container.NewBorder(nil, nil, widget.NewLabel("Local DB: "), browseBtn, dbPathEntry),
-		container.NewBorder(nil, nil, widget.NewLabel("Server IP:"), nil, serverIPEntry),
-	)
+	serverDBNameEntry := widget.NewEntry()
+	serverDBNameEntry.SetText("HQ_CENTRAL")
 
 	// Log Terminal
 	logTextBox := widget.NewMultiLineEntry()
@@ -78,6 +57,38 @@ func main() {
 	logTextBox.SetText("==================================================\nServiceTransfer System Ready.\nConfigure settings and click 'Start Sync'.\n==================================================\n")
 	scrollContainer := container.NewScroll(logTextBox)
 	uiLogger := &UILogger{LogEntry: logTextBox}
+
+	testServerDbBtn := widget.NewButton("Test DB Connection", func() {
+		ip := serverIPEntry.Text
+		dbName := serverDBNameEntry.Text
+		uiLogger.Println(fmt.Sprintf("Testing DB: %s (DB: %s)...", ip, dbName))
+		
+		go func() {
+			connString := fmt.Sprintf("server=%s;user id=sa;password=pass;database=%s", ip, dbName)
+			db, err := sql.Open("sqlserver", connString)
+			if err != nil {
+				uiLogger.Println(fmt.Sprintf("Error creating connection to %s: %v", ip, err))
+				return
+			}
+			defer db.Close()
+			
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			if err = db.PingContext(ctx); err != nil {
+				uiLogger.Println(fmt.Sprintf("Connection failed to %s: %v", ip, err))
+			} else {
+				uiLogger.Println(fmt.Sprintf("✅ SUCCESS! Connected to DB: %s", dbName))
+			}
+		}()
+	})
+
+	// Layout for DB Settings
+	settingsForm := widget.NewForm(
+		&widget.FormItem{Text: "Server DB Location:", Widget: serverIPEntry},
+		&widget.FormItem{Text: "Server DB Name:", Widget: serverDBNameEntry},
+		&widget.FormItem{Text: "", Widget: testServerDbBtn},
+	)
+
 
 	// Status Bar
 	statusLabel := widget.NewLabelWithStyle("🔴 Status: Stopped", fyne.TextAlignTrailing, fyne.TextStyle{Bold: true})
@@ -93,15 +104,14 @@ func main() {
 		statusLabel.SetText("🟢 Status: Running...")
 		startBtn.Disable()
 		stopBtn.Enable()
-		dbPathEntry.Disable()
 		serverIPEntry.Disable()
-		browseBtn.Disable()
+		serverDBNameEntry.Disable()
 
 		uiLogger.Println("Sync Agent Started.")
 
 		config := Config{
-			LocalDBDSN:   dbPathEntry.Text,
-			ServerDBDSN:  serverIPEntry.Text,
+			LocalDBDSN:   fmt.Sprintf("server=%s;user id=sa;password=pass;database=%s", serverIPEntry.Text, serverDBNameEntry.Text),
+			ServerDBDSN:  fmt.Sprintf("server=%s;user id=sa;password=pass;database=%s", serverIPEntry.Text, serverDBNameEntry.Text),
 			PollInterval: 5 * time.Second,
 		}
 
@@ -120,9 +130,8 @@ func main() {
 		statusLabel.SetText("🔴 Status: Stopped")
 		stopBtn.Disable()
 		startBtn.Enable()
-		dbPathEntry.Enable()
 		serverIPEntry.Enable()
-		browseBtn.Enable()
+		serverDBNameEntry.Enable()
 		uiLogger.Println("Sync Agent Stopped by user.")
 	})
 	stopBtn.Disable()
