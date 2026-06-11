@@ -12,7 +12,7 @@ This document provides a comprehensive summary of the modernization process appl
 ### Phase 1: Analysis & Documentation
 1. **Reverse Engineering**: Analyzed the VB6 source code to extract the database structure, data dictionary, and core polling workflows.
 2. **Documentation Generation (Dual-Language)**:
-   - Generated complete `01_Data_Dictionary.md`, `02_Program_Spec.md`, and `03_SRS_Document.md` in both **Thai** and **English** within the `Revamp_Docs` folder.
+   - Generated complete `01_Data_Dictionary.md`, `02_Program_Spec.md`, and `03_SRS_Document.md` in both **Thai** and **English** within the `agy-revamp-docs` folder.
    - Generated PlantUML (`.puml`) diagrams for ER, Sequence, and Use Case architectures.
 3. **Diagram Formatting & Presentation**:
    - Organized diagrams into `UML`, `HTML`, and `PPTX` subfolders.
@@ -32,8 +32,8 @@ This document provides a comprehensive summary of the modernization process appl
 
 ## 3. Current Repository Structure
 - `Legacy_Source/`: Contains the original VB6 project files.
-- `Modern_Go_Source/`: Contains the new Go GUI Prototype (`main.go`, `go.mod`).
-- `Revamp_Docs/`: Contains all technical documentation separated by language (`TH`, `EN`) and format (`Specifications`, `Diagrams`).
+- `modern_go_source/`: Contains the new Go GUI Prototype (`main.go`, `go.mod`).
+- `agy-revamp-docs/`: Contains all technical documentation separated by language (`TH`, `EN`) and format (`Specifications`, `Diagrams`).
 - `.github/workflows/`: Contains the CI/CD pipeline for the Go build.
 
 ## 4. Next Steps for Developers

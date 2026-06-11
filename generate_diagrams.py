@@ -63,7 +63,7 @@ def create_pptx(puml_files, pptx_path, title):
     prs.save(pptx_path)
 
 for lang in ['EN', 'TH']:
-    base_dir = f"Revamp_Docs/{lang}/Diagrams"
+    base_dir = f"agy-revamp-docs/{lang}/Diagrams"
     uml_dir = f"{base_dir}/UML"
     html_dir = f"{base_dir}/HTML"
     pptx_dir = f"{base_dir}/PPTX"
