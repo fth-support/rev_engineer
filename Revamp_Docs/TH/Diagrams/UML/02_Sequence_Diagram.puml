@@ -1,0 +1,65 @@
+@startuml
+' Sequence Diagram สำหรับระบบ ServiceTransfer
+skinparam maxMessageSize 150
+
+actor "POS Local Timer\n(otmForm_Timer)" as Timer
+participant "wMain.frm" as Form
+participant "mMain.bas" as CoreModule
+database "Local DB\n(TPSTSalHD, TPSTSalDT...)" as LocalDB
+database "Server DB\n(Central Server)" as ServerDB
+
+== Workflow 1: กระบวนการซิงค์ข้อมูล (Local ส่งไปยัง Server) ==
+Timer -> Form : Trigger Tick Event
+activate Form
+Form -> CoreModule : SP_CHKbWebservice()
+activate CoreModule
+CoreModule --> Form : isOnline
+deactivate CoreModule
+
+alt isOnline == True
+    Form -> LocalDB : SELECT ข้อมูลธุรกรรม (ที่ FTStaSentOnOff = '0')
+    activate LocalDB
+    LocalDB --> Form : Transactions Data
+    deactivate LocalDB
+    
+    loop สำหรับแต่ละตารางธุรกรรม (HD, DT, RC, CD, Deposit)
+        Form -> ServerDB : INSERT / UPDATE ข้อมูลไปยัง Server
+        activate ServerDB
+        ServerDB --> Form : Success
+        deactivate ServerDB
+        
+        Form -> LocalDB : UPDATE FTStaSentOnOff = '1' (ซิงค์แล้ว)
+    end
+end
+deactivate Form
+
+== Workflow 2: การจัดการ Token สำหรับข้อมูลสำคัญ ==
+Form -> CoreModule : SP_PRCbToken(CardNo)
+activate CoreModule
+CoreModule -> ServerDB : SELECT FTToken FROM TPSTTokenLst WHERE FTValue = CardNo
+activate ServerDB
+ServerDB --> CoreModule : Token Value (ถ้ามี)
+deactivate ServerDB
+
+alt กรณีที่ยังไม่มี Token นี้
+    CoreModule -> ServerDB : INSERT INTO TPSTTokenLst สร้าง Token ใหม่
+end
+CoreModule --> Form : รหัส Token String
+deactivate CoreModule
+
+== Workflow 3: การอัปเดตคะแนนสะสมสมาชิก (Member Point) ==
+Timer -> Form : W_UPDxUpdatePoint()
+activate Form
+Form -> LocalDB : SELECT คะแนนจาก TPSTSalePoint WHERE FTRemark = '0'
+activate LocalDB
+LocalDB --> Form : ข้อมูล Member Point ที่ยังไม่ได้ประมวลผล
+deactivate LocalDB
+
+loop สำหรับรายการคะแนนแต่ละชุด (Group by Member)
+    Form -> ServerDB : UPDATE TCNMMallCard SET FCEarned = FCEarned + Points
+    Form -> ServerDB : INSERT INTO TPSTBPHis (บันทึกประวัติแต้ม)
+    Form -> LocalDB : UPDATE TPSTSalePoint SET FTRemark = '1' (ประมวลผลแล้ว)
+end
+deactivate Form
+
+@enduml

@@ -1,0 +1,35 @@
+@startuml
+' Use Case Diagram สำหรับระบบ ServiceTransfer
+left to right direction
+skinparam packageStyle rectangle
+
+actor "POS Terminal (เครื่องจุดขาย)" as POS
+actor "ServiceTransfer System (บริการซิงค์)" as SyncAgent
+actor "Central Server (เซิร์ฟเวอร์กลาง)" as Server
+
+rectangle "กระบวนการหลัก ServiceTransfer" {
+  usecase "ตรวจสอบการเชื่อมต่อเซิร์ฟเวอร์" as UC_CheckConn
+  usecase "ซิงค์ข้อมูลธุรกรรม\n(HD, DT, RC, CD)" as UC_SyncData
+  usecase "อัปเดตคะแนนสะสมสมาชิก" as UC_SyncPoints
+  usecase "แปลงข้อมูลส่วนบุคคลเป็น Token" as UC_Tokenize
+  usecase "ทำเครื่องหมายว่าซิงค์ข้อมูลแล้ว" as UC_MarkSync
+}
+
+POS --> UC_SyncData : สร้างข้อมูลธุรกรรมตอน Offline
+POS --> UC_SyncPoints : สะสมคะแนนให้กับสมาชิก
+
+SyncAgent --> UC_CheckConn
+SyncAgent --> UC_SyncData
+SyncAgent --> UC_SyncPoints
+SyncAgent --> UC_Tokenize
+SyncAgent --> UC_MarkSync
+
+UC_SyncData ..> UC_Tokenize : <<includes>> (ถ้ามีข้อมูลเลขบัตร/บุคคล)
+UC_SyncData ..> UC_MarkSync : <<includes>> (เมื่อซิงค์ข้อมูลสำเร็จ)
+
+UC_CheckConn --> Server : ส่ง Ping / เช็ค Connection
+UC_SyncData --> Server : บันทึกข้อมูลเข้าตาราง (Insert/Update)
+UC_SyncPoints --> Server : อัปเดตตาราง TCNMMallCard
+UC_Tokenize --> Server : บันทึก Token ลงตารางแมปปิ้ง
+
+@enduml

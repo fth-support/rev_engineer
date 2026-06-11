@@ -1,0 +1,68 @@
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+table { border-collapse: collapse; width: 100%; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+th, td { border: 1px solid black; padding: 8px; text-align: left; }
+h1, h2, h3, h4, h5, p, li { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
+pre { background-color: #f4f4f4; padding: 10px; border-radius: 5px; }
+code { font-family: Consolas, "Courier New", monospace; }
+</style>
+</head>
+<body>
+<h1>เอกสารข้อกำหนดซอฟต์แวร์ (SRS) - บทสรุปผู้บริหาร</h1>
+<h2>ภาพรวมของระบบ (System Overview)</h2>
+<p>แอปพลิเคชัน <strong>ServiceTransfer</strong> คือบริการซิงโครไนซ์ข้อมูลแบบเบื้องหลัง (Background Data Synchronization Service) สำหรับสถาปัตยกรรมระบบเครื่องจุดขาย (POS) เดิมถูกพัฒนาด้วยภาษา Visual Basic 6 ทำหน้าที่เป็นคนกลาง (Middleware) ระหว่างเครื่อง POS สาขากับฐานข้อมูลส่วนกลาง (Central Server) โดยมีหน้าที่หลักเพื่อส่งข้อมูลธุรกรรมที่ค้างอยู่ (Offline) และคะแนนสะสมสมาชิกไปยังฐานข้อมูลหลักทันทีที่เครือข่ายสามารถเชื่อมต่อได้ พร้อมทั้งมีระบบแปลงข้อมูลอ่อนไหวเป็น Token (Tokenization) ก่อนจัดเก็บ</p>
+<h3>โครงสร้างไฟล์ต้นฉบับ (Legacy Codebase Structure)</h3>
+<p>โครงสร้างโปรเจกต์ต้นฉบับ (Visual Basic 6) เพื่อให้ทีมพัฒนาใหม่ใช้เป็นข้อมูลอ้างอิงในการแกะรอยระบบ (Traceability):
+<code>text
+Legacy_Source
+├── ServiceTranfer.vbp      # ไฟล์โปรเจกต์หลัก เก็บการตั้งค่าคอมไพล์และ Library ที่อ้างอิง
+├── ServiceTranfer.vbw      # ไฟล์ตั้งค่า Workspace (เก็บสถานะหน้าต่างที่เปิดค้างไว้ใน Editor)
+├── Forms/
+│   ├── wMain.frm           # ไฟล์ Form หลัก (UI) บรรจุลอจิกการวนลูปซิงค์ข้อมูล (Timer) และการอัปเดต DB
+│   └── wMain.frx           # ไฟล์ Resource ของ Form หลัก (รูปภาพ, ไอคอน, ข้อมูล Binary)
+└── Modules/
+    ├── mMain.bas           # โมดูลระบบหลัก บรรจุฟังก์ชันส่วนกลาง เช่น การต่อ Database, การเช็คออนไลน์, และระบบ Token
+    ├── Module1.bas         # โมดูลย่อย 1 (มักบรรจุฟังก์ชันช่วยเหลือหรือตัวแปร Global ต่างๆ)
+    ├── Module2.bas         # โมดูลย่อย 2 (ฟังก์ชันช่วยเหลือเฉพาะทาง)
+    ├── Module3.bas         # โมดูลย่อย 3
+    └── Module4.bas         # โมดูลย่อย 4</code>
+<em>ข้อสังเกต: ตรรกะการทำงาน (Core Logic) ส่วนใหญ่จะกระจุกตัวอยู่ที่ไฟล์ <code>wMain.frm</code> (ควบคุมการทำงานหลัก) และ <code>mMain.bas</code> (ฟังก์ชันเชื่อมต่อส่วนกลาง)</em></p>
+<h2>ฟีเจอร์ที่สำคัญ (Key Features)</h2>
+<ul>
+<li><strong>Automated Background Sync:</strong> มีระบบตั้งเวลา (Timer-based Polling) เพื่อคอยตรวจสอบข้อมูลที่ยังไม่ถูกส่งขึ้นเซิร์ฟเวอร์อย่างสม่ำเสมอ</li>
+<li><strong>Resilient Data Transfer:</strong> รองรับระบบ Offline โดยมีการใช้แฟล็ก <code>FTStaSentOnOff</code> ในฐานข้อมูลฝั่ง Local เพื่อเช็คสถานะการส่ง หากส่งไม่สำเร็จจะมีการ Retry เมื่อเครือข่ายกลับมา</li>
+<li><strong>Dynamic SQL Generation:</strong> ระบบใช้ ADODB Recordsets ในการสร้างสคริปต์ <code>INSERT</code> และ <code>UPDATE</code> แบบอัตโนมัติ ทำให้ลดการฮาร์ดโค้ดโครงสร้างของตารางธุรกรรมย่อยๆ เช่น Header, Detail, Receipt</li>
+<li><strong>Member Point Management:</strong> มีระบบคำนวณและรวบรวมคะแนนฝั่ง Local เพื่อไปส่งยอดบวกเข้าที่ฐานข้อมูลสมาชิกกลาง (<code>TCNMMallCard</code>, <code>TPSTBPHis</code>) ได้อย่างถูกต้อง</li>
+<li><strong>Data Tokenization:</strong> สามารถเปลี่ยนเลขบัตรเครดิตหรือข้อมูลสำคัญของสมาชิกให้เป็น Token (<code>TPSTTokenLst</code>) โดยอัตโนมัติ เพื่อให้เป็นไปตามมาตรฐานการจัดการข้อมูลส่วนบุคคล</li>
+</ul>
+<h2>บทบาทและสิทธิ์ผู้ใช้งาน (User Roles &amp; Permissions)</h2>
+<ul>
+<li><strong>POS Terminal (Actor เครื่องจุดขาย):</strong> เป็นผู้สร้างข้อมูลธุรกรรมในระบบ จัดเก็บไว้ในฐานข้อมูล Local (SQL Express/MS Access) มีสิทธิ์เขียนข้อมูลลง Local Tables</li>
+<li><strong>ServiceTransfer Agent (System Actor ตัวซิงค์ข้อมูล):</strong> ตัวโปรแกรมบริการนี้เอง ที่จำเป็นต้องมีสิทธิ์ Read/Write ทั้งกับฐานข้อมูล Local และ ฐานข้อมูล Server ส่วนกลาง</li>
+<li><strong>Central Server (Actor ระบบกลาง):</strong> เป็นฐานข้อมูลเป้าหมายหลัก คอยรับการบันทึกข้อมูล และมีหน้าที่เก็บข้อมูลส่วนกลางแบบองค์รวม</li>
+</ul>
+<h2>คำแนะนำสำหรับการพัฒนาและปรับปรุงระบบ (Revamp Recommendations)</h2>
+<p>จากการวิเคราะห์โค้ด มีคำแนะนำในการปรับปรุงสถาปัตยกรรมสู่ยุคปัจจุบัน (Modernization) ดังนี้:</p>
+<ol>
+<li><strong>เปลี่ยนจากการวนรอบ (Polling) ไปใช้สถาปัตยกรรมแบบ Event-Driven / Message Queue:</strong></li>
+<li><em>สถานะปัจจุบัน:</em> แอพ VB6 ตัวนี้ใช้ Timer (<code>otmForm_Timer</code>) วนลูปดึงข้อมูลจาก DB ทุกๆ ไม่กี่วินาที ทำให้กินทรัพยากร CPU และ I/O โดยไม่จำเป็น</li>
+<li>
+<p><em>คำแนะนำ:</em> นำ Message Broker (เช่น RabbitMQ, Apache Kafka, หรือ AWS SQS) มาใช้แทน เมื่อ POS สร้างบิล ให้ส่ง Event เข้า Queue ทันที แล้วให้ Microservice ตัวใหม่คอยรับไปบันทึกลง DB หลัก</p>
+</li>
+<li>
+<p><strong>เปลี่ยนไปใช้ RESTful APIs / gRPC แทนการต่อตรงเข้าฐานข้อมูล (Direct DB Connection):</strong></p>
+</li>
+<li><em>สถานะปัจจุบัน:</em> ตัวแอปต่อตรงเข้า Database เซิร์ฟเวอร์ผ่าน ODBC/OLEDB ซึ่งเสี่ยงต่อความปลอดภัย และง่ายต่อการหลุดเมื่อ Network ไม่เสถียร</li>
+<li>
+<p><em>คำแนะนำ:</em> สร้าง API Gateway ที่เซิร์ฟเวอร์ ตัว Agent ที่สาขาเพียงแค่เรียกใช้ API (HTTPS) เพื่อโยนข้อมูลขึ้นไป การทำเช่นนี้ช่วยให้จัดการ Load Balance ได้ดีขึ้นและปลอดภัยมากขึ้น</p>
+</li>
+<li>
+<p><strong>เขียนระบบใหม่ด้วยภาษาที่ทันสมัย (Retire VB6):</strong></p>
+</li>
+<li><em>สถานะปัจจุบัน:</em> โค้ด Visual Basic 6 ล้าสมัยมาก ขาดการสนับสนุนไลบรารีสมัยใหม่ ไม่มี Framework สำหรับทำ CI/CD หรือ Automated Test</li>
+<li><em>คำแนะนำ:</em> พัฒนา ServiceTransfer ตัวนี้ใหม่ด้วยภาษาอย่าง Go (ซึ่งคอมไพล์แล้วกินทรัพยากรน้อยมาก) หรือ C# (.NET Core Worker Service) ซึ่งเหมาะแก่การเขียน Background Service นำมาซึ่งความเสถียรและประสิทธิภาพที่ดีกว่า</li>
+</ol>
+</body>
+</html>

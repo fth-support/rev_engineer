@@ -1,0 +1,35 @@
+@startuml
+' Use Case Diagram for ServiceTransfer System
+left to right direction
+skinparam packageStyle rectangle
+
+actor "POS Terminal (Local)" as POS
+actor "ServiceTransfer System" as SyncAgent
+actor "Central Server" as Server
+
+rectangle "ServiceTransfer Core" {
+  usecase "Check Server Connection" as UC_CheckConn
+  usecase "Sync Transaction Data\n(HD, DT, RC, CD)" as UC_SyncData
+  usecase "Update Member Points" as UC_SyncPoints
+  usecase "Tokenize Sensitive Data" as UC_Tokenize
+  usecase "Mark Data as Synced" as UC_MarkSync
+}
+
+POS --> UC_SyncData : Generates offline transactions
+POS --> UC_SyncPoints : Accumulates member points
+
+SyncAgent --> UC_CheckConn
+SyncAgent --> UC_SyncData
+SyncAgent --> UC_SyncPoints
+SyncAgent --> UC_Tokenize
+SyncAgent --> UC_MarkSync
+
+UC_SyncData ..> UC_Tokenize : <<includes>> (if sensitive data exists)
+UC_SyncData ..> UC_MarkSync : <<includes>> (on success)
+
+UC_CheckConn --> Server : Pings / Connects
+UC_SyncData --> Server : Inserts/Updates Data
+UC_SyncPoints --> Server : Updates TCNMMallCard
+UC_Tokenize --> Server : Inserts Token Mapping
+
+@enduml

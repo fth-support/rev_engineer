@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Reverse-Engineering & Documentation Framework</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        h1, h2, h3, h4 {
+            color: #0d47a1;
+            margin-top: 1.5em;
+        }
+        h1 { border-bottom: 2px solid #0d47a1; padding-bottom: 0.5rem; }
+        h2 { border-bottom: 1px solid #e0e0e0; padding-bottom: 0.3rem; }
+        pre {
+            background-color: #f5f5f5;
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+        }
+        code {
+            font-family: "Courier New", Courier, monospace;
+            background-color: #f5f5f5;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        ul, ol { margin-bottom: 1rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>System Reverse-Engineering & Documentation Prompt</h1>
+        <p><strong>Role:</strong> Expert Enterprise Solution Architect and System Analyst</p>
+    </header>
+
+    <section id="role-and-objective">
+        <h2>Role & Objective</h2>
+        <p>Your primary objective is to reverse-engineer an existing, undocumented codebase to generate comprehensive technical and business documentation.</p>
+        
+        <h3>Project Goal</h3>
+        <p>The ultimate goal of this documentation is to prepare for a <strong>System Revamp/Modernization</strong>. Therefore, your analysis must:</p>
+        <ul>
+            <li>Clearly identify current business logic, data structures, and system flows.</li>
+            <li>Highlight any hidden dependencies, legacy constraints, or bottlenecks found in the code.</li>
+            <li>Output the documentation in clean, structured Markdown and PlantUML formats.</li>
+        </ul>
+
+        <h3>Operating Rules</h3>
+        <ol>
+            <li><strong>No Hallucination:</strong> Rely ONLY on the provided source code and file structures. Do not invent features or tables that do not exist in the code.</li>
+            <li><strong>Step-by-Step Focus:</strong> Only generate the specific output requested in the current prompt. Do not jump ahead.</li>
+            <li><strong>Format strictly:</strong> Output diagrams exclusively in valid PlantUML format enclosed in <code>```plantuml</code> blocks, and text in standard Markdown.</li>
+        </ol>
+    </section>
+
+    <section id="documentation-requirements">
+        <h2>Documentation Formatting Requirements</h2>
+        <p>When generating documentation for this system, you MUST strictly adhere to the following formatting rules:</p>
+        <ol>
+            <li><strong>Dual Language (TH, ENG):</strong> Every piece of documentation must always be generated in both Thai and English versions.</li>
+            <li><strong>Professional Format & Table of Contents:</strong> Documents must be formatted professionally with a clear Table of Contents (TOC) linking to sections.</li>
+            <li><strong>Visual Aids (Images/Diagrams):</strong> Whenever describing a system flow or workflow, you must include or embed an image of the diagram (or a link to the corresponding PlantUML/HTML visual) to accompany the text.</li>
+            <li><strong>Separation of Concerns:</strong> Diagrams and flows must be saved in separate folders categorized by format: <code>HTML</code>, <code>UML</code>, and <code>PPTX</code>.</li>
+        </ol>
+    </section>
+
+    <section id="task-1-data-architecture">
+        <h2>Task: Data Architecture Extraction</h2>
+        
+        <h3>Input Context</h3>
+        <p>Please analyze the provided Database scripts, ORM models, and Entity files.</p>
+        
+        <h3>Required Output</h3>
+        <p>Generate the following two sections:</p>
+        
+        <h4>1. ER Diagram (PlantUML)</h4>
+        <ul>
+            <li>Create an Entity-Relationship diagram representing all tables, primary keys, foreign keys, and relationships (1:1, 1:N, N:M).</li>
+            <li>Output must be in valid PlantUML format (<code>```plantuml</code>).</li>
+        </ul>
+
+        <h4>2. Data Dictionary</h4>
+        <ul>
+            <li>Create a Markdown table detailing the database schema.</li>
+            <li>Include columns: <code>Table Name</code>, <code>Column Name</code>, <code>Data Type</code>, <code>Constraints (PK/FK/Nullable)</code>, and <code>Inferred Description/Label</code>.</li>
+        </ul>
+    </section>
+
+    <section id="task-2-system-design">
+        <h2>Task: System Design & Specification Extraction</h2>
+        
+        <h3>Input Context</h3>
+        <p>Please analyze the provided Controller, Service, and API Route files.<br>
+        <em>Note:</em> Use the Data Architecture from Step 1 as your reference for data structures.</p>
+        
+        <h3>Required Output</h3>
+        <p>Generate the following two sections:</p>
+        
+        <h4>1. Detailed Sequence Diagram (DSD)</h4>
+        <ul>
+            <li>Identify the 3 most critical workflows (e.g., Authentication, Main Transaction, Data Submission) from the code.</li>
+            <li>Create a Sequence Diagram for EACH workflow showing the interaction between Client, Controller, Service, and Database.</li>
+            <li>Output must be in valid PlantUML format (<code>```plantuml</code>).</li>
+        </ul>
+
+        <h4>2. Chapter Program Specification</h4>
+        <ul>
+            <li>Document all identified API endpoints and core functions.</li>
+            <li>Format as Markdown with the following details per function/endpoint:
+                <ul>
+                    <li><code>Function Name / Endpoint Path</code></li>
+                    <li><code>Method (GET/POST/PUT/DELETE)</code></li>
+                    <li><code>Request Payload / Parameters</code></li>
+                    <li><code>Response Payload</code></li>
+                    <li><code>Core Logic Summary (Step-by-step plain text)</code></li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+
+    <section id="task-3-business-requirements">
+        <h2>Task: Business Requirements & User Flow Extraction</h2>
+        
+        <h3>Input Context</h3>
+        <p>Please analyze the provided Project Structure (<code>tree.txt</code>), Frontend Routes (if any), and the outputs generated from Step 1 and Step 2.</p>
+        
+        <h3>Required Output</h3>
+        <p>Generate the following two sections to facilitate the System Revamp:</p>
+        
+        <h4>1. User Diagram / Use Case (PlantUML)</h4>
+        <ul>
+            <li>Identify all user roles (Actors) and system components based on the logic.</li>
+            <li>Create a Use Case Diagram mapping which Actor can perform which actions.</li>
+            <li>Output must be in valid PlantUML format (<code>```plantuml</code>).</li>
+        </ul>
+
+        <h4>2. Software Requirements Specification (SRS) - Executive Summary</h4>
+        <ul>
+            <li>Provide a high-level Markdown document summarizing what this system currently does.</li>
+            <li>Include sections:
+                <ul>
+                    <li><code>System Overview</code> (What is this app?)</li>
+                    <li><code>Key Features</code> (Bullet points of main capabilities)</li>
+                    <li><code>User Roles & Permissions</code></li>
+                    <li><code>Revamp Recommendations</code> (Based on the code analysis, what are 2-3 potential areas for improvement, refactoring, or modernization?)</li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+
+    <section id="post-processing-scripts">
+        <h2>Post-Processing Automation Scripts</h2>
+        <p>The following shell script references explain how the outputs generated by the AI will be parsed and organized into the Revamp Documentation directory structure.</p>
+
+<pre><code class="language-bash"># บันทึกคำตอบทั้งหมดจาก AI (สมมติว่าอยู่ในตัวแปร $AI_RESPONSE) ลงไฟล์ชั่วคราว
+echo "$AI_RESPONSE" > temp_output.txt
+
+# สกัดเฉพาะ PlantUML ไปเป็นไฟล์ .puml สำหรับสร้างภาพ Diagram
+awk '/^```plantuml/{flag=1; next} /^```/{flag=0} flag' temp_output.txt > output_diagram.puml
+
+# สกัดเฉพาะเอกสาร Markdown (ลบ PlantUML ออก)
+awk '/^```plantuml/{flag=1} !flag {print} /^```/{if(flag) flag=0; next}' temp_output.txt > output_document.md
+
+# สร้างโฟลเดอร์สำหรับเก็บเอกสาร Revamp
+mkdir -p ./Revamp_Docs/Diagrams
+mkdir -p ./Revamp_Docs/Specifications
+
+# (ตัวอย่าง) หลังจากได้รับผลลัพธ์จาก Step 1
+cat step1_result.md > ./Revamp_Docs/Specifications/01_Data_Dictionary.md
+cat step1_diagram.puml > ./Revamp_Docs/Diagrams/01_ER_Diagram.puml
+
+# (ตัวอย่าง) หลังจากได้รับผลลัพธ์จาก Step 2
+cat step2_result.md > ./Revamp_Docs/Specifications/02_Program_Spec.md
+cat step2_diagram.puml > ./Revamp_Docs/Diagrams/02_Sequence_Diagram.puml
+
+# (ตัวอย่าง) หลังจากได้รับผลลัพธ์จาก Step 3
+cat step3_result.md > ./Revamp_Docs/Specifications/03_SRS_Document.md
+cat step3_diagram.puml > ./Revamp_Docs/Diagrams/03_UseCase_Diagram.puml
+</code></pre>
+    </section>
+
+</body>
+</html>

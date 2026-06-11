@@ -1,0 +1,124 @@
+@startuml
+' ER Diagram for ServiceTransfer System
+skinparam linetype ortho
+
+entity "TPSTSalHD" as SalHD {
+  * FTTmnNum : varchar
+  * FTShdTransNo : varchar
+  * FDShdTransDate : date
+  --
+  FTShdTransType : varchar
+  FTShdStaDoc : varchar
+  FTShdStaPrcGL : varchar
+}
+
+entity "TPSTSalDT" as SalDT {
+  * FTTmnNum : varchar
+  * FTShdTransNo : varchar
+  * FDShdTransDate : date
+  * FNSdtSeqNo : numeric
+  --
+  FTStaSentOnOff : varchar
+}
+
+entity "TPSTSalRC" as SalRC {
+  * FTTmnNum : varchar
+  * FTShdTransNo : varchar
+  * FDShdTransDate : date
+  * FNSrcSeqNo : numeric
+  --
+  FTStaSentOnOff : varchar
+}
+
+entity "TPSTSalCD" as SalCD {
+  * FTTmnNum : varchar
+  * FTShdTransNo : varchar
+  * FDShdTransDate : date
+  * FNScdSeqNo : numeric
+  * FNSdtSeqNo : numeric
+  --
+  FTStaSentOnOff : varchar
+}
+
+entity "TPSTSalePoint" as SalePoint {
+  * FTTmnNum : varchar
+  * FTShdTransNo : varchar
+  * FDShdTransDate : date
+  * FTSpoMemID : varchar
+  --
+  FCSpoPoint : numeric
+  FTStaSentOnOff : varchar
+  FTRemark : varchar
+  FDDateUpd : date
+  FTWhoUpd : varchar
+}
+
+entity "TPSTTokenLst" as TokenLst {
+  * FTToken : varchar
+  * FTValue : varchar
+  * FTTblName : varchar
+  * FTFldName : varchar
+  --
+  FDDateIns : date
+  FTWhoIns : varchar
+  FTTmnNum : varchar
+  FTShdTransNo : varchar
+  FDShdTransDate : date
+  FNStatus : numeric
+  FTSrvName : varchar
+  FTMcdCode : varchar
+  FDMcdExpDate : date
+}
+
+entity "TCNMMallCard" as MallCard {
+  * FTMcdCode : varchar
+  * FDMcdExpDate : date
+  --
+  FTMcdStaAct : varchar
+  FTMcdName : varchar
+  FDMcdBirthday : date
+  FCMcdAmountPoint : numeric
+  FCMcdTotalPoint : numeric
+  FCEarned : numeric
+  FCBalance : numeric
+  FDDateUpd : date
+  FTTimeUpd : varchar
+  FTWhoUpd : varchar
+}
+
+entity "TPSTBPHis" as BPHis {
+  * FTTmnNum : varchar
+  * FTShdTransNo : varchar
+  * FDShdTransDate : date
+  * FTShdMemberID : varchar
+  --
+  FTShdTransTime : varchar
+  FCCstCardPoint : numeric
+  FCTotalBP : numeric
+  FCBalanceBP : numeric
+  FDDateUpd : date
+  FTTimeUpd : varchar
+}
+
+entity "TCNMTerminalMtn" as TerminalMtn {
+  * FTTmnCode : varchar
+  --
+  FTTmnNum : varchar
+  FTTmnName : varchar
+}
+
+entity "TSysSync" as SysSync {
+  * FTSscTable : varchar
+  * FTSscDocType : varchar
+  * FTSscTableDest : varchar
+  --
+  FTSscStaActive : varchar
+}
+
+SalHD ||--o{ SalDT
+SalHD ||--o{ SalRC
+SalHD ||--o{ SalCD
+SalHD ||--o{ SalePoint
+SalHD ||--o{ BPHis
+MallCard ||--o{ TokenLst
+@enduml

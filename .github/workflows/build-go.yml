@@ -1,0 +1,37 @@
+name: Build Go Executable
+
+on:
+  push:
+    branches: [ "main", "master" ]
+    paths:
+      - 'Modern_Go_Source/**'
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        working-directory: ./Modern_Go_Source
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.22'
+
+    - name: Build GUI Executable
+      env:
+        CGO_ENABLED: 1
+      run: go build -v -ldflags="-H windowsgui" -o ServiceTransfer-Modern.exe
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ServiceTransfer-Modern-EXE
+        path: ./Modern_Go_Source/ServiceTransfer-Modern.exe

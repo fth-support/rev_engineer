@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PlantUML Diagram</title>
+</head>
+<body>
+    <h2>Diagram from 02_Sequence_Diagram.puml</h2>
+    <img src="http://www.plantuml.com/plantuml/svg/~1hVXLbtswELzrKxa52EGTtGnRiwEFbSQZDho_YDJNDwGCtbR2CEukS9Jp068vSPpB1TZ6kECZO7uzwx36i7Go7bqpkw4w-rkmWRLkAhcaG5grDYz0qyiJa5RmThrYm7HUJGYp5ApdUIO_h2QMLoiJPwTXnz8kCZZWaTibjBncqxJr4KIh_SS7yjZ9pZtn_31-BmjCVrJCbUUpVigtnP0aopBXc934AAdo7zd-f4bG72dK01BV65qSCi3O0BCchbL57ZPs8gnjDOtBfgGbZc6vrq5CdR-X30ZI1zDpAM1IWo21F2HLN6zz2yRJU3hUejmv1S-47kGOFoG9yfJFKyn-oBVKQjcQsWqbA9I08S3D5Y1vDXrAtVgsSAMX5RKKV5LWKShe0VLo3sdd3kStQg_Y5DkbfJs90syEM-qe72GRKBHocl9TmLGshaSkomOgBGu7i4E0Ba7XlABAwF_ebJVzRIr7IuPgR8TlUtJAt8-ZRUbSjuV4PocUOh865z7BrtxWe_fjNlvEsJXPiesDI7ox3r9qpVYODYTlS4wHjrOaoOtmIOcXMM0uIHNrWikjbOAVN7c9ZOjB3YgVUw7v4WGSf-VFK-2OVauv3YRsd3bZou7YuizJmF1M1NcB_oDeXvsNqUO1rzseRbJK3BOl9xPVGt6PPeBqSRIGKKtayIUb0lMzN5lmMx_dzVBXI_X_oWvJuRmWPg8V-9Px0NvSf94bC4-DYuoa-o71miCFUCU5VKelaotlSO0TxI3vneuGOwSNxhyKH3eMMy_XSdqbKbgb8XGLrhf3uMNCAWa1kItTLotP4VMPhtTMSMNECWnhYVW58CP3xePzwyT_HfZ9bOz81oVxYFIfbvayM6xDip3uU2pQL4NhkwOvHfFpi7R3xBGPJm1vDmNM5KjWDRPJv_VeNhoOsa7dTAArOPSzArWkCtL98t2myVO5_j3K28lAGOgGLgNhrNJv4UY4abe2cp5IpNt157jlvpCs3D_tXw==" alt="UML Diagram" />
+    <hr>
+    <h3>Source Code:</h3>
+    <pre><code>@startuml
+' Sequence Diagram for ServiceTransfer System
+skinparam maxMessageSize 150
+
+actor "POS Local Timer\n(otmForm_Timer)" as Timer
+participant "wMain.frm" as Form
+participant "mMain.bas" as CoreModule
+database "Local DB\n(TPSTSalHD, TPSTSalDT...)" as LocalDB
+database "Server DB\n(Central Server)" as ServerDB
+
+== Workflow 1: Data Synchronization (Local to Server) ==
+Timer -> Form : Trigger Tick Event
+activate Form
+Form -> CoreModule : SP_CHKbWebservice()
+activate CoreModule
+CoreModule --> Form : isOnline
+deactivate CoreModule
+
+alt isOnline == True
+    Form -> LocalDB : SELECT Transactions (FTStaSentOnOff = '0')
+    activate LocalDB
+    LocalDB --> Form : Transactions Data
+    deactivate LocalDB
+    
+    loop For each Transaction Table (HD, DT, RC, CD, Deposit)
+        Form -> ServerDB : INSERT / UPDATE Transaction Data
+        activate ServerDB
+        ServerDB --> Form : Success
+        deactivate ServerDB
+        
+        Form -> LocalDB : UPDATE FTStaSentOnOff = '1'
+    end
+end
+deactivate Form
+
+== Workflow 2: Token Handling ==
+Form -> CoreModule : SP_PRCbToken(CardNo)
+activate CoreModule
+CoreModule -> ServerDB : SELECT FTToken FROM TPSTTokenLst WHERE FTValue = CardNo
+activate ServerDB
+ServerDB --> CoreModule : Token Value
+deactivate ServerDB
+
+alt Token NOT EXISTS
+    CoreModule -> ServerDB : INSERT INTO TPSTTokenLst
+end
+CoreModule --> Form : Token String
+deactivate CoreModule
+
+== Workflow 3: Member Point Update ==
+Timer -> Form : W_UPDxUpdatePoint()
+activate Form
+Form -> LocalDB : SELECT Points FROM TPSTSalePoint WHERE FTRemark = '0'
+activate LocalDB
+LocalDB --> Form : Member Point Data
+deactivate LocalDB
+
+loop For each Member Point Transaction
+    Form -> ServerDB : UPDATE TCNMMallCard SET FCEarned = FCEarned + Points
+    Form -> ServerDB : INSERT INTO TPSTBPHis (Point History)
+    Form -> LocalDB : UPDATE TPSTSalePoint SET FTRemark = '1'
+end
+deactivate Form
+
+@enduml
+</code></pre>
+</body>
+</html>
