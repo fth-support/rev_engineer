@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiceTransfer — System Architecture</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#f0f4f8;padding:2rem}
+h1{text-align:center;color:#0d47a1;margin-bottom:.3rem}
+.sub{text-align:center;color:#666;margin-bottom:2rem}
+.diagram{max-width:1000px;margin:0 auto;display:grid;grid-template-columns:1fr 100px 1fr;grid-template-rows:auto auto auto;gap:20px;align-items:center}
+.box{background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.1);padding:1.2rem;position:relative}
+.box h3{margin-bottom:.8rem;font-size:15px}
+.box-title{font-weight:700;font-size:14px;text-align:center;padding:8px;border-radius:6px 6px 0 0;margin:-1.2rem -1.2rem .8rem;color:#fff}
+.branch{border:2px solid #1565c0}
+.branch .box-title{background:#1565c0}
+.hq{border:2px solid #2e7d32}
+.hq .box-title{background:#2e7d32}
+.ext{border:2px solid #e65100}
+.ext .box-title{background:#e65100}
+.db-list{list-style:none;font-size:12px;font-family:monospace}
+.db-list li{padding:3px 8px;margin:2px 0;background:#f5f5f5;border-radius:4px;display:flex;justify-content:space-between}
+.db-list li span{color:#888;font-size:11px}
+.arrow{text-align:center;color:#666;font-size:24px;font-weight:700}
+.arrow-label{font-size:10px;color:#888;display:block}
+.config-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px}
+.config-icon{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;flex-shrink:0}
+.section{max-width:1000px;margin:2rem auto 0;background:#fff;border-radius:10px;padding:1.5rem;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.section h2{color:#0d47a1;font-size:16px;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid #e0e0e0}
+.flow-step{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid #f5f5f5}
+.flow-step:last-child{border-bottom:none}
+.step-num{width:28px;height:28px;border-radius:50%;background:#1565c0;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.step-text{font-size:13px;line-height:1.5}
+.step-text strong{color:#0d47a1}
+.timer-badge{display:inline-block;background:#e65100;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+</style>
+</head>
+<body>
+<h1>System Architecture</h1>
+<p class="sub">ServiceTransfer v5.1810.1 — Deployment & Component Overview</p>
+
+<div class="diagram">
+<!-- Branch POS -->
+<div class="box branch" style="grid-column:1;grid-row:1/3">
+<div class="box-title">POS Terminal (Branch)</div>
+<h3>ServiceTransfer.exe <span class="timer-badge">Timer: 500ms</span></h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+<div>
+<div style="font-size:11px;color:#888;margin-bottom:4px">Core Files</div>
+<ul class="db-list">
+<li>wMain.frm <span>1,763 lines</span></li>
+<li>mMain.bas <span>1,099 lines</span></li>
+<li>Module4.bas <span>SleepEx</span></li>
+</ul>
+</div>
+<div>
+<div style="font-size:11px;color:#888;margin-bottom:4px">Dependencies</div>
+<ul class="db-list">
+<li>AdaUT.dll <span>Utility</span></li>
+<li>ADODB 2.7 <span>DB</span></li>
+<li>MSSOAP 3.0 <span>Token</span></li>
+</ul>
+</div>
+</div>
+<div style="font-size:11px;color:#888;margin-bottom:4px">SQL Server Express (Local DB)</div>
+<ul class="db-list">
+<li>TPSTSalHD / DT / RC / CD <span>Sales</span></li>
+<li>TPSTSalePoint <span>Points</span></li>
+<li>TPSTDepositHD / DT / RC / CD <span>Deposit</span></li>
+<li>TPSTHoldHD / DT / CD <span>Hold</span></li>
+<li>TPSTVoucherHD / RC <span>Voucher</span></li>
+<li>TPSTCV / TPSTLogDT <span>CV & Log</span></li>
+</ul>
+<div style="margin-top:10px">
+<div style="font-size:11px;color:#888;margin-bottom:4px">Local Configuration</div>
+<div class="config-item"><div class="config-icon" style="background:#78909c">A</div> AdaIni.Ada — Access DB (connection strings)</div>
+<div class="config-item"><div class="config-icon" style="background:#5c6bc0">R</div> Registry: AdaPosMall\POSFront (runtime state)</div>
+<div class="config-item"><div class="config-icon" style="background:#26a69a">L</div> LOG\TransferOffline*.Log (operation logs)</div>
+</div>
+</div>
+
+<!-- Arrow -->
+<div class="arrow" style="grid-column:2;grid-row:1/3">
+⇄<br><span class="arrow-label">SQLOLEDB.1<br>LAN/WAN</span>
+</div>
+
+<!-- Central Server -->
+<div class="box hq" style="grid-column:3;grid-row:1">
+<div class="box-title">Central Server (HQ)</div>
+<div style="font-size:11px;color:#888;margin-bottom:4px">SQL Server (Central DB)</div>
+<ul class="db-list">
+<li>TPSTSal* <span>Sales (copy)</span></li>
+<li>TSysSync <span>Sync Config</span></li>
+<li>TSysConfig <span>System Config</span></li>
+<li>TCNMTerminalMtn <span>Terminal Map</span></li>
+<li>TCNMStorePara <span>Store Params</span></li>
+<li>TPSTTokenLst <span>Token Map</span></li>
+</ul>
+<div style="margin-top:10px;font-size:11px;color:#888;margin-bottom:4px">SQL Server (Member DB)</div>
+<ul class="db-list">
+<li>TCNMMallCard <span>Member Cards</span></li>
+<li>TPSTBPHis <span>Point History</span></li>
+<li>TPSTTokenLst <span>Token Map</span></li>
+</ul>
+</div>
+
+<!-- SafeNet -->
+<div class="box ext" style="grid-column:3;grid-row:2">
+<div class="box-title">SafeNet Tokenizer</div>
+<div style="font-size:12px">
+<div class="config-item"><div class="config-icon" style="background:#e65100">S</div> MSSOAP.SoapClient30 (SOAP/HTTP)</div>
+<div class="config-item"><strong>InsertToken()</strong> — Card → Token</div>
+<div class="config-item"><strong>GetValue()</strong> — Token → Card</div>
+<div class="config-item">Format: FIRST_SIX_TOKEN</div>
+<div class="config-item">Timeout: 10,000ms</div>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2>Main Processing Flow (otmForm_Timer — every 500ms)</h2>
+<div class="flow-step"><div class="step-num">1</div><div class="step-text"><strong>Pre-check:</strong> Disable timer, verify Log file, read Registry (SentSale, Online status)</div></div>
+<div class="flow-step"><div class="step-num">2</div><div class="step-text"><strong>Connect:</strong> W_DATbConnectOrChk() to Central Server + health check (SELECT FTTmnCode FROM TCNMTerminalMtn)</div></div>
+<div class="flow-step"><div class="step-num">3</div><div class="step-text"><strong>Store Check:</strong> W_GETbStoreOpen() verifies TsysTerminalSta.FTTmsOpnStore = 'Y'</div></div>
+<div class="flow-step"><div class="step-num">4</div><div class="step-text"><strong>Config:</strong> Fetch TSysSync table list, Terminal Number, Sale Date</div></div>
+<div class="flow-step"><div class="step-num">5</div><div class="step-text"><strong>Sync Loop:</strong> For each table in TSysSync → fetch records where FTStaSentOnOff='0' → INSERT/UPDATE to Server with tokenization → mark as '1'</div></div>
+<div class="flow-step"><div class="step-num">6</div><div class="step-text"><strong>Points:</strong> W_UPDxUpdatePoint() — SUM points per member, tokenize member ID, UPDATE/INSERT TCNMMallCard, log to TPSTBPHis</div></div>
+<div class="flow-step"><div class="step-num">7</div><div class="step-text"><strong>Cleanup:</strong> Save Registry state, re-enable timer</div></div>
+</div>
+</body>
+</html>

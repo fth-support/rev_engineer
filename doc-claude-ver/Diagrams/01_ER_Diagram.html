@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiceTransfer — ER Diagram</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f0f4f8;padding:2rem}
+h1{text-align:center;color:#0d47a1;margin-bottom:.5rem}
+.subtitle{text-align:center;color:#666;margin-bottom:2rem}
+.canvas{max-width:1100px;margin:0 auto;position:relative}
+.entity{position:absolute;background:#fff;border:2px solid #1565c0;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.12);min-width:220px;font-size:13px}
+.entity.config{border-color:#78909c}
+.entity.member{border-color:#2e7d32}
+.entity.token{border-color:#c62828}
+.entity-title{background:#1565c0;color:#fff;padding:6px 12px;border-radius:5px 5px 0 0;font-weight:700;text-align:center}
+.entity.config .entity-title{background:#78909c}
+.entity.member .entity-title{background:#2e7d32}
+.entity.token .entity-title{background:#c62828}
+.entity-body{padding:8px 12px}
+.field{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #f0f0f0}
+.field:last-child{border-bottom:none}
+.field-name{font-family:monospace;font-size:12px}
+.field-type{color:#888;font-size:11px}
+.pk{color:#e65100;font-weight:700}
+.fk{color:#1565c0}
+.tok{background:#fff3e0;border-radius:3px;padding:0 4px}
+.separator{border-top:2px solid #e0e0e0;margin:4px 0}
+svg.lines{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.legend{max-width:1100px;margin:2rem auto 0;background:#fff;border-radius:8px;padding:1rem 1.5rem;box-shadow:0 1px 4px rgba(0,0,0,.08);display:flex;gap:2rem;flex-wrap:wrap;font-size:13px}
+.legend-item{display:flex;align-items:center;gap:.5rem}
+.legend-color{width:16px;height:16px;border-radius:3px;border:2px solid}
+</style>
+</head>
+<body>
+<h1>Entity Relationship Diagram</h1>
+<p class="subtitle">ServiceTransfer v5.1810.1 — Database Schema</p>
+
+<div class="canvas" style="height:900px">
+<svg class="lines" viewBox="0 0 1100 900">
+<defs><marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#1565c0"/></marker></defs>
+<!-- HD → DT --><line x1="240" y1="290" x2="420" y2="80" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow)"/>
+<!-- HD → RC --><line x1="240" y1="290" x2="420" y2="250" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow)"/>
+<!-- HD → CD --><line x1="240" y1="340" x2="420" y2="420" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow)"/>
+<!-- HD → SP --><line x1="240" y1="380" x2="420" y2="600" stroke="#2e7d32" stroke-width="1.5" marker-end="url(#arrow)"/>
+<!-- SP → MC --><line x1="640" y1="640" x2="820" y2="200" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
+<!-- MC → BH --><line x1="920" y1="330" x2="920" y2="450" stroke="#2e7d32" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="300" y="170" fill="#1565c0" font-size="11">1:N</text>
+<text x="300" y="270" fill="#1565c0" font-size="11">1:N</text>
+<text x="300" y="390" fill="#1565c0" font-size="11">1:N</text>
+<text x="300" y="510" fill="#2e7d32" font-size="11">1:N</text>
+<text x="720" y="400" fill="#2e7d32" font-size="11">Lookup</text>
+<text x="930" y="400" fill="#2e7d32" font-size="11">1:N</text>
+</svg>
+
+<!-- TPSTSalHD -->
+<div class="entity" style="left:20px;top:230px">
+<div class="entity-title">TPSTSalHD (Sales Header)</div>
+<div class="entity-body">
+<div class="field"><span class="field-name pk">* FTTmnNum</span><span class="field-type">VARCHAR PK</span></div>
+<div class="field"><span class="field-name pk">* FTShdTransNo</span><span class="field-type">VARCHAR PK</span></div>
+<div class="field"><span class="field-name pk">* FDShdTransDate</span><span class="field-type">DATE PK</span></div>
+<div class="separator"></div>
+<div class="field"><span class="field-name">FTShdTransType</span><span class="field-type">VARCHAR</span></div>
+<div class="field"><span class="field-name">FTStaSentOnOff</span><span class="field-type">VARCHAR</span></div>
+<div class="field"><span class="field-name tok">FTCstCardCode</span><span class="field-type">Tokenized</span></div>
+</div></div>
+
+<!-- TPSTSalDT -->
+<div class="entity" style="left:400px;top:20px">
+<div class="entity-title">TPSTSalDT (Sales Detail)</div>
+<div class="entity-body">
+<div class="field"><span class="field-name fk">* FTTmnNum</span><span class="field-type">FK</span></div>
+<div class="field"><span class="field-name fk">* FTShdTransNo</span><span class="field-type">FK</span></div>
+<div class="field"><span class="field-name fk">* FDShdTransDate</span><span class="field-type">FK</span></div>
+<div class="field"><span class="field-name pk">* FNSdtSeqNo</span><span class="field-type">PK</span></div>
+<div class="separator"></div>
+<div class="field"><span class="field-name">FTStaSentOnOff</span><span class="field-type">VARCHAR</span></div>
+</div></div>
+
+<!-- TPSTSalRC -->
+<div class="entity" style="left:400px;top:200px">
+<div class="entity-title">TPSTSalRC (Sales Receipt)</div>
+<div class="entity-body">
+<div class="field"><span class="field-name fk">* FTTmnNum / TransNo / Date</span><span class="field-type">FK</span></div>
+<div class="field"><span class="field-name pk">* FNSrcSeqNo</span><span class="field-type">PK</span></div>
+<div class="separator"></div>
+<div class="field"><span class="field-name">FTTdmCode</span><span class="field-type">VARCHAR</span></div>
+<div class="field"><span class="field-name tok">FTSrcCardNo</span><span class="field-type">Tokenized</span></div>
+</div></div>
+
+<!-- TPSTSalCD -->
+<div class="entity" style="left:400px;top:380px">
+<div class="entity-title">TPSTSalCD (Sales Card)</div>
+<div class="entity-body">
+<div class="field"><span class="field-name fk">* FTTmnNum / TransNo / Date</span><span class="field-type">FK</span></div>
+<div class="field"><span class="field-name pk">* FNSdtSeqNo / FNScdSeqNo</span><span class="field-type">PK</span></div>
+<div class="separator"></div>
+<div class="field"><span class="field-name tok">FTScdCardID</span><span class="field-type">Tokenized</span></div>
+<div class="field"><span class="field-name">FNDctNo</span><span class="field-type">NUMERIC</span></div>
+</div></div>
+
+<!-- TPSTSalePoint -->
+<div class="entity" style="left:400px;top:550px">
+<div class="entity-title" style="background:#2e7d32">TPSTSalePoint (Points)</div>
+<div class="entity-body">
+<div class="field"><span class="field-name fk">* FTTmnNum / TransNo / Date</span><span class="field-type">FK</span></div>
+<div class="field"><span class="field-name pk tok">* FTSpoMemID</span><span class="field-type">PK, Tokenized</span></div>
+<div class="separator"></div>
+<div class="field"><span class="field-name">FCSpoPoint</span><span class="field-type">NUMERIC</span></div>
+<div class="field"><span class="field-name">FTRemark</span><span class="field-type">0=pending 1=done</span></div>
+</div></div>
+
+<!-- TCNMMallCard -->
+<div class="entity member" style="left:780px;top:100px">
+<div class="entity-title">TCNMMallCard (Member)</div>
+<div class="entity-body">
+<div class="field"><span class="field-name pk">* FTMcdCode</span><span class="field-type">Token PK</span></div>
+<div class="field"><span class="field-name pk">* FDMcdExpDate</span><span class="field-type">DATE PK</span></div>
+<div class="separator"></div>
+<div class="field"><span class="field-name">FTMcdStaAct</span><span class="field-type">'A'=Active</span></div>
+<div class="field"><span class="field-name">FCEarned</span><span class="field-type">NUMERIC</span></div>
+<div class="field"><span class="field-name">FCBalance</span><span class="field-type">NUMERIC</span></div>
+</div></div>
+
+<!-- TPSTBPHis -->
+<div class="entity member" style="left:780px;top:450px">
+<div class="entity-title">TPSTBPHis (Point History)</div>
+<div class="entity-body">
+<div class="field"><span class="field-name pk">* TmnNum/TransNo/Date/MemberID</span><span class="field-type">PK</span></div>
+<div class="separator"></div>
+<div class="field"><span class="field-name">FCCstCardPoint</span><span class="field-type">NUMERIC +/-</span></div>
+<div class="field"><span class="field-name">FCTotalBP / FCBalanceBP</span><span class="field-type">NUMERIC</span></div>
+</div></div>
+
+<!-- TPSTTokenLst -->
+<div class="entity token" style="left:780px;top:620px">
+<div class="entity-title">TPSTTokenLst (Token Map)</div>
+<div class="entity-body">
+<div class="field"><span class="field-name pk">* FTToken / FTValue / TblName / FldName</span><span class="field-type">PK</span></div>
+<div class="separator"></div>
+<div class="field"><span class="field-name">FDDateIns</span><span class="field-type">DATE</span></div>
+<div class="field"><span class="field-name">FNStatus</span><span class="field-type">1=Active</span></div>
+</div></div>
+
+<!-- TSysSync -->
+<div class="entity config" style="left:20px;top:600px">
+<div class="entity-title">TSysSync (Sync Config)</div>
+<div class="entity-body">
+<div class="field"><span class="field-name pk">* FTSscTable / DocType / Dest</span><span class="field-type">PK</span></div>
+<div class="separator"></div>
+<div class="field"><span class="field-name">FTSscCondScript</span><span class="field-type">WHERE clause</span></div>
+<div class="field"><span class="field-name">FTSscStaActive</span><span class="field-type">'1'=Active</span></div>
+</div></div>
+
+<!-- TCNMTerminalMtn -->
+<div class="entity config" style="left:20px;top:770px">
+<div class="entity-title">TCNMTerminalMtn (Terminal)</div>
+<div class="entity-body">
+<div class="field"><span class="field-name pk">* FTTmnCode</span><span class="field-type">PK</span></div>
+<div class="separator"></div>
+<div class="field"><span class="field-name">FTTmnNum</span><span class="field-type">Terminal #</span></div>
+<div class="field"><span class="field-name">FTTmnName</span><span class="field-type">Computer Name</span></div>
+</div></div>
+</div>
+
+<div class="legend">
+<div class="legend-item"><div class="legend-color" style="border-color:#1565c0;background:#e3f2fd"></div>Sales Transaction Tables</div>
+<div class="legend-item"><div class="legend-color" style="border-color:#2e7d32;background:#e8f5e9"></div>Member & Points Tables</div>
+<div class="legend-item"><div class="legend-color" style="border-color:#c62828;background:#ffebee"></div>Token Tables</div>
+<div class="legend-item"><div class="legend-color" style="border-color:#78909c;background:#eceff1"></div>Configuration Tables</div>
+<div class="legend-item"><span style="background:#fff3e0;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:12px">Tokenized</span> Fields that undergo tokenization</div>
+</div>
+</body>
+</html>

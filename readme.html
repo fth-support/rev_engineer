@@ -71,12 +71,50 @@
     <section id="documentation-requirements">
         <h2>Documentation Formatting Requirements</h2>
         <p>When generating documentation for this system, you MUST strictly adhere to the following formatting rules:</p>
-        <ol>
-            <li><strong>Dual Language (TH, ENG):</strong> Every piece of documentation must always be generated in both Thai and English versions.</li>
-            <li><strong>Professional Format & Table of Contents:</strong> Documents must be formatted professionally with a clear Table of Contents (TOC) linking to sections.</li>
-            <li><strong>Visual Aids (Images/Diagrams):</strong> Whenever describing a system flow or workflow, you must include or embed an image of the diagram (or a link to the corresponding PlantUML/HTML visual) to accompany the text.</li>
-            <li><strong>Separation of Concerns:</strong> Diagrams and flows must be saved in separate folders categorized by format: <code>HTML</code>, <code>UML</code>, and <code>PPTX</code>.</li>
-        </ol>
+
+        <h3>1. Dual Language (TH, ENG)</h3>
+        <p>Every piece of documentation must always be generated in both Thai and English versions.</p>
+
+        <h3>2. Specification Documents → Word (.docx)</h3>
+        <p>The three core specification documents must be produced as <strong>Microsoft Word (.docx)</strong> files:</p>
+        <ul>
+            <li><code>01_SRS_Document.docx</code> — Software Requirements Specification</li>
+            <li><code>02_Data_Dictionary.docx</code> — Data Dictionary</li>
+            <li><code>03_Program_Specification.docx</code> — Program Specification</li>
+        </ul>
+        <p>Each Word document must include:</p>
+        <ul>
+            <li>Professional formatting with a Table of Contents (TOC).</li>
+            <li>Diagrams and visuals embedded as <strong>inline image objects</strong> (PNG/SVG), not as PlantUML code blocks or text-art.</li>
+            <li>Consistent heading styles (Heading 1, Heading 2, etc.) for TOC generation.</li>
+        </ul>
+
+        <h3>3. Diagrams & Flows → PNG + HTML + UML + PowerPoint</h3>
+        <p>All system diagrams and workflow visualizations must be produced in <strong>four formats</strong>, stored in separate folders:</p>
+        <ul>
+            <li><code>Diagrams/PNG/</code> — High-resolution PNG images (200 DPI) for embedding in Word docs and cross-platform use.</li>
+            <li><code>Diagrams/HTML/</code> — Interactive HTML viewers (self-contained, browser-viewable).</li>
+            <li><code>Diagrams/UML/</code> — PlantUML source files (<code>.puml</code>) for version control and re-rendering.</li>
+            <li><code>Diagrams/ServiceTransfer_Diagrams.pptx</code> — PowerPoint with <strong>all native editable shapes</strong> (every object individually selectable and movable).</li>
+        </ul>
+
+        <h3>4. Final Deliverable → Comprehensive Presentation (.pptx)</h3>
+        <p>As the final output, combine all Word document content and visual diagrams into <strong>one comprehensive PowerPoint presentation</strong>:</p>
+        <ul>
+            <li>File: <code>ServiceTransfer_Complete_Presentation.pptx</code></li>
+            <li>Must include: cover slide, TOC slide, all SRS sections, data dictionary tables, program specification details, all diagrams, and a summary/recommendations slide.</li>
+            <li><strong>All objects must be native PowerPoint shapes</strong> — individually selectable, movable, and editable. No embedded PNG images in slides.</li>
+            <li>This is the single deliverable intended for stakeholder review and handoff.</li>
+        </ul>
+
+        <h3>5. Markdown Source Files (.md)</h3>
+        <p>All documentation content originates from <strong>Markdown source files</strong> that serve as the single source of truth:</p>
+        <ul>
+            <li><code>docs/TH/</code> and <code>docs/EN/</code> — Thai and English versions of all 3 specs.</li>
+            <li>Markdown files include <code>![diagram](../Diagrams/PNG/...)</code> image references for cross-platform rendering.</li>
+            <li>ASCII diagrams are retained alongside PNG references for text-only environments.</li>
+            <li>These files can be used to generate documentation on any platform (Confluence, Notion, GitBook, etc.).</li>
+        </ul>
     </section>
 
     <section id="task-1-data-architecture">
