@@ -18,16 +18,16 @@
 
 ```mermaid
 erDiagram
-    TPSTSalHD ||--o{ TPSTSalDT : "1:N (TmnNum,TransNo,Date)"
-    TPSTSalHD ||--o{ TPSTSalRC : "1:N"
-    TPSTSalHD ||--o{ TPSTSalCD : "1:N"
-    TPSTSalHD ||--o{ TPSTSalePoint : "1:N"
+    TPSTSalHD ||--o{ TPSTSalDT : "1 to N via TmnNum TransNo Date"
+    TPSTSalHD ||--o{ TPSTSalRC : "1 to N"
+    TPSTSalHD ||--o{ TPSTSalCD : "1 to N"
+    TPSTSalHD ||--o{ TPSTSalePoint : "1 to N"
     
-    TPSTSalePoint }o--|| TCNMMallCard : "Lookup (Token Member ID)"
-    TCNMMallCard ||--o{ TPSTBPHis : "1:N (History)"
+    TPSTSalePoint }o--|| TCNMMallCard : "Lookup via Token Member ID"
+    TCNMMallCard ||--o{ TPSTBPHis : "1 to N History"
     
-    TPSTTokenLst ||--o{ TPSTSalHD : "Tokenize (CardCode)"
-    TPSTTokenLst ||--o{ TPSTSalePoint : "Tokenize (MemID)"
+    TPSTTokenLst ||--o{ TPSTSalHD : "Tokenize CardCode"
+    TPSTTokenLst ||--o{ TPSTSalePoint : "Tokenize MemID"
 ```
 
 ---

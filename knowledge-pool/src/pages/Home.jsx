@@ -1,6 +1,8 @@
 import { Server, Database, Code, ShieldCheck, MapPin, DatabaseZap, Globe, Zap, FileText } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+import JourneyMap from '../components/JourneyMap'
+
 function Home() {
   return (
     <div className="home-page">
@@ -23,54 +25,9 @@ function Home() {
         </p>
       </div>
 
-      <div className="journey-section">
+      <div className="journey-section" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '3rem' }}>User & Application Journey</h2>
-        
-        <div className="timeline">
-          {/* Node 1 */}
-          <div className="timeline-item">
-            <div className="timeline-icon" style={{ background: '#3b82f6' }}>
-              <MapPin size={24} color="#fff" />
-            </div>
-            <div className="timeline-content glass-panel">
-              <h3>1. Transaction Capture</h3>
-              <p>ลูกค้าชำระเงินที่เคาน์เตอร์ POS สาขา ข้อมูลธุรกรรมจะถูกบันทึกลงในฐานข้อมูล <strong>Local SQL Express</strong> ทันที (Offline First) โดยเรคอร์ดจะถูกกำหนด Flag เบื้องต้นเป็น <code>FTStaSentOnOff = '0'</code> (รอดำเนินการ)</p>
-            </div>
-          </div>
-
-          {/* Node 2 */}
-          <div className="timeline-item">
-            <div className="timeline-icon" style={{ background: '#8b5cf6' }}>
-              <Zap size={24} color="#fff" />
-            </div>
-            <div className="timeline-content glass-panel">
-              <h3>2. Background Sync Agent</h3>
-              <p>โปรแกรม ServiceTransfer ที่ทำงานอยู่เบื้องหลัง จะทำ Timer Polling ทุก ๆ 500 มิลลิวินาที ตรวจสอบตารางทั้งหมด หากพบ Flag = '0' จะดึงข้อมูลขึ้นมาเตรียมส่ง โดยรอให้ส่วนประกอบย่อยของบิล (เช่น รายการสินค้า, การชำระ) ครบถ้วนก่อนส่ง Header เสมอ (HD-First Rule)</p>
-            </div>
-          </div>
-
-          {/* Node 3 */}
-          <div className="timeline-item">
-            <div className="timeline-icon" style={{ background: '#f59e0b' }}>
-              <ShieldCheck size={24} color="#fff" />
-            </div>
-            <div className="timeline-content glass-panel">
-              <h3>3. Data Tokenization</h3>
-              <p>ก่อนส่งข้อมูลออกจากสาขา ข้อมูลที่เป็นความลับ (เลขบัตรเครดิต, เลขสมาชิก) จะถูกดักจับและส่งผ่าน SafeNet SOAP Web Service เพื่อแปลงให้เป็น <strong>Token (First 6 digits)</strong> ป้องกันไม่ให้ข้อมูลจริงรั่วไหลระหว่างการเดินทางข้ามเครือข่าย</p>
-            </div>
-          </div>
-
-          {/* Node 4 */}
-          <div className="timeline-item">
-            <div className="timeline-icon" style={{ background: '#10b981' }}>
-              <Globe size={24} color="#fff" />
-            </div>
-            <div className="timeline-content glass-panel">
-              <h3>4. Central Delivery & Member Points</h3>
-              <p>ข้อมูลที่ถูก Tokenize แล้วจะถูกต่อข้อความเป็นคำสั่ง SQL INSERT/UPDATE แล้วยิงไปยัง <strong>Central DB (Head Office)</strong> และมีการนำคะแนนการซื้อไปคำนวณสะสมให้สมาชิกในระบบ <strong>Member DB (MallCard)</strong> ต่อไป</p>
-            </div>
-          </div>
-        </div>
+        <JourneyMap />
       </div>
 
       <div className="docs-links" style={{ marginTop: '5rem', paddingTop: '3rem', borderTop: '1px solid var(--border-color)' }}>

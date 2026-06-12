@@ -51,7 +51,7 @@ sequenceDiagram
 
 ```mermaid
 flowchart TD
-    subgraph POS Terminal (Branch)
+    subgraph POS_Terminal["POS Terminal (Branch)"]
         POS_App[POS Application]
         LocalDB[(Local DB\nSQL Express)]
         ST[ServiceTransfer.exe\n(VB6 Agent)]
@@ -62,12 +62,12 @@ flowchart TD
         LocalDB <-->|SELECT / UPDATE Flag| ST
     end
 
-    subgraph Head Office (HQ)
+    subgraph Head_Office["Head Office (HQ)"]
         CentralDB[(Central Server\nOnline DB)]
         MemberDB[(Member DB)]
     end
 
-    subgraph Security Layer
+    subgraph Security_Layer["Security Layer"]
         SafeNet[SafeNet Tokenizer\nSOAP Web Service]
     end
 
@@ -94,23 +94,23 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    subgraph POS Terminal (Branch)
+    subgraph POS_Terminal["POS Terminal (Branch)"]
         LocalDB[(Local DB)]
         NewAgent[New Go/.NET Agent\n(Event-Driven)]
         LocalDB -->|Tail Logs / Event| NewAgent
     end
 
-    subgraph Message Broker
+    subgraph Message_Broker["Message Broker"]
         MQ[RabbitMQ / Kafka]
     end
 
-    subgraph HQ Microservices
+    subgraph HQ_Microservices["HQ Microservices"]
         APIGW[API Gateway\n(REST/gRPC)]
         SyncSvc[Sync Service]
         PointSvc[Member Point Service]
     end
 
-    subgraph Databases & Security
+    subgraph Databases_Security["Databases & Security"]
         CentralDB[(Central DB)]
         MemberDB[(Member DB)]
         TokenSvc[Modern Token Service\nHSM / Cloud KMS]

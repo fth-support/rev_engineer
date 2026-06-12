@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import Sidebar from './components/Sidebar'
 import Home from './pages/Home'
+import SystemFlows from './pages/SystemFlows'
 import MarkdownViewer from './components/MarkdownViewer'
 import './App.css'
 
@@ -46,6 +47,7 @@ function App() {
         <div className="content-area glass-panel">
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/flows" element={<SystemFlows />} />
             <Route path="/docs/architecture-srs" element={<MarkdownViewer file="01_System_Architecture_and_SRS.md" />} />
             <Route path="/docs/data-dictionary" element={<MarkdownViewer file="02_Data_Dictionary.md" />} />
             <Route path="/docs/program-spec" element={<MarkdownViewer file="03_Program_Specification.md" />} />

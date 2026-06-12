@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { X, Home, Map, FileText, Database, Code, ShieldCheck, Download } from 'lucide-react'
+import { Home, FileText, Database, ShieldCheck, Download, Code, X, Network, Map } from 'lucide-react'
 
 function Sidebar({ isOpen, onClose }) {
   return (
@@ -27,6 +27,10 @@ function Sidebar({ isOpen, onClose }) {
         <div className="nav-links">
           <NavLink to="/" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 1024 && onClose()}>
             <Home size={18} /> Introduction & Journey
+          </NavLink>
+
+          <NavLink to="/flows" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 1024 && onClose()}>
+            <Network size={18} /> System Flows & Diagrams
           </NavLink>
 
           <div className="nav-group">Documents</div>
