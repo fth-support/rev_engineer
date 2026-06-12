@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { Network, Database, RefreshCw, ShieldCheck, CreditCard } from 'lucide-react';
 import MarkdownViewer from '../components/MarkdownViewer';
+import SystemArchitecture from '../components/diagrams/SystemArchitecture';
+import SyncFlow from '../components/diagrams/SyncFlow';
+import ERDiagram from '../components/diagrams/ERDiagram';
+import TokenizationFlow from '../components/diagrams/TokenizationFlow';
+import MemberPointsFlow from '../components/diagrams/MemberPointsFlow';
 import './SystemFlows.css';
 
 const flows = [
@@ -10,7 +15,7 @@ const flows = [
     icon: <Network size={20} />,
     description: 'ภาพรวมสถาปัตยกรรมของ ServiceTransfer แบบดั้งเดิม (Legacy) และการเชื่อมต่อข้ามระบบ',
     relatedDoc: '01_System_Architecture_and_SRS.md',
-    iframeUrl: '/doc-claude-ver/Diagrams/02_System_Architecture.html'
+    component: <SystemArchitecture />
   },
   {
     id: 'sync_flow',
@@ -18,7 +23,7 @@ const flows = [
     icon: <RefreshCw size={20} />,
     description: 'กระบวนการดึงข้อมูลจาก Local DB และส่งต่อขึ้นส่วนกลาง',
     relatedDoc: '03_Program_Specification.md',
-    iframeUrl: '/doc-claude-ver/Diagrams/03_Sync_Flow.html'
+    component: <SyncFlow />
   },
   {
     id: 'er_diagram',
@@ -26,7 +31,7 @@ const flows = [
     icon: <Database size={20} />,
     description: 'ความสัมพันธ์ของตารางหลักที่ใช้ในการโอนถ่ายข้อมูลและ Token',
     relatedDoc: '02_Data_Dictionary.md',
-    iframeUrl: '/doc-claude-ver/Diagrams/01_ER_Diagram.html'
+    component: <ERDiagram />
   },
   {
     id: 'tokenization',
@@ -34,7 +39,7 @@ const flows = [
     icon: <ShieldCheck size={20} />,
     description: 'กระบวนการแปลงรหัสบัตรให้เป็น Token ก่อนนำออกจากสาขา',
     relatedDoc: '04_Tokenization_and_Security.md',
-    iframeUrl: '/doc-claude-ver/Diagrams/04_Tokenization_Flow.html'
+    component: <TokenizationFlow />
   },
   {
     id: 'member_points',
@@ -42,7 +47,7 @@ const flows = [
     icon: <CreditCard size={20} />,
     description: 'กระบวนการสะสมแต้มสมาชิกจากยอดขาย',
     relatedDoc: '03_Program_Specification.md',
-    iframeUrl: '/doc-claude-ver/Diagrams/05_Member_Points_Flow.html'
+    component: <MemberPointsFlow />
   }
 ];
 
@@ -76,11 +81,7 @@ function SystemFlows() {
             <p>{activeFlow.description}</p>
           </div>
           <div className="flow-render-area" style={{ flex: 1, padding: 0, overflow: 'hidden', minHeight: '600px', background: '#f0f4f8', borderRadius: '0 0 16px 16px' }}>
-            <iframe 
-              src={activeFlow.iframeUrl} 
-              style={{ width: '100%', height: '100%', border: 'none' }}
-              title={activeFlow.title}
-            />
+            {activeFlow.component}
           </div>
         </div>
       </div>

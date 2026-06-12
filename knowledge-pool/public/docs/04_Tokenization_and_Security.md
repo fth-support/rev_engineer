@@ -8,22 +8,8 @@
 
 ระบบทำงานร่วมกับ **SafeNet Tokenizer** ซึ่งเป็นบริการภายนอกผ่าน SOAP Web Service (เรียกใช้โดยไลบรารี `MSSOAP.SoapClient30`) รูปแบบ Token ที่ได้คือแบบ **FIRST_SIX_TOKEN** (คงเลข 6 หลักแรกของบัตรไว้ ส่วนที่เหลือจะถูกสุ่มใหม่)
 
-```mermaid
-flowchart TD
-    Start(["เริ่มฟังก์ชัน Tokenize"]) --> G1{"เลขยาว < 7 หลัก?"}
-    G1 -- "Yes" --> RetOrig(["คืนค่าเดิม"])
-    G1 -- "No" --> G2{"เลขสั้นกว่า 14 หรือว่าง?"}
-    G2 -- "Yes" --> RetOrig
-    G2 -- "No" --> DBSearch[("ค้นหาใน TPSTTokenLst")]
-    
-    DBSearch --> CheckFound{"พบค่า Token เดิม?"}
-    CheckFound -- "Yes" --> RetToken(["คืนค่า Token เดิม"])
-    CheckFound -- "No" --> InitSOAP["Initialize SOAP Client"]
-    
-    InitSOAP --> CallWS["เรียก InsertToken() ผ่าน Web Service"]
-    CallWS --> ResWS{"สำเร็จ?"}
-    ResWS -- "Yes" --> RetNew(["คืนค่า Token ใหม่ และบันทึกลง DB"])
-    ResWS -- "No" --> Error(["Error 557: Token Failed"])
+```diagram
+tokenization
 ```
 
 > [!TIP]

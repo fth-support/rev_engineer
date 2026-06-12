@@ -70,8 +70,9 @@
       grid-template-columns: repeat(4, 1fr);
       grid-template-areas:
           'hero  hero  about stats'
-          'promo promo feat  feat'
-          'media feed  tasks card';
+          'media feed  tasks card'
+          'promo promo promo promo'
+          'feat  feat  feat  feat';
       gap: var(--grid-gap-lg);
   }
 }

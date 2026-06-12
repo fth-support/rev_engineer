@@ -22,24 +22,8 @@ While resilient (handling duplicate updates, timeouts, and ensuring header recor
 | **IT Operations** | Auto-recovery เมื่อเกิดข้อผิดพลาด, Logging ชัดเจน, ลด manual intervention |
 
 ### 2.2 End-to-End Business Flow
-```mermaid
-sequenceDiagram
-    participant C as Customer
-    participant P as POS Terminal (Local)
-    participant S as ServiceTransfer Agent
-    participant T as SafeNet Tokenizer
-    participant HQ as Central Server (HQ)
-    participant M as Member DB
-
-    C->>P: 1. ซื้อสินค้า / ทำธุรกรรม
-    P->>P: 2. บันทึกลง Local DB (Offline Mode)
-    loop Every 500 ms
-        S->>P: 3. ดึงข้อมูลที่ยังไม่ส่ง (Flag='0')
-        S->>T: 4. ส่งเลขบัตรเพื่อสร้าง Token
-        T-->>S: คืนค่า Token
-        S->>HQ: 5. INSERT/UPDATE ข้อมูลธุรกรรมพร้อม Token
-        S->>M: 6. ประมวลผลและอัปเดตคะแนนสมาชิก
-    end
+```diagram
+sync_flow
 ```
 
 ---
@@ -49,31 +33,8 @@ sequenceDiagram
 ### 3.1 Legacy Component Architecture
 สถาปัตยกรรมเดิมใช้การรันโปรแกรม Background บนเครื่อง POS โดยเชื่อมต่อฐานข้อมูลโดยตรงผ่าน ADODB OLEDB Provider ຂ้ามระบบเครือข่าย
 
-```mermaid
-flowchart TD
-    subgraph POS_Terminal["POS Terminal (Branch)"]
-        POS_App["POS Application"]
-        LocalDB[("Local DB SQL Express")]
-        ST["ServiceTransfer.exe (VB6 Agent)"]
-        Config["AdaIni.Ada (Access DB Config)"]
-        
-        POS_App -->|"บันทึกธุรกรรม"| LocalDB
-        Config -.->|"อ่านรหัสผ่าน"| ST
-        LocalDB <-->|"SELECT / UPDATE Flag"| ST
-    end
-
-    subgraph Head_Office["Head Office (HQ)"]
-        CentralDB[("Central Server Online DB")]
-        MemberDB[("Member DB")]
-    end
-
-    subgraph Security_Layer["Security Layer"]
-        SafeNet["SafeNet Tokenizer SOAP Web Service"]
-    end
-
-    ST == "INSERT/UPDATE (SQLOLEDB.1)" ==> CentralDB
-    ST == "UPDATE Points" ==> MemberDB
-    ST <-->|"Tokenize (FIRST_SIX)"| SafeNet
+```diagram
+architecture
 ```
 
 ### 3.2 Key Features & Constraints
@@ -92,39 +53,8 @@ flowchart TD
 ### 4.1 Recommended Target Architecture
 แทนที่การเปิด Connection ฐานข้อมูลข้าม WAN ด้วยการใช้สถาปัตยกรรมแบบ **Event-Driven** และ **API Gateway**
 
-```mermaid
-flowchart TD
-    subgraph POS_Terminal["POS Terminal (Branch)"]
-        LocalDB[("Local DB")]
-        NewAgent["New Go/.NET Agent (Event-Driven)"]
-        LocalDB -->|"Tail Logs / Event"| NewAgent
-    end
-
-    subgraph Message_Broker["Message Broker"]
-        MQ["RabbitMQ / Kafka"]
-    end
-
-    subgraph HQ_Microservices["HQ Microservices"]
-        APIGW["API Gateway (REST/gRPC)"]
-        SyncSvc["Sync Service"]
-        PointSvc["Member Point Service"]
-    end
-
-    subgraph Databases_Security["Databases & Security"]
-        CentralDB[("Central DB")]
-        MemberDB[("Member DB")]
-        TokenSvc["Modern Token Service HSM / Cloud KMS"]
-    end
-
-    NewAgent -- "Publish Events (TLS Encrypted)" --> MQ
-    MQ -- "Consume" --> APIGW
-    APIGW --> SyncSvc
-    APIGW --> PointSvc
-    
-    SyncSvc <--> TokenSvc
-    SyncSvc --> CentralDB
-    PointSvc <--> TokenSvc
-    PointSvc --> MemberDB
+```diagram
+target_architecture
 ```
 
 ### 4.2 Prioritized Improvement List

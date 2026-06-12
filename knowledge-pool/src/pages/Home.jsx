@@ -39,9 +39,9 @@ function Home() {
         </div>
 
         {/* JOURNEY / FEAT CELL */}
-        <div className="cell cell--feat" style={{ padding: 0, overflow: 'hidden' }}>
+        <div className="cell cell--feat" style={{ padding: 0, overflow: 'hidden', minHeight: '400px' }}>
           <span className="cell__tag" style={{ left: '20px', top: 0, borderRadius: '0 0 8px 8px' }}>JOURNEY</span>
-          <div style={{ padding: '2rem 1.5rem', width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
+          <div style={{ padding: '3rem 1.5rem 1.5rem 1.5rem', width: '100%' }}>
             <JourneyMap />
           </div>
         </div>

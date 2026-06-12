@@ -1,19 +1,31 @@
 import { useState, useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import mermaid from 'mermaid'
+
+// Import diagram components
+import SystemArchitecture from './diagrams/SystemArchitecture'
+import SyncFlow from './diagrams/SyncFlow'
+import ERDiagram from './diagrams/ERDiagram'
+import TokenizationFlow from './diagrams/TokenizationFlow'
+import MemberPointsFlow from './diagrams/MemberPointsFlow'
+import TargetArchitecture from './diagrams/TargetArchitecture'
+
+const DiagramRenderer = ({ id }) => {
+  const normalizedId = String(id).trim().toLowerCase();
+  switch (normalizedId) {
+    case 'architecture': return <SystemArchitecture />;
+    case 'target_architecture': return <TargetArchitecture />;
+    case 'sync_flow': return <SyncFlow />;
+    case 'er_diagram': return <ERDiagram />;
+    case 'tokenization': return <TokenizationFlow />;
+    case 'member_points': return <MemberPointsFlow />;
+    default: return <div style={{ color: 'red', padding: '1rem' }}>Unknown diagram: {id}</div>;
+  }
+};
 
 function MarkdownViewer({ file }) {
   const [content, setContent] = useState('Loading...')
   const containerRef = useRef(null)
-
-  useEffect(() => {
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'dark',
-      securityLevel: 'loose',
-    })
-  }, [])
 
   useEffect(() => {
     fetch(`./docs/${file}`)
@@ -22,23 +34,6 @@ function MarkdownViewer({ file }) {
       .catch((err) => setContent(`Error loading document: ${err.message}`))
   }, [file])
 
-  useEffect(() => {
-    // Render mermaid diagrams after content updates
-    if (containerRef.current) {
-      const elements = containerRef.current.querySelectorAll('.mermaid')
-      elements.forEach((el, i) => {
-        const id = `mermaid-${Date.now()}-${i}`
-        const graphDefinition = el.textContent
-        if (el.getAttribute('data-processed')) return
-        
-        el.setAttribute('data-processed', 'true')
-        mermaid.render(id, graphDefinition).then(({ svg }) => {
-          el.innerHTML = svg
-        }).catch(e => console.error('Mermaid render error', e))
-      })
-    }
-  }, [content])
-
   return (
     <div className="markdown-body" ref={containerRef}>
       <ReactMarkdown 
@@ -46,8 +41,8 @@ function MarkdownViewer({ file }) {
         components={{
           code({node, inline, className, children, ...props}) {
             const match = /language-(\w+)/.exec(className || '')
-            if (!inline && match && match[1] === 'mermaid') {
-              return <div className="mermaid">{String(children).replace(/\n$/, '')}</div>
+            if (!inline && match && match[1] === 'diagram') {
+              return <DiagramRenderer id={children} />
             }
             return !inline && match ? (
               <code className={className} {...props}>
