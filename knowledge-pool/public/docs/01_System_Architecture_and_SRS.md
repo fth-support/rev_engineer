@@ -52,26 +52,26 @@ sequenceDiagram
 ```mermaid
 flowchart TD
     subgraph POS_Terminal["POS Terminal (Branch)"]
-        POS_App[POS Application]
-        LocalDB[(Local DB\nSQL Express)]
-        ST[ServiceTransfer.exe\n(VB6 Agent)]
-        Config[AdaIni.Ada\n(Access DB Config)]
+        POS_App["POS Application"]
+        LocalDB[("Local DB SQL Express")]
+        ST["ServiceTransfer.exe (VB6 Agent)"]
+        Config["AdaIni.Ada (Access DB Config)"]
         
-        POS_App -->|บันทึกธุรกรรม| LocalDB
-        Config -.->|อ่านรหัสผ่าน| ST
-        LocalDB <-->|SELECT / UPDATE Flag| ST
+        POS_App -->|"บันทึกธุรกรรม"| LocalDB
+        Config -.->|"อ่านรหัสผ่าน"| ST
+        LocalDB <-->|"SELECT / UPDATE Flag"| ST
     end
 
     subgraph Head_Office["Head Office (HQ)"]
-        CentralDB[(Central Server\nOnline DB)]
-        MemberDB[(Member DB)]
+        CentralDB[("Central Server Online DB")]
+        MemberDB[("Member DB")]
     end
 
     subgraph Security_Layer["Security Layer"]
-        SafeNet[SafeNet Tokenizer\nSOAP Web Service]
+        SafeNet["SafeNet Tokenizer SOAP Web Service"]
     end
 
-    ST == "INSERT/UPDATE\n(SQLOLEDB.1)" ==> CentralDB
+    ST == "INSERT/UPDATE (SQLOLEDB.1)" ==> CentralDB
     ST == "UPDATE Points" ==> MemberDB
     ST <-->|"Tokenize (FIRST_SIX)"| SafeNet
 ```
@@ -95,28 +95,28 @@ flowchart TD
 ```mermaid
 flowchart TD
     subgraph POS_Terminal["POS Terminal (Branch)"]
-        LocalDB[(Local DB)]
-        NewAgent[New Go/.NET Agent\n(Event-Driven)]
-        LocalDB -->|Tail Logs / Event| NewAgent
+        LocalDB[("Local DB")]
+        NewAgent["New Go/.NET Agent (Event-Driven)"]
+        LocalDB -->|"Tail Logs / Event"| NewAgent
     end
 
     subgraph Message_Broker["Message Broker"]
-        MQ[RabbitMQ / Kafka]
+        MQ["RabbitMQ / Kafka"]
     end
 
     subgraph HQ_Microservices["HQ Microservices"]
-        APIGW[API Gateway\n(REST/gRPC)]
-        SyncSvc[Sync Service]
-        PointSvc[Member Point Service]
+        APIGW["API Gateway (REST/gRPC)"]
+        SyncSvc["Sync Service"]
+        PointSvc["Member Point Service"]
     end
 
     subgraph Databases_Security["Databases & Security"]
-        CentralDB[(Central DB)]
-        MemberDB[(Member DB)]
-        TokenSvc[Modern Token Service\nHSM / Cloud KMS]
+        CentralDB[("Central DB")]
+        MemberDB[("Member DB")]
+        TokenSvc["Modern Token Service HSM / Cloud KMS"]
     end
 
-    NewAgent -- "Publish Events\n(TLS Encrypted)" --> MQ
+    NewAgent -- "Publish Events (TLS Encrypted)" --> MQ
     MQ -- "Consume" --> APIGW
     APIGW --> SyncSvc
     APIGW --> PointSvc

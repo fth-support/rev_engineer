@@ -70,7 +70,7 @@ a:hover {
 
 .content-area {
   width: 100%;
-  max-width: 1000px;
+  max-width: 100%;
   background: var(--bg-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);

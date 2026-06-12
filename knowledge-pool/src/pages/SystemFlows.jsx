@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
 import { Network, Database, RefreshCw, ShieldCheck, CreditCard } from 'lucide-react';
+import MarkdownViewer from '../components/MarkdownViewer';
 import './SystemFlows.css';
 
 const flows = [
@@ -9,25 +10,26 @@ const flows = [
     title: 'System Architecture',
     icon: <Network size={20} />,
     description: 'ภาพรวมสถาปัตยกรรมของ ServiceTransfer แบบดั้งเดิม (Legacy) และการเชื่อมต่อข้ามระบบ',
+    relatedDoc: '01_System_Architecture_and_SRS.md',
     code: `flowchart TD
     subgraph POS_Terminal["POS Terminal (Branch)"]
-        POS_App[POS Application]
-        LocalDB[(Local DB SQL Express)]
-        ST[ServiceTransfer.exe VB6 Agent]
-        Config[AdaIni.Ada Access DB Config]
+        POS_App["POS Application"]
+        LocalDB[("Local DB SQL Express")]
+        ST["ServiceTransfer.exe VB6 Agent"]
+        Config["AdaIni.Ada Access DB Config"]
         
-        POS_App -->|บันทึกธุรกรรม| LocalDB
-        Config -.->|อ่านรหัสผ่าน| ST
-        LocalDB <-->|SELECT / UPDATE Flag| ST
+        POS_App -->|"บันทึกธุรกรรม"| LocalDB
+        Config -.->|"อ่านรหัสผ่าน"| ST
+        LocalDB <-->|"SELECT / UPDATE Flag"| ST
     end
 
     subgraph Head_Office["Head Office (HQ)"]
-        CentralDB[(Central Server Online DB)]
-        MemberDB[(Member DB)]
+        CentralDB[("Central Server Online DB")]
+        MemberDB[("Member DB")]
     end
 
     subgraph Security_Layer["Security Layer"]
-        SafeNet[SafeNet Tokenizer SOAP Web Service]
+        SafeNet["SafeNet Tokenizer SOAP Web Service"]
     end
 
     ST == "INSERT/UPDATE (SQLOLEDB.1)" ==> CentralDB
@@ -39,22 +41,23 @@ const flows = [
     title: 'Data Sync Flow',
     icon: <RefreshCw size={20} />,
     description: 'กระบวนการดึงข้อมูลจาก Local DB และส่งต่อขึ้นส่วนกลาง',
+    relatedDoc: '03_Program_Specification.md',
     code: `sequenceDiagram
     participant C as Customer
-    participant P as POS Terminal (Local)
+    participant P as POS Terminal
     participant S as ServiceTransfer Agent
     participant T as SafeNet Tokenizer
-    participant HQ as Central Server (HQ)
+    participant HQ as Central Server
     participant M as Member DB
 
     C->>P: 1. ซื้อสินค้า / ทำธุรกรรม
-    P->>P: 2. บันทึกลง Local DB (Offline Mode)
+    P->>P: 2. บันทึกลง Local DB
     loop Every 500 ms
-        S->>P: 3. ดึงข้อมูลที่ยังไม่ส่ง (Flag=0)
+        S->>P: 3. ดึงข้อมูลที่ยังไม่ส่ง
         S->>T: 4. ส่งเลขบัตรเพื่อสร้าง Token
         T-->>S: คืนค่า Token
-        S->>HQ: 5. INSERT/UPDATE ข้อมูลธุรกรรมพร้อม Token
-        S->>M: 6. ประมวลผลและอัปเดตคะแนนสมาชิก
+        S->>HQ: 5. INSERT/UPDATE
+        S->>M: 6. ประมวลผลคะแนน
     end`
   },
   {
@@ -62,6 +65,7 @@ const flows = [
     title: 'ER Diagram (Core Tables)',
     icon: <Database size={20} />,
     description: 'ความสัมพันธ์ของตารางหลักที่ใช้ในการโอนถ่ายข้อมูลและ Token',
+    relatedDoc: '02_Data_Dictionary.md',
     code: `erDiagram
     TPSTSalHD ||--o{ TPSTSalDT : "1 to N via TmnNum TransNo Date"
     TPSTSalHD ||--o{ TPSTSalRC : "1 to N"
@@ -79,21 +83,22 @@ const flows = [
     title: 'Tokenization Flow',
     icon: <ShieldCheck size={20} />,
     description: 'กระบวนการแปลงรหัสบัตรให้เป็น Token ก่อนนำออกจากสาขา',
+    relatedDoc: '04_Tokenization_and_Security.md',
     code: `flowchart TD
-    Start([เริ่มฟังก์ชัน Tokenize]) --> G1{เลขยาว < 7 หลัก?}
-    G1 -- Yes --> RetOrig([คืนค่าเดิม])
-    G1 -- No --> G2{เลขสั้นกว่า 14 หรือว่าง?}
-    G2 -- Yes --> RetOrig
-    G2 -- No --> DBSearch[(ค้นหาใน TPSTTokenLst)]
+    Start(["เริ่มฟังก์ชัน Tokenize"]) --> G1{"เลขยาว < 7 หลัก?"}
+    G1 -- "Yes" --> RetOrig(["คืนค่าเดิม"])
+    G1 -- "No" --> G2{"เลขสั้นกว่า 14 หรือว่าง?"}
+    G2 -- "Yes" --> RetOrig
+    G2 -- "No" --> DBSearch[("ค้นหาใน TPSTTokenLst")]
     
-    DBSearch --> CheckFound{พบค่า Token เดิม?}
-    CheckFound -- Yes --> RetToken([คืนค่า Token เดิม])
-    CheckFound -- No --> InitSOAP[Initialize SOAP Client]
+    DBSearch --> CheckFound{"พบค่า Token เดิม?"}
+    CheckFound -- "Yes" --> RetToken(["คืนค่า Token เดิม"])
+    CheckFound -- "No" --> InitSOAP["Initialize SOAP Client"]
     
-    InitSOAP --> CallWS[เรียก InsertToken() ผ่าน Web Service]
-    CallWS --> ResWS{สำเร็จ?}
-    ResWS -- Yes --> RetNew([คืนค่า Token ใหม่ และบันทึกลง DB])
-    ResWS -- No --> Error([Error 557: Token Failed])`
+    InitSOAP --> CallWS["เรียก InsertToken() ผ่าน Web Service"]
+    CallWS --> ResWS{"สำเร็จ?"}
+    ResWS -- "Yes" --> RetNew(["คืนค่า Token ใหม่ และบันทึกลง DB"])
+    ResWS -- "No" --> Error(["Error 557 Token Failed"])`
   }
 ];
 
@@ -149,6 +154,15 @@ function SystemFlows() {
           </div>
         </div>
       </div>
+
+      {activeFlow.relatedDoc && (
+        <div className="flow-related-doc glass-panel" style={{ padding: '2rem', marginTop: '2rem' }}>
+          <h3 style={{ margin: '0 0 1rem 0', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)', color: '#60a5fa' }}>
+            Detailed Documentation
+          </h3>
+          <MarkdownViewer file={activeFlow.relatedDoc} />
+        </div>
+      )}
     </div>
   );
 }

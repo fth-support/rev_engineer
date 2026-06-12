@@ -25,7 +25,7 @@ function Home() {
         </p>
       </div>
 
-      <div className="journey-section" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
+      <div className="journey-section" style={{ width: '100%', margin: '0 auto' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '3rem' }}>User & Application Journey</h2>
         <JourneyMap />
       </div>
