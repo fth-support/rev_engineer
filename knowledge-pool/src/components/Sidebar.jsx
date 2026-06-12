@@ -11,7 +11,7 @@ function Sidebar({ isOpen, onClose }) {
           onClick={onClose}
           style={{
             position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', 
-            zIndex: 90, display: window.innerWidth < 768 ? 'block' : 'none'
+            zIndex: 90, display: window.innerWidth < 1024 ? 'block' : 'none'
           }}
         />
       )}
@@ -25,25 +25,22 @@ function Sidebar({ isOpen, onClose }) {
         </div>
 
         <div className="nav-links">
-          <NavLink to="/" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 768 && onClose()}>
-            <Home size={18} /> Introduction
-          </NavLink>
-          <NavLink to="/journey" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 768 && onClose()}>
-            <Map size={18} /> App Journey
+          <NavLink to="/" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 1024 && onClose()}>
+            <Home size={18} /> Introduction & Journey
           </NavLink>
 
           <div className="nav-group">Documents</div>
           
-          <NavLink to="/docs/architecture-srs" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 768 && onClose()}>
+          <NavLink to="/docs/architecture-srs" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 1024 && onClose()}>
             <FileText size={18} /> Architecture & SRS
           </NavLink>
-          <NavLink to="/docs/data-dictionary" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 768 && onClose()}>
+          <NavLink to="/docs/data-dictionary" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 1024 && onClose()}>
             <Database size={18} /> Data Dictionary
           </NavLink>
-          <NavLink to="/docs/program-spec" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 768 && onClose()}>
+          <NavLink to="/docs/program-spec" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 1024 && onClose()}>
             <Code size={18} /> Program Spec
           </NavLink>
-          <NavLink to="/docs/security" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 768 && onClose()}>
+          <NavLink to="/docs/security" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 1024 && onClose()}>
             <ShieldCheck size={18} /> Security & Tokens
           </NavLink>
         </div>

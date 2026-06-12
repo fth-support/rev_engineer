@@ -61,16 +61,27 @@ a:hover {
 
 .main-content {
   flex: 1;
-  padding: 2rem;
-  max-width: 1000px;
-  margin: 0 auto;
+  padding: 1rem;
   width: 100%;
   transition: padding-left 0.3s ease;
+  display: flex;
+  justify-content: center;
 }
 
-@media (min-width: 768px) {
+.content-area {
+  width: 100%;
+  max-width: 1000px;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+@media (min-width: 1024px) {
   .main-content.sidebar-open {
-    padding-left: calc(var(--sidebar-width) + 2rem);
+    padding-left: var(--sidebar-width);
   }
 }
 
