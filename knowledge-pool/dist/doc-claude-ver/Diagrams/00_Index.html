@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiceTransfer — Diagrams Index</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#eef2f7;padding:2.5rem 2rem}
+.wrap{max-width:980px;margin:0 auto}
+header{background:linear-gradient(135deg,#0d47a1,#1565c0);color:#fff;border-radius:14px;padding:28px 32px;margin-bottom:26px;box-shadow:0 4px 14px rgba(13,71,161,.25)}
+header h1{font-size:26px;margin-bottom:6px}
+header p{font-size:13.5px;opacity:.92;line-height:1.6}
+.badge{display:inline-block;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:2px 12px;font-size:11.5px;margin-right:6px;margin-top:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+a.card{display:flex;background:#fff;border-radius:12px;text-decoration:none;color:inherit;box-shadow:0 2px 8px rgba(0,0,0,.07);overflow:hidden;transition:transform .15s,box-shadow .15s}
+a.card:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(0,0,0,.12)}
+.bar{width:10px;flex-shrink:0}
+.body{padding:16px 18px}
+.num{font-size:11px;font-weight:700;letter-spacing:.08em;color:#888;margin-bottom:3px}
+.title{font-size:15.5px;font-weight:700;margin-bottom:5px}
+.desc{font-size:12.5px;color:#555;line-height:1.55}
+.tag{display:inline-block;font-size:10.5px;font-weight:600;border-radius:4px;padding:1px 8px;margin-top:8px;margin-right:4px}
+footer{text-align:center;color:#8a97a8;font-size:11.5px;margin-top:26px;line-height:1.7}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>ServiceTransfer — System Diagrams</h1>
+  <p>แผนภาพประกอบเอกสาร System Revamp ของระบบ ServiceTransfer v5.1810.1 (VB6 POS Data Sync Agent)<br>
+  คลิกที่การ์ดเพื่อเปิดแผนภาพแต่ละชุด — ทุกไฟล์เปิดได้ในเบราว์เซอร์โดยตรง ไม่ต้องติดตั้งโปรแกรมเพิ่ม</p>
+  <span class="badge">Adasoft Co., Ltd. — Legacy Analysis</span>
+  <span class="badge">Reverse Engineering</span>
+  <span class="badge">5 Diagrams</span>
+</header>
+
+<div class="grid">
+  <a class="card" href="02_System_Architecture.html">
+    <div class="bar" style="background:#1565c0"></div>
+    <div class="body">
+      <div class="num">DIAGRAM 01</div>
+      <div class="title">System Architecture — สถาปัตยกรรมระบบ</div>
+      <div class="desc">ภาพรวมองค์ประกอบทั้งหมด: POS Terminal (VB6 Agent + SQL Express + Config), Central Server (Central DB + Member DB) และ SafeNet Tokenizer พร้อมเส้นทางการเชื่อมต่อ</div>
+      <span class="tag" style="background:#e3f2fd;color:#1565c0">Components</span>
+      <span class="tag" style="background:#e3f2fd;color:#1565c0">Connections</span>
+    </div>
+  </a>
+
+  <a class="card" href="03_Sync_Flow.html">
+    <div class="bar" style="background:#2e7d32"></div>
+    <div class="body">
+      <div class="num">DIAGRAM 02</div>
+      <div class="title">Main Sync Flow — ขั้นตอนการซิงค์หลัก</div>
+      <div class="desc">ลำดับการทำงาน 6 เฟสของ otmForm_Timer( ) ที่ทำงานทุก 500 ms ตั้งแต่ Pre-check, Connect, Configuration, Sync Loop, Member Points จนถึง Cleanup พร้อมกลยุทธ์จัดการ Error</div>
+      <span class="tag" style="background:#e8f5e9;color:#2e7d32">Timer Loop</span>
+      <span class="tag" style="background:#e8f5e9;color:#2e7d32">Error Handling</span>
+    </div>
+  </a>
+
+  <a class="card" href="01_ER_Diagram.html">
+    <div class="bar" style="background:#0d47a1"></div>
+    <div class="body">
+      <div class="num">DIAGRAM 03</div>
+      <div class="title">ER Diagram — แผนผังความสัมพันธ์ข้อมูล</div>
+      <div class="desc">โครงสร้างตารางและความสัมพันธ์: กลุ่ม Sales (HD/DT/RC/CD/SalePoint), กลุ่มสมาชิก (TCNMMallCard, TPSTBPHis), Token Mapping (TPSTTokenLst) และตาราง Configuration</div>
+      <span class="tag" style="background:#e8eaf6;color:#0d47a1">11+ Tables</span>
+      <span class="tag" style="background:#e8eaf6;color:#0d47a1">Keys & Relations</span>
+    </div>
+  </a>
+
+  <a class="card" href="04_Tokenization_Flow.html">
+    <div class="bar" style="background:#e65100"></div>
+    <div class="body">
+      <div class="num">DIAGRAM 04</div>
+      <div class="title">Tokenization Flow — ขั้นตอนการ Token ข้อมูลบัตร</div>
+      <div class="desc">ลำดับการตัดสินใจของ SP_PRCbToken( ): Guard Clauses, การค้นหา Token เดิมใน TPSTTokenLst และการเรียก SafeNet SOAP Web Service (InsertToken / FIRST_SIX_TOKEN)</div>
+      <span class="tag" style="background:#fff3e0;color:#e65100">PCI-DSS</span>
+      <span class="tag" style="background:#fff3e0;color:#e65100">SafeNet SOAP</span>
+    </div>
+  </a>
+
+  <a class="card" href="05_Member_Points_Flow.html" style="grid-column:1/-1">
+    <div class="bar" style="background:#6a1b9a"></div>
+    <div class="body">
+      <div class="num">DIAGRAM 05</div>
+      <div class="title">Member Points Flow — การประมวลผลคะแนนสมาชิก</div>
+      <div class="desc">6 ขั้นตอนของ W_UPDxUpdatePoint( ): ดึงธุรกรรมค้าง → รวมคะแนนต่อสมาชิก → Tokenize รหัสสมาชิก → กำหนดเครื่องหมาย +/− ตาม TransType → UPDATE/INSERT บัตรสมาชิก (พร้อมสูตร FCEarned / FCBalance) → บันทึกประวัติ TPSTBPHis และปิดงาน FTRemark='1'</div>
+      <span class="tag" style="background:#f3e5f5;color:#6a1b9a">Member DB</span>
+      <span class="tag" style="background:#f3e5f5;color:#6a1b9a">Point Formulas</span>
+      <span class="tag" style="background:#f3e5f5;color:#6a1b9a">New Member Logic</span>
+    </div>
+  </a>
+</div>
+
+<footer>
+  ServiceTransfer v5.1810.1 — System Revamp Documentation • จัดทำจากการวิเคราะห์ย้อนกลับซอร์สโค้ด (Reverse Engineering)<br>
+  เอกสารประกอบ: 01_SRS_Document.docx • 02_Data_Dictionary.docx • 03_Program_Specification.docx • ServiceTransfer_Complete_Presentation.pptx
+</footer>
+</div>
+</body>
+</html>

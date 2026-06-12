@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiceTransfer — Sync Flow</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#f0f4f8;padding:2rem}
+h1{text-align:center;color:#0d47a1;margin-bottom:.3rem}
+.sub{text-align:center;color:#666;margin-bottom:2rem}
+.container{max-width:900px;margin:0 auto}
+.phase{background:#fff;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:16px;overflow:hidden}
+.phase-header{padding:10px 16px;color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;gap:10px}
+.phase-body{padding:16px}
+.p1 .phase-header{background:#78909c}
+.p2 .phase-header{background:#1565c0}
+.p3 .phase-header{background:#2e7d32}
+.p4 .phase-header{background:#e65100}
+.p5 .phase-header{background:#6a1b9a}
+.p6 .phase-header{background:#c62828}
+.step{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px;align-items:flex-start}
+.step:last-child{border-bottom:none}
+.step-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.step code{background:#f5f5f5;padding:1px 6px;border-radius:3px;font-size:12px}
+.decision{background:#fff3e0;border:1px solid #ffe0b2;border-radius:6px;padding:10px 14px;margin:8px 0;font-size:12px}
+.decision strong{color:#e65100}
+.arrow-down{text-align:center;color:#999;font-size:20px;padding:4px 0}
+.error-box{background:#ffebee;border:1px solid #ffcdd2;border-radius:6px;padding:8px 12px;font-size:12px;margin:4px 0}
+.error-box code{background:#fff;font-size:11px}
+.success-box{background:#e8f5e9;border:1px solid #c8e6c9;border-radius:6px;padding:8px 12px;font-size:12px;margin:4px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+</style>
+</head>
+<body>
+<h1>Data Synchronization Flow</h1>
+<p class="sub">ServiceTransfer — otmForm_Timer() / W_DATbInsertData() / W_DATbUpdateData()</p>
+
+<div class="container">
+
+<div class="phase p1">
+<div class="phase-header"><span>1</span> Pre-check Phase</div>
+<div class="phase-body">
+<div class="step"><div class="step-icon" style="background:#78909c">T</div><div><code>otmForm.Enabled = False</code> — Disable timer to prevent re-entrant execution</div></div>
+<div class="step"><div class="step-icon" style="background:#78909c">L</div><div>Check/create log file, read Registry (<code>SentSale</code>, <code>SentStartDate</code>)</div></div>
+<div class="decision"><strong>Decision:</strong> IF <code>SentSale != "1"</code> OR <code>Registry("Online") != "1"</code> → Skip to Cleanup</div>
+</div>
+</div>
+
+<div class="arrow-down">▼</div>
+
+<div class="phase p2">
+<div class="phase-header"><span>2</span> Connection & Validation Phase</div>
+<div class="phase-body">
+<div class="step"><div class="step-icon" style="background:#1565c0">S</div><div><code>W_DATbConnectOrChk(ocnOnline)</code> — Health check: <code>SELECT FTTmnCode FROM TCNMTerminalMtn</code></div></div>
+<div class="step"><div class="step-icon" style="background:#1565c0">O</div><div><code>W_GETbStoreOpen()</code> — Check <code>TsysTerminalSta.FTTmsOpnStore = 'Y'</code></div></div>
+<div class="step"><div class="step-icon" style="background:#1565c0">L</div><div><code>W_DATbConnectOrChk(ocnOffline)</code> — Verify local DB connection</div></div>
+<div class="decision"><strong>Decision:</strong> Any check fails → Log error, skip to Cleanup</div>
+</div>
+</div>
+
+<div class="arrow-down">▼</div>
+
+<div class="phase p3">
+<div class="phase-header"><span>3</span> Configuration Phase</div>
+<div class="phase-body">
+<div class="step"><div class="step-icon" style="background:#2e7d32">T</div><div><code>MM_GETxTable()</code> — Fetch sync table list from <code>TSysSync WHERE FTSscStaActive='1'</code></div></div>
+<div class="step"><div class="step-icon" style="background:#2e7d32">#</div><div><code>W_GETtTmnNum()</code> — Map Computer Name → Terminal Number via <code>TCNMTerminalMtn</code></div></div>
+<div class="step"><div class="step-icon" style="background:#2e7d32">D</div><div><code>SP_GETdSaleDate()</code> — Get operation date from <code>TSysChgDateTime.FDCdtDate</code></div></div>
+</div>
+</div>
+
+<div class="arrow-down">▼</div>
+
+<div class="phase p4">
+<div class="phase-header"><span>4</span> Main Sync Loop (FOR EACH Table × Record)</div>
+<div class="phase-body">
+<div class="step"><div class="step-icon" style="background:#e65100">Q</div><div><code>MM_GETxData()</code> — <code>SELECT * FROM [Table] WHERE FTStaSentOnOff='0' AND FDShdTransDate &lt;= SaleDate</code></div></div>
+
+<div style="margin:12px 0;padding:12px;background:#fafafa;border-radius:8px;border:1px solid #e0e0e0">
+<div style="font-weight:700;font-size:13px;margin-bottom:8px;color:#e65100">For Each Record → W_DATbInsertData()</div>
+
+<div class="step"><div class="step-icon" style="background:#ff8f00">1</div><div><strong>Pre-check (HD only):</strong> Verify all child tables (DT/RC/CD/SalePoint) have <code>FTStaSentOnOff='1'</code></div></div>
+<div class="step"><div class="step-icon" style="background:#ff8f00">2</div><div><strong>Duplicate check:</strong> SELECT from Server → if exists & <code>FTShdStaDoc != '1'</code> → DELETE old</div></div>
+<div class="step"><div class="step-icon" style="background:#ff8f00">3</div><div><strong>Build SQL:</strong> Loop all fields → FT=Text (escape quotes), FC/FN=Numeric, FD=Date format</div></div>
+<div class="step"><div class="step-icon" style="background:#ff8f00">4</div><div><strong>Tokenize:</strong> Check field × table × tender × transtype rules → <code>SP_PRCbToken()</code></div></div>
+<div class="step"><div class="step-icon" style="background:#ff8f00">5</div><div><strong>Execute:</strong> <code>INSERT INTO [Table](...) VALUES(...)</code> on Central Server</div></div>
+
+<div class="grid2" style="margin-top:10px">
+<div class="success-box"><strong>Success →</strong> <code>W_DATxUpdateByScript()</code> — Set <code>FTStaSentOnOff='1'</code> in Local DB</div>
+<div class="error-box"><strong>Error Handling:</strong><br>
+<code>-2147217873</code> Duplicate → try UPDATE<br>
+<code>-2147467259</code> Connection lost → abort<br>
+<code>555</code> Children not ready → skip<br>
+<code>557</code> Token failed → skip + reset
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="arrow-down">▼</div>
+
+<div class="phase p5">
+<div class="phase-header"><span>5</span> Member Points Phase (W_UPDxUpdatePoint)</div>
+<div class="phase-body">
+<div class="step"><div class="step-icon" style="background:#6a1b9a">1</div><div>Fetch <code>TPSTSalePoint WHERE FTRemark='0' AND FTSpoMemID &lt;&gt; ''</code></div></div>
+<div class="step"><div class="step-icon" style="background:#6a1b9a">2</div><div>SUM points GROUP BY member → Tokenize member ID</div></div>
+<div class="step"><div class="step-icon" style="background:#6a1b9a">3</div><div>Calculate +/- by TransType (Sale=+, Return/IPV/Cancel=-)</div></div>
+<div class="step"><div class="step-icon" style="background:#6a1b9a">4</div><div>UPDATE/INSERT <code>TCNMMallCard</code> on Member DB</div></div>
+<div class="step"><div class="step-icon" style="background:#6a1b9a">5</div><div>INSERT history to <code>TPSTBPHis</code>, mark <code>FTRemark='1'</code> in Local</div></div>
+</div>
+</div>
+
+<div class="arrow-down">▼</div>
+
+<div class="phase p6">
+<div class="phase-header"><span>6</span> Cleanup</div>
+<div class="phase-body">
+<div class="step"><div class="step-icon" style="background:#c62828">R</div><div>Save Registry state (<code>SentStartDate</code>, <code>SentStartTime</code>, <code>SentStaOn='1'</code>)</div></div>
+<div class="step"><div class="step-icon" style="background:#c62828">T</div><div><code>otmForm.Enabled = True</code> — Re-enable timer for next cycle</div></div>
+</div>
+</div>
+
+</div>
+</body>
+</html>

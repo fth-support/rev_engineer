@@ -5,6 +5,7 @@ import Sidebar from './components/Sidebar'
 import Home from './pages/Home'
 import SystemFlows from './pages/SystemFlows'
 import MarkdownViewer from './components/MarkdownViewer'
+import Downloads from './pages/Downloads'
 import './App.css'
 
 function App() {
@@ -48,6 +49,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/flows" element={<SystemFlows />} />
+            <Route path="/downloads" element={<Downloads />} />
             <Route path="/docs/architecture-srs" element={<MarkdownViewer file="01_System_Architecture_and_SRS.md" />} />
             <Route path="/docs/data-dictionary" element={<MarkdownViewer file="02_Data_Dictionary.md" />} />
             <Route path="/docs/program-spec" element={<MarkdownViewer file="03_Program_Specification.md" />} />

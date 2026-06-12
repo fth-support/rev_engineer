@@ -1,5 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
-import mermaid from 'mermaid';
+import { useState } from 'react';
 import { Network, Database, RefreshCw, ShieldCheck, CreditCard } from 'lucide-react';
 import MarkdownViewer from '../components/MarkdownViewer';
 import './SystemFlows.css';
@@ -11,30 +10,7 @@ const flows = [
     icon: <Network size={20} />,
     description: 'ภาพรวมสถาปัตยกรรมของ ServiceTransfer แบบดั้งเดิม (Legacy) และการเชื่อมต่อข้ามระบบ',
     relatedDoc: '01_System_Architecture_and_SRS.md',
-    code: `flowchart TD
-    subgraph POS_Terminal["POS Terminal (Branch)"]
-        POS_App["POS Application"]
-        LocalDB[("Local DB SQL Express")]
-        ST["ServiceTransfer.exe VB6 Agent"]
-        Config["AdaIni.Ada Access DB Config"]
-        
-        POS_App -->|"บันทึกธุรกรรม"| LocalDB
-        Config -.->|"อ่านรหัสผ่าน"| ST
-        LocalDB <-->|"SELECT / UPDATE Flag"| ST
-    end
-
-    subgraph Head_Office["Head Office (HQ)"]
-        CentralDB[("Central Server Online DB")]
-        MemberDB[("Member DB")]
-    end
-
-    subgraph Security_Layer["Security Layer"]
-        SafeNet["SafeNet Tokenizer SOAP Web Service"]
-    end
-
-    ST == "INSERT/UPDATE (SQLOLEDB.1)" ==> CentralDB
-    ST == "UPDATE Points" ==> MemberDB
-    ST <-->|"Tokenize (FIRST_SIX)"| SafeNet`
+    iframeUrl: '/doc-claude-ver/Diagrams/02_System_Architecture.html'
   },
   {
     id: 'sync_flow',
@@ -42,23 +18,7 @@ const flows = [
     icon: <RefreshCw size={20} />,
     description: 'กระบวนการดึงข้อมูลจาก Local DB และส่งต่อขึ้นส่วนกลาง',
     relatedDoc: '03_Program_Specification.md',
-    code: `sequenceDiagram
-    participant C as Customer
-    participant P as POS Terminal
-    participant S as ServiceTransfer Agent
-    participant T as SafeNet Tokenizer
-    participant HQ as Central Server
-    participant M as Member DB
-
-    C->>P: 1. ซื้อสินค้า / ทำธุรกรรม
-    P->>P: 2. บันทึกลง Local DB
-    loop Every 500 ms
-        S->>P: 3. ดึงข้อมูลที่ยังไม่ส่ง
-        S->>T: 4. ส่งเลขบัตรเพื่อสร้าง Token
-        T-->>S: คืนค่า Token
-        S->>HQ: 5. INSERT/UPDATE
-        S->>M: 6. ประมวลผลคะแนน
-    end`
+    iframeUrl: '/doc-claude-ver/Diagrams/03_Sync_Flow.html'
   },
   {
     id: 'er_diagram',
@@ -66,17 +26,7 @@ const flows = [
     icon: <Database size={20} />,
     description: 'ความสัมพันธ์ของตารางหลักที่ใช้ในการโอนถ่ายข้อมูลและ Token',
     relatedDoc: '02_Data_Dictionary.md',
-    code: `erDiagram
-    TPSTSalHD ||--o{ TPSTSalDT : "1 to N via TmnNum TransNo Date"
-    TPSTSalHD ||--o{ TPSTSalRC : "1 to N"
-    TPSTSalHD ||--o{ TPSTSalCD : "1 to N"
-    TPSTSalHD ||--o{ TPSTSalePoint : "1 to N"
-    
-    TPSTSalePoint }o--|| TCNMMallCard : "Lookup via Token Member ID"
-    TCNMMallCard ||--o{ TPSTBPHis : "1 to N History"
-    
-    TPSTTokenLst ||--o{ TPSTSalHD : "Tokenize CardCode"
-    TPSTTokenLst ||--o{ TPSTSalePoint : "Tokenize MemID"`
+    iframeUrl: '/doc-claude-ver/Diagrams/01_ER_Diagram.html'
   },
   {
     id: 'tokenization',
@@ -84,44 +34,20 @@ const flows = [
     icon: <ShieldCheck size={20} />,
     description: 'กระบวนการแปลงรหัสบัตรให้เป็น Token ก่อนนำออกจากสาขา',
     relatedDoc: '04_Tokenization_and_Security.md',
-    code: `flowchart TD
-    Start(["เริ่มฟังก์ชัน Tokenize"]) --> G1{"เลขยาว < 7 หลัก?"}
-    G1 -- "Yes" --> RetOrig(["คืนค่าเดิม"])
-    G1 -- "No" --> G2{"เลขสั้นกว่า 14 หรือว่าง?"}
-    G2 -- "Yes" --> RetOrig
-    G2 -- "No" --> DBSearch[("ค้นหาใน TPSTTokenLst")]
-    
-    DBSearch --> CheckFound{"พบค่า Token เดิม?"}
-    CheckFound -- "Yes" --> RetToken(["คืนค่า Token เดิม"])
-    CheckFound -- "No" --> InitSOAP["Initialize SOAP Client"]
-    
-    InitSOAP --> CallWS["เรียก InsertToken() ผ่าน Web Service"]
-    CallWS --> ResWS{"สำเร็จ?"}
-    ResWS -- "Yes" --> RetNew(["คืนค่า Token ใหม่ และบันทึกลง DB"])
-    ResWS -- "No" --> Error(["Error 557 Token Failed"])`
+    iframeUrl: '/doc-claude-ver/Diagrams/04_Tokenization_Flow.html'
+  },
+  {
+    id: 'member_points',
+    title: 'Member Points Flow',
+    icon: <CreditCard size={20} />,
+    description: 'กระบวนการสะสมแต้มสมาชิกจากยอดขาย',
+    relatedDoc: '03_Program_Specification.md',
+    iframeUrl: '/doc-claude-ver/Diagrams/05_Member_Points_Flow.html'
   }
 ];
 
 function SystemFlows() {
   const [activeFlow, setActiveFlow] = useState(flows[0]);
-  const mermaidRef = useRef(null);
-
-  useEffect(() => {
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: 'dark',
-      fontFamily: 'Inter, sans-serif'
-    });
-  }, []);
-
-  useEffect(() => {
-    if (mermaidRef.current) {
-      mermaidRef.current.innerHTML = '';
-      mermaid.render(`mermaid-${activeFlow.id}`, activeFlow.code).then(({ svg }) => {
-        mermaidRef.current.innerHTML = svg;
-      });
-    }
-  }, [activeFlow]);
 
   return (
     <div className="system-flows-container">
@@ -144,13 +70,17 @@ function SystemFlows() {
           ))}
         </div>
 
-        <div className="flows-content glass-panel">
-          <div className="flow-content-header">
+        <div className="flows-content glass-panel" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="flow-content-header" style={{ flexShrink: 0 }}>
             <h3>{activeFlow.title}</h3>
             <p>{activeFlow.description}</p>
           </div>
-          <div className="flow-render-area" ref={mermaidRef}>
-            {/* SVG is rendered here */}
+          <div className="flow-render-area" style={{ flex: 1, padding: 0, overflow: 'hidden', minHeight: '600px', background: '#f0f4f8', borderRadius: '0 0 16px 16px' }}>
+            <iframe 
+              src={activeFlow.iframeUrl} 
+              style={{ width: '100%', height: '100%', border: 'none' }}
+              title={activeFlow.title}
+            />
           </div>
         </div>
       </div>

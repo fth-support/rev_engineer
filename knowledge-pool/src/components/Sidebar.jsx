@@ -49,11 +49,11 @@ function Sidebar({ isOpen, onClose }) {
           </NavLink>
         </div>
 
-        <div className="download-section">
-          <a href="./downloads/doc-claude-ver.zip" download className="download-btn">
-            <Download size={18} /> Download Original
-          </a>
-        </div>
+        <div className="sidebar-footer">
+        <NavLink to="/downloads" className={({isActive}) => `nav-item download-btn ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 1024 && onClose()}>
+          <Download size={18} /> Download Original
+        </NavLink>
+      </div>
       </aside>
     </>
   )
