@@ -1,89 +1,71 @@
 import { useMemo, useRef, useState, useLayoutEffect, useCallback } from 'react'
-import AnimatedConnections from './AnimatedConnections'
 import DetailPanel from './DetailPanel'
 
-// Reusable interactive graph: animated connectors (behind) + absolutely-positioned
-// nodes (in front). Clicking a node highlights it + its neighbours and dims the rest.
-//
-// Responsive strategy (fit-to-width): the graph is laid out on a FIXED "design canvas"
-// (DESIGN_W × designH) so node positions, sizes, fonts and connectors keep identical
-// proportions at every screen size. A wrapper then `transform: scale()`s the whole
-// canvas down to fit the available width — so it's always fully visible, never clipped
-// and never overlapping, without needing full screen.
+// Interactive node graph rendered as ONE inline <svg viewBox>. The browser scales the
+// fixed coordinate space (VBW × VBH) to the container width, preserving aspect ratio —
+// so the diagram is always fully visible, never clipped, and fully responsive WITHOUT
+// any JS scale math, ResizeObserver, or size measurement (which previously raced with
+// the webfont). Node box heights are computed deterministically from content, calibrated
+// to the loaded font, so a card never exceeds its box → no overflow, no clipping.
 
-const DESIGN_W = 1080
-const MARGIN = 10
+const VBW = 1080
+const MARGIN = 14
+
+// Deterministic node box size (in viewBox units), calibrated to the loaded Inter font.
+function nodeSize(n) {
+  const w = n.w || 210
+  const h = n.fields
+    ? 44 + n.fields.length * 36          // entity card: header + field rows
+    : 62 + (n.items ? n.items.length : 0) * 30 // graph card: header + bullet items
+  return { w, h }
+}
+
+function buildPath(fx, fy, tx, ty) {
+  const dx = tx - fx, dy = ty - fy
+  if (Math.abs(dx) >= Math.abs(dy)) {
+    const mx = (fx + tx) / 2
+    return `M ${fx} ${fy} C ${mx} ${fy}, ${mx} ${ty}, ${tx} ${ty}`
+  }
+  const my = (fy + ty) / 2
+  return `M ${fx} ${fy} C ${fx} ${my}, ${tx} ${my}, ${tx} ${ty}`
+}
+function hashDelay(k) { let h = 0; for (let i = 0; i < k.length; i++) h = ((h << 5) - h + k.charCodeAt(i)) | 0; return (Math.abs(h) % 3000) / 1000 }
+
+function DrawPath({ d, stroke, width, delay }) {
+  const ref = useRef(null)
+  const [len, setLen] = useState(0)
+  useLayoutEffect(() => { if (ref.current) setLen(ref.current.getTotalLength()) }, [d])
+  return (
+    <path ref={ref} d={d} fill="none" stroke={stroke} strokeWidth={width} strokeLinecap="round"
+      strokeDasharray={len || 1} strokeDashoffset={len || 1}
+      style={{
+        animationName: len ? 'draw-line' : undefined,
+        animationDuration: len ? '1.3s' : undefined,
+        animationTimingFunction: 'cubic-bezier(0.4,0,0.2,1)',
+        animationFillMode: 'forwards',
+        animationDelay: `${delay}s`,
+      }} />
+  )
+}
 
 function NodeGraph({ nodes, edges, aspect = 1.6, renderNode, getDetail, ariaLabel = 'Diagram' }) {
-  const fitRef = useRef(null)
-  const nodeRefs = useRef({})
-  const [scale, setScale] = useState(1)
-  const [sizes, setSizes] = useState({}) // id -> { w, h } measured at design scale
+  const VBH = Math.round(VBW / aspect)
   const [selectedId, setSelectedId] = useState(null)
 
-  const designH = Math.round(DESIGN_W / aspect)
-
-  // Scale the fixed design canvas to fit the available width.
-  useLayoutEffect(() => {
-    const el = fitRef.current
-    if (!el) return
-    const measure = () => {
-      const w = el.clientWidth
-      if (w > 0) setScale(Math.min(1, w / DESIGN_W))
-    }
-    measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
-  // Measure each node's intrinsic (unscaled) size for clamping. Re-measure after the
-  // webfont loads and whenever a node resizes — otherwise the clamp uses fallback-font
-  // heights measured before Inter loads, and tall nodes overflow the top edge.
-  useLayoutEffect(() => {
-    const remeasure = () => {
-      const m = {}
-      for (const n of nodes) {
-        const el = nodeRefs.current[n.id]
-        if (el) m[n.id] = { w: el.offsetWidth, h: el.offsetHeight }
-      }
-      setSizes((prev) => {
-        let changed = false
-        for (const k in m) {
-          if (!prev[k] || prev[k].w !== m[k].w || prev[k].h !== m[k].h) changed = true
-        }
-        return changed ? { ...prev, ...m } : prev
-      })
-    }
-    remeasure()
-    let cancelled = false
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(() => { if (!cancelled) remeasure() })
-    }
-    const ro = new ResizeObserver(remeasure)
-    for (const n of nodes) {
-      const el = nodeRefs.current[n.id]
-      if (el) ro.observe(el)
-    }
-    return () => { cancelled = true; ro.disconnect() }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes])
-
-  // Node centers in DESIGN pixels, clamped so each box stays inside the design canvas.
+  // Node centers + boxes in viewBox units, clamped so every box stays inside the canvas.
   const centers = useMemo(() => {
     const out = {}
     for (const n of nodes) {
-      const sz = sizes[n.id] || { w: n.w || 210, h: 130 }
-      const hw = sz.w / 2
-      const hh = sz.h / 2
-      let cx = (n.x / 100) * DESIGN_W
-      let cy = (n.y / 100) * designH
-      cx = Math.max(hw + MARGIN, Math.min(DESIGN_W - hw - MARGIN, cx))
-      cy = Math.max(hh + MARGIN, Math.min(designH - hh - MARGIN, cy))
-      out[n.id] = { cx, cy }
+      const { w, h } = nodeSize(n)
+      const hw = w / 2, hh = h / 2
+      let cx = (n.x / 100) * VBW
+      let cy = (n.y / 100) * VBH
+      cx = Math.max(hw + MARGIN, Math.min(VBW - hw - MARGIN, cx))
+      cy = Math.max(hh + MARGIN, Math.min(VBH - hh - MARGIN, cy))
+      out[n.id] = { cx, cy, w, h }
     }
     return out
-  }, [nodes, sizes, designH])
+  }, [nodes, VBH])
 
   const relatedMap = useMemo(() => {
     const m = {}
@@ -99,44 +81,50 @@ function NodeGraph({ nodes, edges, aspect = 1.6, renderNode, getDetail, ariaLabe
   }, [nodes, edges])
 
   const relatedIds = selectedId ? relatedMap[selectedId] : null
-  const onSelect = useCallback((id) => setSelectedId((prev) => (prev === id ? null : id)), [])
+  const onSelect = useCallback((id) => setSelectedId((p) => (p === id ? null : id)), [])
   const selectedNode = selectedId ? nodes.find((n) => n.id === selectedId) : null
   const detail = selectedNode && getDetail ? getDetail(selectedNode) : null
 
   return (
     <div className="ngraph" aria-label={ariaLabel}>
-      <div className="ngraph__fit" ref={fitRef}>
-        <div className="ngraph__scaler" style={{ width: DESIGN_W * scale, height: designH * scale }}>
-          <div
-            className="ngraph__canvas"
-            style={{ width: DESIGN_W, height: designH, transform: `scale(${scale})`, transformOrigin: 'top left' }}
-          >
-            <AnimatedConnections
-              centers={centers}
-              edges={edges}
-              width={DESIGN_W}
-              height={designH}
-              selectedId={selectedId}
-              relatedIds={relatedIds}
-            />
-            {nodes.map((node) => {
-              const isSelected = node.id === selectedId
-              const isDimmed = selectedId ? !relatedIds.has(node.id) : false
-              const c = centers[node.id]
-              return (
-                <div
-                  key={node.id}
-                  ref={(el) => { nodeRefs.current[node.id] = el }}
-                  className="ngraph__node"
-                  style={{ left: `${c ? c.cx : 0}px`, top: `${c ? c.cy : 0}px`, opacity: isDimmed ? 0.32 : 1 }}
-                >
-                  {renderNode({ node, isSelected, isDimmed, onSelect })}
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
+      <svg className="ngraph__svg" viewBox={`0 0 ${VBW} ${VBH}`} preserveAspectRatio="xMidYMid meet" role="img">
+        {/* connectors */}
+        {edges.map((e, i) => {
+          const a = centers[e.from]
+          const b = centers[e.to]
+          if (!a || !b) return null
+          const d = buildPath(a.cx, a.cy, b.cx, b.cy)
+          const key = `${e.from}-${e.to}-${i}`
+          const isRel = selectedId && relatedIds ? relatedIds.has(e.from) && relatedIds.has(e.to) : false
+          const dim = selectedId ? !isRel : false
+          return (
+            <g key={key} opacity={dim ? 0.12 : 1} style={{ transition: 'opacity .25s' }}>
+              <DrawPath d={d} stroke={isRel ? 'var(--connection-highlight)' : 'var(--connection-line)'} width={isRel ? 2.6 : 1.8} delay={0.5 + i * 0.06} />
+              <circle r={isRel ? 3.4 : 2.2} fill={isRel ? 'var(--particle)' : 'var(--connection-line)'}
+                style={{ offsetPath: `path("${d}")`, animationName: 'orbit', animationDuration: `${isRel ? 2.2 : 4}s`, animationTimingFunction: 'linear', animationIterationCount: 'infinite', animationDelay: `${-hashDelay(key)}s` }} />
+              {e.label && (
+                <foreignObject x={(a.cx + b.cx) / 2 - 85} y={(a.cy + b.cy) / 2 - 15} width="170" height="30" style={{ overflow: 'visible' }}>
+                  <div xmlns="http://www.w3.org/1999/xhtml" className={`ngraph__edge-label ${isRel ? 'is-related' : ''}`} style={{ opacity: dim ? 0.15 : 1 }}>{e.label}</div>
+                </foreignObject>
+              )}
+            </g>
+          )
+        })}
+        {/* nodes */}
+        {nodes.map((n) => {
+          const c = centers[n.id]
+          const isSelected = n.id === selectedId
+          const isDimmed = selectedId ? !relatedIds.has(n.id) : false
+          return (
+            <foreignObject key={n.id} x={c.cx - c.w / 2} y={c.cy - c.h / 2} width={c.w} height={c.h + 6}
+              style={{ overflow: 'visible', opacity: isDimmed ? 0.32 : 1, transition: 'opacity .25s' }}>
+              <div xmlns="http://www.w3.org/1999/xhtml" style={{ width: '100%' }}>
+                {renderNode({ node: n, isSelected, isDimmed, onSelect })}
+              </div>
+            </foreignObject>
+          )
+        })}
+      </svg>
       {detail && <DetailPanel node={selectedNode} detail={detail} onClose={() => setSelectedId(null)} />}
     </div>
   )

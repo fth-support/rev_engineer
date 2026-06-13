@@ -14,21 +14,18 @@
 
 /* ---------- Node graph ---------- */
 .ngraph { width: 100%; min-width: 0; max-width: 100%; }
-/* fit-to-width: the canvas is laid out at a fixed design size then scaled down.
-   overflow:hidden + min-width:0 guard against the fixed 1080px canvas forcing
-   parent width before the scale is applied. */
-.ngraph__fit { width: 100%; min-width: 0; max-width: 100%; overflow: hidden; }
-.ngraph__scaler { margin: 0 auto; position: relative; max-width: 100%; }
-.ngraph__canvas {
-  position: relative;
+.ngraph__svg {
+  width: 100%;
+  height: auto;
+  display: block;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background:
     radial-gradient(var(--grid-dot) 1px, transparent 1px) 0 0 / 22px 22px,
     var(--surface-sunken);
-  overflow: hidden;
+  /* overflow: visible so nodes slightly outside don't clip */
+  overflow: visible;
 }
-.ngraph__svg { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 .ngraph__edge-label {
   font-size: 10.5px; font-weight: 600; text-align: center; line-height: 1.2;
   color: var(--text-muted);
@@ -38,7 +35,7 @@
   white-space: nowrap; transition: opacity .25s;
 }
 .ngraph__edge-label.is-related { color: var(--accent); border-color: var(--accent); }
-.ngraph__node { position: absolute; transform: translate(-50%, -50%); z-index: 2; transition: opacity .25s; }
+
 
 /* ---------- Graph node card ---------- */
 .gnode {
