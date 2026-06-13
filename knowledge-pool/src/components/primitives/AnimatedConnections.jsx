@@ -48,29 +48,26 @@ function DrawPath({ d, stroke, strokeWidth, delay }) {
   )
 }
 
-function AnimatedConnections({ nodes, edges, width, height, selectedId, relatedIds }) {
+// `centers` is a map of nodeId -> { cx, cy } in pixels (already clamped to the
+// canvas by NodeGraph), so connectors always meet the visible node.
+function AnimatedConnections({ centers, edges, width, height, selectedId, relatedIds }) {
   const paths = useMemo(() => {
     if (!width || !height) return []
-    const map = new Map(nodes.map((n) => [n.id, n]))
     return edges
       .map((e, i) => {
-        const a = map.get(e.from)
-        const b = map.get(e.to)
+        const a = centers[e.from]
+        const b = centers[e.to]
         if (!a || !b) return null
-        const fx = (a.x / 100) * width
-        const fy = (a.y / 100) * height
-        const tx = (b.x / 100) * width
-        const ty = (b.y / 100) * height
         const key = `${e.from}-${e.to}-${i}`
         return {
           key, index: i, from: e.from, to: e.to, label: e.label,
-          d: buildPath(fx, fy, tx, ty),
-          lx: (fx + tx) / 2, ly: (fy + ty) / 2,
+          d: buildPath(a.cx, a.cy, b.cx, b.cy),
+          lx: (a.cx + b.cx) / 2, ly: (a.cy + b.cy) / 2,
           delay: hashDelay(key),
         }
       })
       .filter(Boolean)
-  }, [nodes, edges, width, height])
+  }, [centers, edges, width, height])
 
   if (!width || !height) return null
 

@@ -109,7 +109,7 @@ function renderGraph(el,data){
   canvas.appendChild(svg);
   const nodeEls={};
   data.nodes.forEach(n=>{
-    const d=document.createElement('div');d.className='node';d.style.left=n.x+'%';d.style.top=n.y+'%';
+    const d=document.createElement('div');d.className='node';
     d.appendChild(data.kind==='graph'&&n.fields?entCard(n):graphCard(n));
     canvas.appendChild(d);nodeEls[n.id]=d;
   });
@@ -130,9 +130,14 @@ function renderGraph(el,data){
     const div=document.createElement('div');div.className='detail';
     div.innerHTML=`<div class="dh"><div class="dt"><span class="dot" style="background:${rcv(n.role)}"></span><strong>${esc(n.title)}</strong>${det.tag?`<span class="tag" style="color:${rcv(n.role)}">${esc(det.tag)}</span>`:''}</div><button class="x">✕</button></div>${det.desc?`<p class="desc">${esc(det.desc)}</p>`:''}<ul class="facts">${(det.facts||[]).map(f=>`<li><code>${esc(f)}</code></li>`).join('')}</ul>`;
     div.querySelector('.x').onclick=()=>{selected=null;draw();renderNodes();renderDetail()};detailHost.appendChild(div)}
-  function draw(){const W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;svg.setAttribute('width',W);svg.setAttribute('height',H);svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML='';
-    const map={};data.nodes.forEach(n=>map[n.id]=n);
-    data.edges.forEach((e,i)=>{const a=map[e.from],b=map[e.to];if(!a||!b)return;const fx=a.x/100*W,fy=a.y/100*H,tx=b.x/100*W,ty=b.y/100*H;const d=buildPath(fx,fy,tx,ty);
+  const M=8;
+  function draw(){const W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
+    const centers={};
+    data.nodes.forEach(n=>{const el=nodeEls[n.id];const w=el.offsetWidth||(n.w||210),h=el.offsetHeight||130;const hw=w/2,hh=h/2;
+      let cx=n.x/100*W,cy=n.y/100*H;cx=Math.max(hw+M,Math.min(W-hw-M,cx));cy=Math.max(hh+M,Math.min(H-hh-M,cy));
+      centers[n.id]={cx,cy};el.style.left=cx+'px';el.style.top=cy+'px';});
+    svg.setAttribute('width',W);svg.setAttribute('height',H);svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML='';
+    data.edges.forEach((e,i)=>{const a=centers[e.from],b=centers[e.to];if(!a||!b)return;const fx=a.cx,fy=a.cy,tx=b.cx,ty=b.cy;const d=buildPath(fx,fy,tx,ty);
       const isRel=selected&&rel[selected].has(e.from)&&rel[selected].has(e.to);const dim=selected&&!isRel;
       const g=document.createElementNS(svg.namespaceURI,'g');g.setAttribute('opacity',dim?0.12:1);
       const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',d);path.setAttribute('fill','none');path.setAttribute('stroke',isRel?'var(--chigh)':'var(--cline)');path.setAttribute('stroke-width',isRel?2.6:1.8);path.setAttribute('stroke-linecap','round');
