@@ -13,10 +13,12 @@
 .diagram-frame__hint { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem; display: inline-flex; align-items: center; gap: 0.35rem; }
 
 /* ---------- Node graph ---------- */
-.ngraph { width: 100%; }
-/* fit-to-width: the canvas is laid out at a fixed design size then scaled down. */
-.ngraph__fit { width: 100%; }
-.ngraph__scaler { margin: 0 auto; position: relative; }
+.ngraph { width: 100%; min-width: 0; max-width: 100%; }
+/* fit-to-width: the canvas is laid out at a fixed design size then scaled down.
+   overflow:hidden + min-width:0 guard against the fixed 1080px canvas forcing
+   parent width before the scale is applied. */
+.ngraph__fit { width: 100%; min-width: 0; max-width: 100%; overflow: hidden; }
+.ngraph__scaler { margin: 0 auto; position: relative; max-width: 100%; }
 .ngraph__canvas {
   position: relative;
   border-radius: var(--radius-md);

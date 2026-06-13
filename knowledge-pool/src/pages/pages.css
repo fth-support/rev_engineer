@@ -33,6 +33,7 @@
 
 .cell {
   position: relative;
+  min-width: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
@@ -100,7 +101,10 @@
 .flows-head { padding: 1.5rem 1.75rem; }
 .flows-head h2 { margin: 0 0 0.3rem; border: none; padding: 0; }
 .flows-head p { margin: 0; color: var(--text-secondary); }
-.flows-layout { display: grid; grid-template-columns: 240px 1fr; gap: 1.25rem; align-items: start; }
+.flows-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+/* allow grid items to shrink below their min-content (the fixed-size diagram canvas)
+   so the fit-to-width scaler can shrink instead of overflowing */
+.flows-layout > * { min-width: 0; }
 @media (max-width: 900px) { .flows-layout { grid-template-columns: 1fr; } }
 .flows-nav { padding: 0.75rem; position: sticky; top: calc(var(--topbar-height) + 1rem); }
 .flow-nav-btn {

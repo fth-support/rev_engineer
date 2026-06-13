@@ -156,8 +156,8 @@ CSS = r"""
 .toggle .thumb{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-contrast);display:flex;align-items:center;justify-content:center;left:4px;top:3px;transition:transform .25s;font-size:13px}
 [data-theme=light] .toggle .thumb{transform:translateX(31px)}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;backdrop-filter:blur(12px)}
-.fit{width:100%}
-.scaler{margin:0 auto;position:relative}
+.fit{width:100%;min-width:0;max-width:100%;overflow:hidden}
+.scaler{margin:0 auto;position:relative;max-width:100%}
 .canvas{position:relative;border-radius:14px;border:1px solid var(--border);background:radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px,var(--sunken);overflow:hidden}
 .csvg{position:absolute;inset:0;pointer-events:none;z-index:1}
 .elabel{font-size:10.5px;font-weight:600;text-align:center;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px 6px;white-space:nowrap}
