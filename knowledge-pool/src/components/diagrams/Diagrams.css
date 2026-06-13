@@ -14,9 +14,11 @@
 
 /* ---------- Node graph ---------- */
 .ngraph { width: 100%; }
+/* fit-to-width: the canvas is laid out at a fixed design size then scaled down. */
+.ngraph__fit { width: 100%; }
+.ngraph__scaler { margin: 0 auto; position: relative; }
 .ngraph__canvas {
   position: relative;
-  width: 100%;
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   background:

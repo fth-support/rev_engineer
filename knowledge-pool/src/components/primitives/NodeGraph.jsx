@@ -3,27 +3,33 @@ import AnimatedConnections from './AnimatedConnections'
 import DetailPanel from './DetailPanel'
 
 // Reusable interactive graph: animated connectors (behind) + absolutely-positioned
-// nodes (in front). Clicking a node highlights it + its neighbours and dims the rest,
-// then opens a DetailPanel. Powers ArchitectureGraph / TargetArchitectureGraph / ERGraph.
+// nodes (in front). Clicking a node highlights it + its neighbours and dims the rest.
 //
-// Node centers are clamped so each node's full bounding box stays inside the canvas
-// (no clipping at the edges), and connectors are drawn to those clamped centers.
+// Responsive strategy (fit-to-width): the graph is laid out on a FIXED "design canvas"
+// (DESIGN_W × designH) so node positions, sizes, fonts and connectors keep identical
+// proportions at every screen size. A wrapper then `transform: scale()`s the whole
+// canvas down to fit the available width — so it's always fully visible, never clipped
+// and never overlapping, without needing full screen.
 
-const MARGIN = 8
+const DESIGN_W = 1080
+const MARGIN = 10
 
 function NodeGraph({ nodes, edges, aspect = 1.6, renderNode, getDetail, ariaLabel = 'Diagram' }) {
-  const ref = useRef(null)
+  const fitRef = useRef(null)
   const nodeRefs = useRef({})
-  const [size, setSize] = useState({ width: 0, height: 0 })
-  const [sizes, setSizes] = useState({}) // id -> { w, h } measured in px
+  const [scale, setScale] = useState(1)
+  const [sizes, setSizes] = useState({}) // id -> { w, h } measured at design scale
   const [selectedId, setSelectedId] = useState(null)
 
+  const designH = Math.round(DESIGN_W / aspect)
+
+  // Scale the fixed design canvas to fit the available width.
   useLayoutEffect(() => {
-    const el = ref.current
+    const el = fitRef.current
     if (!el) return
     const measure = () => {
-      const r = el.getBoundingClientRect()
-      setSize({ width: r.width, height: r.height })
+      const w = el.clientWidth
+      if (w > 0) setScale(Math.min(1, w / DESIGN_W))
     }
     measure()
     const ro = new ResizeObserver(measure)
@@ -31,7 +37,7 @@ function NodeGraph({ nodes, edges, aspect = 1.6, renderNode, getDetail, ariaLabe
     return () => ro.disconnect()
   }, [])
 
-  // Measure each node's rendered size once the canvas has a size.
+  // Measure each node's intrinsic (unscaled) size for clamping.
   useLayoutEffect(() => {
     const m = {}
     let changed = false
@@ -44,25 +50,23 @@ function NodeGraph({ nodes, edges, aspect = 1.6, renderNode, getDetail, ariaLabe
     }
     if (changed) setSizes(m)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [nodes, size.width, size.height])
+  }, [nodes])
 
-  // Clamp each node's center so its box stays fully inside the canvas.
+  // Node centers in DESIGN pixels, clamped so each box stays inside the design canvas.
   const centers = useMemo(() => {
     const out = {}
-    const W = size.width
-    const H = size.height
     for (const n of nodes) {
       const sz = sizes[n.id] || { w: n.w || 210, h: 130 }
       const hw = sz.w / 2
       const hh = sz.h / 2
-      let cx = (n.x / 100) * W
-      let cy = (n.y / 100) * H
-      if (W) cx = Math.max(hw + MARGIN, Math.min(W - hw - MARGIN, cx))
-      if (H) cy = Math.max(hh + MARGIN, Math.min(H - hh - MARGIN, cy))
+      let cx = (n.x / 100) * DESIGN_W
+      let cy = (n.y / 100) * designH
+      cx = Math.max(hw + MARGIN, Math.min(DESIGN_W - hw - MARGIN, cx))
+      cy = Math.max(hh + MARGIN, Math.min(designH - hh - MARGIN, cy))
       out[n.id] = { cx, cy }
     }
     return out
-  }, [nodes, sizes, size])
+  }, [nodes, sizes, designH])
 
   const relatedMap = useMemo(() => {
     const m = {}
@@ -78,44 +82,45 @@ function NodeGraph({ nodes, edges, aspect = 1.6, renderNode, getDetail, ariaLabe
   }, [nodes, edges])
 
   const relatedIds = selectedId ? relatedMap[selectedId] : null
-
-  const onSelect = useCallback((id) => {
-    setSelectedId((prev) => (prev === id ? null : id))
-  }, [])
-
+  const onSelect = useCallback((id) => setSelectedId((prev) => (prev === id ? null : id)), [])
   const selectedNode = selectedId ? nodes.find((n) => n.id === selectedId) : null
   const detail = selectedNode && getDetail ? getDetail(selectedNode) : null
 
   return (
     <div className="ngraph" aria-label={ariaLabel}>
-      <div className="ngraph__canvas" ref={ref} style={{ aspectRatio: String(aspect) }}>
-        <AnimatedConnections
-          centers={centers}
-          edges={edges}
-          width={size.width}
-          height={size.height}
-          selectedId={selectedId}
-          relatedIds={relatedIds}
-        />
-        {nodes.map((node) => {
-          const isSelected = node.id === selectedId
-          const isDimmed = selectedId ? !relatedIds.has(node.id) : false
-          const c = centers[node.id]
-          return (
-            <div
-              key={node.id}
-              ref={(el) => { nodeRefs.current[node.id] = el }}
-              className="ngraph__node"
-              style={{ left: `${c ? c.cx : 0}px`, top: `${c ? c.cy : 0}px`, opacity: isDimmed ? 0.32 : 1 }}
-            >
-              {renderNode({ node, isSelected, isDimmed, onSelect })}
-            </div>
-          )
-        })}
+      <div className="ngraph__fit" ref={fitRef}>
+        <div className="ngraph__scaler" style={{ width: DESIGN_W * scale, height: designH * scale }}>
+          <div
+            className="ngraph__canvas"
+            style={{ width: DESIGN_W, height: designH, transform: `scale(${scale})`, transformOrigin: 'top left' }}
+          >
+            <AnimatedConnections
+              centers={centers}
+              edges={edges}
+              width={DESIGN_W}
+              height={designH}
+              selectedId={selectedId}
+              relatedIds={relatedIds}
+            />
+            {nodes.map((node) => {
+              const isSelected = node.id === selectedId
+              const isDimmed = selectedId ? !relatedIds.has(node.id) : false
+              const c = centers[node.id]
+              return (
+                <div
+                  key={node.id}
+                  ref={(el) => { nodeRefs.current[node.id] = el }}
+                  className="ngraph__node"
+                  style={{ left: `${c ? c.cx : 0}px`, top: `${c ? c.cy : 0}px`, opacity: isDimmed ? 0.32 : 1 }}
+                >
+                  {renderNode({ node, isSelected, isDimmed, onSelect })}
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </div>
-      {detail && (
-        <DetailPanel node={selectedNode} detail={detail} onClose={() => setSelectedId(null)} />
-      )}
+      {detail && <DetailPanel node={selectedNode} detail={detail} onClose={() => setSelectedId(null)} />}
     </div>
   )
 }

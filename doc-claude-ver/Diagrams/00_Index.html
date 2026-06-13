@@ -17,7 +17,9 @@
 .toggle .thumb{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-contrast);display:flex;align-items:center;justify-content:center;left:4px;top:3px;transition:transform .25s;font-size:13px}
 [data-theme=light] .toggle .thumb{transform:translateX(31px)}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;backdrop-filter:blur(12px)}
-.canvas{position:relative;width:100%;border-radius:14px;border:1px solid var(--border);background:radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px,var(--sunken);overflow:hidden}
+.fit{width:100%}
+.scaler{margin:0 auto;position:relative}
+.canvas{position:relative;border-radius:14px;border:1px solid var(--border);background:radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px,var(--sunken);overflow:hidden}
 .csvg{position:absolute;inset:0;pointer-events:none;z-index:1}
 .elabel{font-size:10.5px;font-weight:600;text-align:center;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px 6px;white-space:nowrap}
 .elabel.rel{color:var(--accent);border-color:var(--accent)}
@@ -104,7 +106,12 @@ function buildPath(fx,fy,tx,ty){const dx=tx-fx,dy=ty-fy;if(Math.abs(dx)>=Math.ab
 function renderGraph(el,data){
   let selected=null;
   const rel={};data.nodes.forEach(n=>{const s=new Set([n.id]);data.edges.forEach(e=>{if(e.from===n.id)s.add(e.to);if(e.to===n.id)s.add(e.from)});rel[n.id]=s});
-  const canvas=document.createElement('div');canvas.className='canvas';canvas.style.aspectRatio=String(data.aspect||1.6);
+  const DESIGN_W=1080,designH=Math.round(DESIGN_W/(data.aspect||1.6));
+  const fit=document.createElement('div');fit.className='fit';
+  const scaler=document.createElement('div');scaler.className='scaler';
+  const canvas=document.createElement('div');canvas.className='canvas';
+  canvas.style.width=DESIGN_W+'px';canvas.style.height=designH+'px';canvas.style.transformOrigin='top left';
+  scaler.appendChild(canvas);fit.appendChild(scaler);
   const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','csvg');
   canvas.appendChild(svg);
   const nodeEls={};
@@ -113,7 +120,7 @@ function renderGraph(el,data){
     d.appendChild(data.kind==='graph'&&n.fields?entCard(n):graphCard(n));
     canvas.appendChild(d);nodeEls[n.id]=d;
   });
-  el.appendChild(canvas);
+  el.appendChild(fit);
   const detailHost=document.createElement('div');el.appendChild(detailHost);
   function graphCard(n){const b=document.createElement('button');b.className='gnode';b.style.width=(n.w||220)+'px';b.style.setProperty('--rc',rcv(n.role));b.style.setProperty('--rsoft',rsv(n.role));
     let li=(n.items||[]).map(x=>`<li>${esc(x)}</li>`).join('');
@@ -124,30 +131,37 @@ function renderGraph(el,data){
     b.innerHTML=`<div class="h"><span class="n">${esc(n.title)}</span><span class="s">${esc(n.sub||'')}</span></div><ul>${li}</ul>`;
     b.onclick=()=>select(n.id);return b}
   function ftClass(t){t=(t||'').toLowerCase();if(t.includes('pk'))return 'pk';if(t.includes('fk'))return 'fk';if(t.includes('token'))return 'token';return ''}
-  function select(id){selected=selected===id?null:id;draw();renderNodes();renderDetail()}
+  function select(id){selected=selected===id?null:id;drawConns();renderNodes();renderDetail()}
   function renderNodes(){data.nodes.forEach(n=>{const card=nodeEls[n.id].firstChild;const dim=selected&&!rel[selected].has(n.id);nodeEls[n.id].style.opacity=dim?0.32:1;card.classList.toggle('sel',selected===n.id)})}
   function renderDetail(){detailHost.innerHTML='';if(!selected)return;const n=data.nodes.find(x=>x.id===selected);const det=n.detail||{tag:n.sub,desc:`${n.title} — ${(n.fields||[]).length} columns.`,facts:(n.fields||[]).map(f=>f[1]?f[0]+' · '+f[1]:f[0])};
     const div=document.createElement('div');div.className='detail';
     div.innerHTML=`<div class="dh"><div class="dt"><span class="dot" style="background:${rcv(n.role)}"></span><strong>${esc(n.title)}</strong>${det.tag?`<span class="tag" style="color:${rcv(n.role)}">${esc(det.tag)}</span>`:''}</div><button class="x">✕</button></div>${det.desc?`<p class="desc">${esc(det.desc)}</p>`:''}<ul class="facts">${(det.facts||[]).map(f=>`<li><code>${esc(f)}</code></li>`).join('')}</ul>`;
-    div.querySelector('.x').onclick=()=>{selected=null;draw();renderNodes();renderDetail()};detailHost.appendChild(div)}
-  const M=8;
-  function draw(){const W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;
-    const centers={};
+    div.querySelector('.x').onclick=()=>{selected=null;drawConns();renderNodes();renderDetail()};detailHost.appendChild(div)}
+  const M=10;let curCenters={};
+  // Lay out nodes on the FIXED design canvas (run once); clamp so none clip the edges.
+  function layout(){
+    curCenters={};
     data.nodes.forEach(n=>{const el=nodeEls[n.id];const w=el.offsetWidth||(n.w||210),h=el.offsetHeight||130;const hw=w/2,hh=h/2;
-      let cx=n.x/100*W,cy=n.y/100*H;cx=Math.max(hw+M,Math.min(W-hw-M,cx));cy=Math.max(hh+M,Math.min(H-hh-M,cy));
-      centers[n.id]={cx,cy};el.style.left=cx+'px';el.style.top=cy+'px';});
-    svg.setAttribute('width',W);svg.setAttribute('height',H);svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML='';
-    data.edges.forEach((e,i)=>{const a=centers[e.from],b=centers[e.to];if(!a||!b)return;const fx=a.cx,fy=a.cy,tx=b.cx,ty=b.cy;const d=buildPath(fx,fy,tx,ty);
+      let cx=n.x/100*DESIGN_W,cy=n.y/100*designH;cx=Math.max(hw+M,Math.min(DESIGN_W-hw-M,cx));cy=Math.max(hh+M,Math.min(designH-hh-M,cy));
+      curCenters[n.id]={cx,cy};el.style.left=cx+'px';el.style.top=cy+'px';});
+    drawConns();
+  }
+  // Draw connectors at the (fixed) design coordinates; only re-runs on select.
+  function drawConns(){
+    svg.setAttribute('width',DESIGN_W);svg.setAttribute('height',designH);svg.setAttribute('viewBox',`0 0 ${DESIGN_W} ${designH}`);svg.innerHTML='';
+    data.edges.forEach((e,i)=>{const a=curCenters[e.from],b=curCenters[e.to];if(!a||!b)return;const fx=a.cx,fy=a.cy,tx=b.cx,ty=b.cy;const d=buildPath(fx,fy,tx,ty);
       const isRel=selected&&rel[selected].has(e.from)&&rel[selected].has(e.to);const dim=selected&&!isRel;
       const g=document.createElementNS(svg.namespaceURI,'g');g.setAttribute('opacity',dim?0.12:1);
       const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',d);path.setAttribute('fill','none');path.setAttribute('stroke',isRel?'var(--chigh)':'var(--cline)');path.setAttribute('stroke-width',isRel?2.6:1.8);path.setAttribute('stroke-linecap','round');
-      const len=path.getTotalLength?0:0;path.style.strokeDasharray='1400';path.style.strokeDashoffset='1400';path.style.animation='draw-line 1.3s cubic-bezier(.4,0,.2,1) forwards';path.style.animationDelay=(0.4+i*0.06)+'s';
+      path.style.strokeDasharray='1400';path.style.strokeDashoffset='1400';path.style.animation='draw-line 1.3s cubic-bezier(.4,0,.2,1) forwards';path.style.animationDelay=(0.4+i*0.06)+'s';
       g.appendChild(path);
       const c=document.createElementNS(svg.namespaceURI,'circle');c.setAttribute('r',isRel?3.2:2);c.setAttribute('fill',isRel?'var(--particle)':'var(--cline)');c.style.offsetPath=`path("${d}")`;c.style.animation=`orbit ${isRel?2.2:4}s linear infinite`;g.appendChild(c);
       if(e.label){const fo=document.createElementNS(svg.namespaceURI,'foreignObject');fo.setAttribute('x',(fx+tx)/2-80);fo.setAttribute('y',(fy+ty)/2-14);fo.setAttribute('width',160);fo.setAttribute('height',28);fo.innerHTML=`<div xmlns="http://www.w3.org/1999/xhtml" class="elabel ${isRel?'rel':''}" style="opacity:${dim?0.15:1}">${esc(e.label)}</div>`;g.appendChild(fo)}
       svg.appendChild(g)})}
-  const ro=new ResizeObserver(()=>draw());ro.observe(canvas);
-  requestAnimationFrame(draw);window.addEventListener('resize',draw);
+  // Fit-to-width: scale the whole design canvas to the available width.
+  function fitScale(){const w=fit.clientWidth;if(!w)return;const s=Math.min(1,w/DESIGN_W);canvas.style.transform='scale('+s+')';scaler.style.width=(DESIGN_W*s)+'px';scaler.style.height=(designH*s)+'px';}
+  const ro=new ResizeObserver(fitScale);ro.observe(fit);
+  requestAnimationFrame(()=>{layout();fitScale();});window.addEventListener('resize',fitScale);
   renderNodes();
 }
 
