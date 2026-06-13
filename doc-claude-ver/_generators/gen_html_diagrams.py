@@ -287,7 +287,10 @@ function renderGraph(el,data){
   // Fit-to-width: scale the whole design canvas to the available width.
   function fitScale(){const w=fit.clientWidth;if(!w)return;const s=Math.min(1,w/DESIGN_W);canvas.style.transform='scale('+s+')';scaler.style.width=(DESIGN_W*s)+'px';scaler.style.height=(designH*s)+'px';}
   const ro=new ResizeObserver(fitScale);ro.observe(fit);
+  // re-layout when nodes resize (e.g. after the webfont loads and boxes grow taller)
+  const ro2=new ResizeObserver(()=>layout());Object.values(nodeEls).forEach(e=>ro2.observe(e));
   requestAnimationFrame(()=>{layout();fitScale();});window.addEventListener('resize',fitScale);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{layout();fitScale();});
   renderNodes();
 }
 

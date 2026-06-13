@@ -37,18 +37,35 @@ function NodeGraph({ nodes, edges, aspect = 1.6, renderNode, getDetail, ariaLabe
     return () => ro.disconnect()
   }, [])
 
-  // Measure each node's intrinsic (unscaled) size for clamping.
+  // Measure each node's intrinsic (unscaled) size for clamping. Re-measure after the
+  // webfont loads and whenever a node resizes — otherwise the clamp uses fallback-font
+  // heights measured before Inter loads, and tall nodes overflow the top edge.
   useLayoutEffect(() => {
-    const m = {}
-    let changed = false
+    const remeasure = () => {
+      const m = {}
+      for (const n of nodes) {
+        const el = nodeRefs.current[n.id]
+        if (el) m[n.id] = { w: el.offsetWidth, h: el.offsetHeight }
+      }
+      setSizes((prev) => {
+        let changed = false
+        for (const k in m) {
+          if (!prev[k] || prev[k].w !== m[k].w || prev[k].h !== m[k].h) changed = true
+        }
+        return changed ? { ...prev, ...m } : prev
+      })
+    }
+    remeasure()
+    let cancelled = false
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => { if (!cancelled) remeasure() })
+    }
+    const ro = new ResizeObserver(remeasure)
     for (const n of nodes) {
       const el = nodeRefs.current[n.id]
-      if (el) {
-        m[n.id] = { w: el.offsetWidth, h: el.offsetHeight }
-        if (!sizes[n.id] || sizes[n.id].w !== m[n.id].w || sizes[n.id].h !== m[n.id].h) changed = true
-      }
+      if (el) ro.observe(el)
     }
-    if (changed) setSizes(m)
+    return () => { cancelled = true; ro.disconnect() }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodes])
 
