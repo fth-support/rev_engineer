@@ -1,5 +1,7 @@
 # ServiceTransfer: Program Specification
 
+> 🔗 **Interactive diagrams:** step through the live [Data Sync Flow](../doc-claude-ver/Diagrams/03_Sync_Flow.html) and [Member Points Flow](../doc-claude-ver/Diagrams/05_Member_Points_Flow.html) (full [index](../doc-claude-ver/Diagrams/00_Index.html)). The Mermaid flow below renders natively on GitHub / GitLab / VS Code.
+
 เอกสารฉบับนี้ถอดตรรกะการทำงาน (Logic) ของ ServiceTransfer เดิมที่เขียนด้วย VB6 ออกมาเป็นรูปแบบ **Pseudocode** เพื่อให้ทีมพัฒนาเข้าใจ Flow การทำงานและสามารถนำไปสร้างระบบใหม่ (Re-implement) ในภาษาใดก็ได้โดยไม่ต้องไล่ดูโค้ด VB6
 
 ## 1. High-Level Call Graph
@@ -28,6 +30,20 @@ otmForm_Timer()  <ทุก 500 ms>                [wMain.frm]
 ---
 
 ## 2. Main Processing Loops (Pseudocode)
+
+ภาพรวมรอบการซิงค์ `otmForm_Timer()` (ทำงานทุก 500ms) — 6 เฟส:
+
+```mermaid
+flowchart TD
+    A["1 · Pre-check<br/>otmForm.Enabled=False · read Registry"] -->|"SentSale≠'1' OR Online≠'1'"| Z["Cleanup<br/>re-enable timer"]
+    A --> B["2 · Connect & Validate<br/>W_DATbConnectOrChk · W_GETbStoreOpen (FTTmsOpnStore='Y')"]
+    B -->|fail| Z
+    B --> C["3 · Configuration<br/>MM_GETxTable (TSysSync) · W_GETtTmnNum · SP_GETdSaleDate"]
+    C --> D["4 · Sync Loop (per table × record)<br/>MM_GETxData (FTStaSentOnOff='0') → W_DATbInsertData → tokenize → INSERT → set '1'"]
+    D -->|"555 children / 557 token / -2147467259 conn"| D
+    D --> E["5 · Member Points<br/>W_UPDxUpdatePoint()"]
+    E --> Z
+```
 
 ### 2.1 Form_Load (เริ่มต้นระบบ)
 ```vb

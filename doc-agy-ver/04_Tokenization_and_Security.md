@@ -1,5 +1,7 @@
 # ServiceTransfer: Tokenization & Security
 
+> 🔗 **Interactive diagram:** step through the live [Tokenization Flow](../doc-claude-ver/Diagrams/04_Tokenization_Flow.html) (full [index](../doc-claude-ver/Diagrams/00_Index.html)). The Mermaid flow below renders natively on GitHub / GitLab / VS Code.
+
 ข้อมูลบัตรเครดิตและบัตรสมาชิกมีความอ่อนไหวสูง (Sensitive Data) เพื่อให้สอดคล้องกับมาตรฐานความปลอดภัย (PCI-DSS) ระบบ ServiceTransfer เดิมจึงทำหน้าที่เสมือน Data Protection Gateway ที่จะจับเลขบัตรจริงจาก Local DB มาแปลงเป็นค่า **Token** ก่อนที่จะส่งขึ้น Central DB
 
 ---

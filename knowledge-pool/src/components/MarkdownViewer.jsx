@@ -1,59 +1,55 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-// Import diagram components
-import SystemArchitecture from './diagrams/SystemArchitecture'
-import SyncFlow from './diagrams/SyncFlow'
-import ERDiagram from './diagrams/ERDiagram'
-import TokenizationFlow from './diagrams/TokenizationFlow'
-import MemberPointsFlow from './diagrams/MemberPointsFlow'
-import TargetArchitecture from './diagrams/TargetArchitecture'
+import ArchitectureGraph from './diagrams/ArchitectureGraph'
+import TargetArchitectureGraph from './diagrams/TargetArchitectureGraph'
+import SyncFlowStepper from './diagrams/SyncFlowStepper'
+import ERGraph from './diagrams/ERGraph'
+import TokenizationStepper from './diagrams/TokenizationStepper'
+import MemberPointsStepper from './diagrams/MemberPointsStepper'
 
-const DiagramRenderer = ({ id }) => {
-  const normalizedId = String(id).trim().toLowerCase();
-  switch (normalizedId) {
-    case 'architecture': return <SystemArchitecture />;
-    case 'target_architecture': return <TargetArchitecture />;
-    case 'sync_flow': return <SyncFlow />;
-    case 'er_diagram': return <ERDiagram />;
-    case 'tokenization': return <TokenizationFlow />;
-    case 'member_points': return <MemberPointsFlow />;
-    default: return <div style={{ color: 'red', padding: '1rem' }}>Unknown diagram: {id}</div>;
-  }
-};
+// Maps a ```diagram fenced block (whose body is an id) to an interactive component.
+const DIAGRAMS = {
+  architecture: ArchitectureGraph,
+  target_architecture: TargetArchitectureGraph,
+  sync_flow: SyncFlowStepper,
+  er_diagram: ERGraph,
+  tokenization: TokenizationStepper,
+  member_points: MemberPointsStepper,
+}
+
+function DiagramRenderer({ id }) {
+  const key = String(id).trim().toLowerCase()
+  const Comp = DIAGRAMS[key]
+  if (!Comp) return <div style={{ color: 'var(--danger)', padding: '1rem' }}>Unknown diagram: {id}</div>
+  return <div className="markdown-diagram"><Comp /></div>
+}
 
 function MarkdownViewer({ file }) {
-  const [content, setContent] = useState('Loading...')
-  const containerRef = useRef(null)
+  const [content, setContent] = useState('Loading…')
 
   useEffect(() => {
+    let cancelled = false
     fetch(`./docs/${file}`)
       .then((res) => res.text())
-      .then((text) => setContent(text))
-      .catch((err) => setContent(`Error loading document: ${err.message}`))
+      .then((text) => { if (!cancelled) setContent(text) })
+      .catch((err) => { if (!cancelled) setContent(`Error loading document: ${err.message}`) })
+    return () => { cancelled = true }
   }, [file])
 
   return (
-    <div className="markdown-body" ref={containerRef}>
-      <ReactMarkdown 
+    <div className="markdown-body glass" style={{ padding: '2rem 2.25rem' }}>
+      <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          code({node, inline, className, children, ...props}) {
+          code({ inline, className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '')
             if (!inline && match && match[1] === 'diagram') {
               return <DiagramRenderer id={children} />
             }
-            return !inline && match ? (
-              <code className={className} {...props}>
-                {children}
-              </code>
-            ) : (
-              <code className={className} {...props}>
-                {children}
-              </code>
-            )
-          }
+            return <code className={className} {...props}>{children}</code>
+          },
         }}
       >
         {content}

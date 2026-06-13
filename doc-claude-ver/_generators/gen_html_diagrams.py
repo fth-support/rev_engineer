@@ -1,0 +1,350 @@
+# -*- coding: utf-8 -*-
+"""Generate the 5 standalone interactive HTML diagrams (+ index) for doc-claude-ver.
+
+Each output is a SELF-CONTAINED .html (no external deps) that mirrors the website's
+new interactive style: a dark/light theme toggle, animated SVG bezier connectors with
+flowing particles, clickable graph nodes with related-highlighting + detail panel, and
+click/Prev/Next steppers. All content is verified against legacy_source/.
+"""
+import os, json
+
+OUT = os.path.normpath(os.path.join(os.path.dirname(__file__), '..', 'Diagrams'))
+os.makedirs(OUT, exist_ok=True)
+
+# --------------------------------------------------------------------------- data
+ARCH = {
+    "kind": "graph", "aspect": 1.7,
+    "nodes": [
+        {"id": "pos", "role": "branch", "x": 22, "y": 30, "w": 240,
+         "title": "POS Terminal (Branch)", "sub": "ServiceTransfer.exe · Timer 500ms",
+         "items": ["wMain.frm (1,763 lines)", "mMain.bas (1,099 lines)", "Local DB — SQL Express"],
+         "detail": {"tag": "VB6 Background Agent",
+                    "desc": "Runs on every branch POS. A 500ms timer loop (otmForm_Timer) polls the local SQL Express DB for rows flagged FTStaSentOnOff='0' and pushes them to HQ.",
+                    "facts": ["Timer Interval = 500ms", "ADODB 2.7 / SQLOLEDB.1", "Config: AdaIni.Ada + Registry", "Logs: LOG\\TransferOffline*.Log"]}},
+        {"id": "central", "role": "central", "x": 72, "y": 24, "w": 230,
+         "title": "Central Server (HQ)", "sub": "SQL Server — Central DB",
+         "items": ["TPSTSalHD / DT / RC / CD", "TSysSync (sync config)", "TCNMTerminalMtn · TSysConfig"],
+         "detail": {"tag": "Consolidated Sales DB",
+                    "desc": "Receives sales from every branch. The agent reads sync config (TSysSync) and the operation date (TSysChgDateTime) from here.",
+                    "facts": ["Health: SELECT FTTmnCode FROM TCNMTerminalMtn", "Sale date: TSysChgDateTime.FDCdtDate", "TSysSync WHERE FTSscStaActive='1'"]}},
+        {"id": "member", "role": "member", "x": 78, "y": 72, "w": 210,
+         "title": "Member DB", "sub": "SQL Server — Loyalty",
+         "items": ["TCNMMallCard (member cards)", "TPSTBPHis (point history)", "TPSTTokenLst (token map)"],
+         "detail": {"tag": "Loyalty / Points DB",
+                    "desc": "Separate connection (ocnMem). W_UPDxUpdatePoint posts accumulated points to TCNMMallCard and writes an audit row to TPSTBPHis.",
+                    "facts": ["UPDATE FCEarned += points", "FCBalance = FCMcdTotalPoint + FCEarned + points", "New member → FTMcdStaAct='A'"]}},
+        {"id": "safenet", "role": "safenet", "x": 26, "y": 76, "w": 220,
+         "title": "SafeNet Tokenizer", "sub": "SOAP Web Service",
+         "items": ["MSSOAP.SoapClient30", "InsertToken() · GetValue()", "FIRST_SIX_TOKEN · Timeout 10,000ms"],
+         "detail": {"tag": "External Tokenization",
+                    "desc": "Card numbers are tokenized here before any sensitive value leaves the branch. FIRST_SIX_TOKEN keeps the first 6 digits.",
+                    "facts": ["SP_CHKbWebservice → MSSoapInit(URL)", "InsertToken(CardNo, format=4, luhn=0)", "Failure raises Error 557"]}},
+    ],
+    "edges": [
+        {"from": "pos", "to": "central", "label": "SQLOLEDB.1 — INSERT/UPDATE"},
+        {"from": "central", "to": "pos", "label": "SELECT config / sale date"},
+        {"from": "pos", "to": "safenet", "label": "SOAP — InsertToken()"},
+        {"from": "pos", "to": "member", "label": "W_UPDxUpdatePoint()"},
+    ],
+}
+
+ER = {
+    "kind": "graph", "aspect": 1.45,
+    "nodes": [
+        {"id": "hd", "role": "branch", "x": 16, "y": 16, "w": 215, "title": "TPSTSalHD", "sub": "Sales Header",
+         "fields": [["FTTmnNum", "PK"], ["FTShdTransNo", "PK"], ["FDShdTransDate", "PK"], ["FTShdTransType", ""], ["FTStaSentOnOff", "0/1/3"], ["FTCstCardCode", "TOKEN"], ["FTShdStaDoc", ""]]},
+        {"id": "dt", "role": "branch", "x": 50, "y": 10, "w": 205, "title": "TPSTSalDT", "sub": "Sales Detail",
+         "fields": [["FTTmnNum+TransNo+Date", "FK"], ["FNSdtSeqNo", "PK"], ["FTStaSentOnOff", "0/1/3"]]},
+        {"id": "rc", "role": "branch", "x": 50, "y": 35, "w": 205, "title": "TPSTSalRC", "sub": "Receipt / Tender",
+         "fields": [["FNSrcSeqNo", "PK"], ["FTTdmCode", "Tender"], ["FTSrcCardNo", "TOKEN"]]},
+        {"id": "cd", "role": "branch", "x": 50, "y": 60, "w": 205, "title": "TPSTSalCD", "sub": "Card Detail",
+         "fields": [["FNSdtSeqNo+FNScdSeqNo", "PK"], ["FNDctNo", "Discount"], ["FTScdCardID", "TOKEN"]]},
+        {"id": "sp", "role": "central", "x": 50, "y": 84, "w": 205, "title": "TPSTSalePoint", "sub": "Transaction Points",
+         "fields": [["FTSpoMemID", "TOKEN"], ["FCSpoPoint", "+/-"], ["FTRemark", "0/1"]]},
+        {"id": "mall", "role": "member", "x": 84, "y": 42, "w": 215, "title": "TCNMMallCard", "sub": "Member Master",
+         "fields": [["FTMcdCode", "PK token"], ["FDMcdExpDate", "PK"], ["FTMcdStaAct", "A"], ["FCMcdTotalPoint", ""], ["FCEarned / FCBalance", ""]]},
+        {"id": "bphis", "role": "member", "x": 84, "y": 70, "w": 215, "title": "TPSTBPHis", "sub": "Point History",
+         "fields": [["FTShdMemberID", "PK token"], ["FCCstCardPoint", "+/-"], ["FCTotalBP / FCBalanceBP", ""]]},
+        {"id": "token", "role": "safenet", "x": 84, "y": 14, "w": 215, "title": "TPSTTokenLst", "sub": "Token Mapping",
+         "fields": [["FTToken", "PK"], ["FTValue", "real card"], ["FTTblName / FTFldName", ""], ["FNStatus", "1=active"]]},
+    ],
+    "edges": [
+        {"from": "hd", "to": "dt", "label": "1:N"}, {"from": "hd", "to": "rc", "label": "1:N"},
+        {"from": "hd", "to": "cd", "label": "1:N"}, {"from": "hd", "to": "sp", "label": "1:N"},
+        {"from": "sp", "to": "mall", "label": "lookup"}, {"from": "mall", "to": "bphis", "label": "1:N"},
+        {"from": "hd", "to": "token", "label": "tokenize"},
+    ],
+}
+
+SYNC = {"kind": "stepper", "steps": [
+    {"title": "Pre-check", "role": "config", "code": "otmForm_Timer()",
+     "lines": ["otmForm.Enabled = False (prevent re-entrancy)", "Read Registry: SentSale, Online, SentStartDate"],
+     "branch": {"label": "IF SentSale≠'1' OR Online≠'1' → skip to Cleanup", "tone": "exit"}},
+    {"title": "Connect & Validate", "role": "branch",
+     "lines": ["W_DATbConnectOrChk(ocnOnline) — SELECT FTTmnCode FROM TCNMTerminalMtn",
+               "W_GETbStoreOpen() — TsysTerminalSta.FTTmsOpnStore = 'Y'", "W_DATbConnectOrChk(ocnOffline)"],
+     "branch": {"label": "Any check fails → log + skip to Cleanup", "tone": "exit"}},
+    {"title": "Configuration", "role": "central",
+     "lines": ["MM_GETxTable() — TSysSync WHERE FTSscStaActive='1'", "W_GETtTmnNum() — Computer Name → Terminal Number", "SP_GETdSaleDate() — TSysChgDateTime.FDCdtDate"]},
+    {"title": "Sync Loop (per table × record)", "role": "member",
+     "lines": ["MM_GETxData() — WHERE FTStaSentOnOff='0' AND FDShdTransDate ≤ SaleDate",
+               "W_DATbInsertData(): HD-first → dup check/DELETE → build SQL → tokenize → INSERT",
+               "Success → W_DATxUpdateByScript() sets FTStaSentOnOff='1'"],
+     "branch": {"label": "-2147217873 dup→UPDATE · -2147467259 conn→abort · 555 children→skip · 557 token→skip+reset", "tone": "error"}},
+    {"title": "Member Points", "role": "purple", "code": "W_UPDxUpdatePoint()",
+     "lines": ["Post accumulated points to Member DB (see Member Points flow)"]},
+    {"title": "Cleanup", "role": "safenet",
+     "lines": ["Save Registry (SentStartDate/Time, SentStaOn='1')", "otmForm.Enabled = True — next cycle in 500ms"]},
+]}
+
+TOKEN = {"kind": "stepper", "steps": [
+    {"title": "Guard clauses", "role": "config", "code": "SP_PRCbToken()",
+     "lines": ["IF NOT bVB_AlwToken (Store Para FTStpCode=29) → return original",
+               "IF Len(CardNo) < 7 (nVB_ChkDigitToken) → return original",
+               "IF Len(CardNo) < 14 OR empty → return original"],
+     "branch": {"label": "Tokenize only when enabled AND Len ≥ 14", "tone": "exit"}},
+    {"title": "DB cache lookup", "role": "branch",
+     "lines": ["IF Online='1' AND NOT pbNoSearchDB:",
+               "SELECT TOP 1 FTToken FROM TPSTTokenLst WHERE FTValue=CardNo AND FTValue≠FTToken ORDER BY FDDateIns DESC"],
+     "branch": {"label": "Found → return cached token (fast path)", "tone": "ok"}},
+    {"title": "Init SOAP client", "role": "safenet", "code": "SP_CHKbWebservice()",
+     "lines": ['CreateObject("MSSOAP.SoapClient30")', "MSSoapInit(tVB_TokenURL)", "Timeout = ConnectTimeout = 10,000ms"]},
+    {"title": "Call InsertToken", "role": "safenet",
+     "lines": ["oToken.InsertToken(NAEUsr, NAEPwd, DBUsr, DBPwd, DB, CardNo, format=4, luhn=0)", "format 4 = FIRST_SIX_TOKEN"],
+     "branch": {"label": "Err ≠ 0 OR empty token → return False (Error 557)", "tone": "error"}},
+    {"title": "Persist mapping", "role": "central", "code": "SP_PRCbINSTokenList()",
+     "lines": ["INSERT INTO TPSTTokenLst (FDDateIns, FTWhoIns, FTTblName, FTFldName, FTTmnNum, FTShdTransNo, FDShdTransDate, FTValue, FTToken, FNStatus, FTSrvName)", "Return new token to caller"]},
+]}
+
+POINTS = {"kind": "stepper", "steps": [
+    {"title": "Fetch pending points", "role": "config", "code": "W_UPDxUpdatePoint()",
+     "lines": ["SELECT DISTINCT FTTmnNum, FTShdTransNo, FTShdTransType, FDShdTransDate", "FROM TPSTSalePoint WHERE FTRemark='0' AND FTSpoMemID ≠ ''"]},
+    {"title": "Aggregate per member", "role": "branch",
+     "lines": ["SUM(FCSpoPoint) GROUP BY FTSpoMemID, FDDateUpd, FTWhoUpd"]},
+    {"title": "Tokenize member ID", "role": "safenet",
+     "lines": ['SP_PRCbToken("TPSTSalePoint", FTSpoMemID) → token', "Write mapping to Member DB TPSTTokenLst"]},
+    {"title": "Calculate +/- by TransType", "role": "member",
+     "lines": ["Sale(03) · VIPSale(10) · Deposit(06) · AddDeposit(19) → +Point", "Return(04) · IPV(05) · DepositCancel(16) · CancelVoucher(21) → −Point"]},
+    {"title": "Update / Insert MallCard", "role": "central",
+     "lines": ["Found: UPDATE TCNMMallCard SET FCEarned += pts, FCBalance = FCMcdTotalPoint + FCEarned + pts",
+               "Not found: INSERT (FTMcdStaAct='A', FTMcdName='New Member', FCEarned=pts, FCBalance=pts)"]},
+    {"title": "History & mark done", "role": "purple",
+     "lines": ["INSERT INTO TPSTBPHis (member, point, totals)", "UPDATE TPSTSalePoint SET FTRemark='1' (Local)"]},
+]}
+
+PAGES = [
+    ("01_ER_Diagram.html", "Entity-Relationship Diagram", "Core sales, member & tokenization tables — verified schema", ER),
+    ("02_System_Architecture.html", "System Architecture", "3-database topology + SafeNet tokenizer", ARCH),
+    ("03_Sync_Flow.html", "Data Synchronization Flow", "otmForm_Timer() — one 6-phase cycle every 500ms", SYNC),
+    ("04_Tokenization_Flow.html", "Tokenization Flow", "SP_PRCbToken() — guard → cache → SafeNet SOAP → persist", TOKEN),
+    ("05_Member_Points_Flow.html", "Member Points Flow", "W_UPDxUpdatePoint() — accrue loyalty points", POINTS),
+]
+
+# --------------------------------------------------------------------------- template
+CSS = r"""
+:root{--role-branch:#60a5fa;--role-branch-soft:rgba(96,165,250,.14);--role-central:#34d399;--role-central-soft:rgba(52,211,153,.14);--role-member:#fbbf24;--role-member-soft:rgba(251,191,36,.14);--role-safenet:#f87171;--role-safenet-soft:rgba(248,113,113,.14);--role-config:#94a3b8;--role-config-soft:rgba(148,163,184,.14);--role-purple:#c084fc;--role-purple-soft:rgba(192,132,252,.14);
+--page:#0b1120;--surface:rgba(30,41,59,.72);--sunken:rgba(2,6,23,.45);--raised:rgba(51,65,85,.55);--border:rgba(148,163,184,.16);--border2:rgba(148,163,184,.32);--text:#f1f5f9;--text2:#94a3b8;--muted:#64748b;--accent:#60a5fa;--accent2:#3b82f6;--accent-soft:rgba(59,130,246,.16);--accent-contrast:#0b1120;--node:rgba(30,41,59,.85);--nodeb:rgba(148,163,184,.22);--nshadow:0 6px 22px rgba(0,0,0,.45);--nglow:0 0 26px rgba(96,165,250,.22);--nselb:rgba(96,165,250,.7);--nselg:0 0 30px rgba(96,165,250,.28),0 0 0 1px rgba(96,165,250,.4);--cline:rgba(148,163,184,.35);--chigh:rgba(96,165,250,.85);--particle:rgba(96,165,250,.9);--dot:rgba(148,163,184,.06);--success:#34d399;--success-bg:rgba(52,211,153,.12);--warning:#fbbf24;--warning-bg:rgba(251,191,36,.12);--danger:#f87171;--danger-bg:rgba(248,113,113,.12);--info:#60a5fa;--info-bg:rgba(96,165,250,.12);--code:rgba(2,6,23,.6);--shadow:0 8px 30px rgba(0,0,0,.35);}
+[data-theme=light]{--page:#eef2f8;--surface:rgba(255,255,255,.86);--sunken:#f1f5f9;--raised:#fff;--border:rgba(15,23,42,.1);--border2:rgba(15,23,42,.2);--text:#0f172a;--text2:#475569;--muted:#64748b;--accent:#2563eb;--accent2:#1d4ed8;--accent-soft:rgba(37,99,235,.1);--accent-contrast:#fff;--node:#fff;--nodeb:rgba(15,23,42,.14);--nshadow:0 4px 16px rgba(15,23,42,.08);--nglow:0 0 18px rgba(37,99,235,.16);--nselb:#2563eb;--nselg:0 0 22px rgba(37,99,235,.18),0 0 0 1.5px #2563eb;--cline:rgba(100,116,139,.5);--chigh:#2563eb;--particle:#2563eb;--dot:rgba(15,23,42,.05);--success:#059669;--success-bg:rgba(5,150,105,.1);--warning:#b45309;--warning-bg:rgba(180,83,9,.1);--danger:#dc2626;--danger-bg:rgba(220,38,38,.08);--role-branch:#1d4ed8;--role-central:#047857;--role-member:#b45309;--role-safenet:#b91c1c;--role-purple:#7c3aed;--code:#f1f5f9;--shadow:0 8px 30px rgba(15,23,42,.1);}
+@keyframes draw-line{to{stroke-dashoffset:0}}@keyframes orbit{from{offset-distance:0%}to{offset-distance:100%}}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+*{box-sizing:border-box}body{margin:0;font-family:'Inter',system-ui,Segoe UI,sans-serif;background:radial-gradient(1000px 500px at 100% -10%,var(--accent-soft),transparent 60%),var(--page);color:var(--text);min-height:100vh;transition:background .25s,color .25s}
+.wrap{max-width:1080px;margin:0 auto;padding:1.5rem}
+.bar{display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem}
+.bar h1{font-size:1.5rem;margin:0}.bar p{margin:.2rem 0 0;color:var(--muted);font-size:.9rem}
+.spacer{flex:1}
+.home-link{font-size:.8rem;color:var(--accent);text-decoration:none;border:1px solid var(--border);padding:.4rem .7rem;border-radius:8px}
+.toggle{position:relative;width:62px;height:30px;border-radius:999px;border:1px solid var(--border2);background:var(--sunken);cursor:pointer;padding:0 4px}
+.toggle .thumb{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-contrast);display:flex;align-items:center;justify-content:center;left:4px;top:3px;transition:transform .25s;font-size:13px}
+[data-theme=light] .toggle .thumb{transform:translateX(31px)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;backdrop-filter:blur(12px)}
+.canvas{position:relative;width:100%;border-radius:14px;border:1px solid var(--border);background:radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px,var(--sunken);overflow:hidden}
+.csvg{position:absolute;inset:0;pointer-events:none;z-index:1}
+.elabel{font-size:10.5px;font-weight:600;text-align:center;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px 6px;white-space:nowrap}
+.elabel.rel{color:var(--accent);border-color:var(--accent)}
+.node{position:absolute;transform:translate(-50%,-50%);z-index:2;transition:opacity .25s}
+.gnode{text-align:left;background:var(--node);border:1.5px solid var(--nodeb);border-radius:14px;box-shadow:var(--nshadow);cursor:pointer;transition:.25s;overflow:hidden}
+.gnode:hover{box-shadow:var(--nglow),var(--nshadow);transform:translateY(-2px)}
+.gnode.sel{border-color:var(--nselb);box-shadow:var(--nselg)}
+.gnode .h{display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;border-bottom:1px solid var(--border);background:var(--rsoft)}
+.gnode .b{width:10px;height:10px;border-radius:3px;background:var(--rc);flex-shrink:0}
+.gnode .t{font-size:.92rem;font-weight:700;color:var(--text);line-height:1.2}
+.gnode .s{font-size:.72rem;color:var(--muted)}
+.gnode ul{list-style:none;margin:0;padding:.5rem .8rem .7rem}
+.gnode li{font-size:.74rem;color:var(--text2);font-family:ui-monospace,monospace;padding:.18rem 0;border-bottom:1px dashed var(--border)}
+.gnode li:last-child{border-bottom:none}
+.ent{background:var(--node);border:1.5px solid var(--nodeb);border-radius:10px;box-shadow:var(--nshadow);cursor:pointer;overflow:hidden;transition:.25s}
+.ent:hover{box-shadow:var(--nglow),var(--nshadow);transform:translateY(-2px)}.ent.sel{border-color:var(--nselb);box-shadow:var(--nselg)}
+.ent .h{display:flex;justify-content:space-between;gap:.4rem;padding:.45rem .7rem;color:#fff;background:var(--rc)}
+.ent .h .n{font-weight:700;font-size:.84rem}.ent .h .s{font-size:.68rem;opacity:.9}
+.ent ul{list-style:none;margin:0;padding:0}
+.ent li{display:flex;justify-content:space-between;gap:.5rem;padding:.3rem .7rem;border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text2)}
+.ent li:last-child{border-bottom:none}.ent .fn{font-family:ui-monospace,monospace}
+.ft{font-size:.64rem;padding:1px 6px;border-radius:999px;background:var(--raised);color:var(--muted);white-space:nowrap}
+.ft.pk{background:var(--danger-bg);color:var(--danger);font-weight:700}.ft.fk{background:var(--info-bg);color:var(--info);font-weight:700}.ft.token{background:var(--warning-bg);color:var(--warning);font-weight:700}
+.detail{margin-top:.9rem;padding:.9rem 1.1rem;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);animation:rise .3s ease both}
+.detail .dh{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.detail .dt{display:flex;align-items:center;gap:.5rem}.detail .dt .dot{width:12px;height:12px;border-radius:4px}
+.detail .dt strong{color:var(--text)}.detail .tag{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--raised)}
+.detail .x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px}
+.detail .desc{color:var(--text2);font-size:.86rem;margin:.6rem 0 .7rem;line-height:1.6}
+.detail .facts{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.4rem}
+.detail .facts code{font-size:.72rem;background:var(--code);color:var(--text2);padding:.25rem .5rem;border-radius:6px;border:1px solid var(--border)}
+.stepper{display:grid;grid-template-columns:260px 1fr;gap:1.25rem;align-items:start}
+@media(max-width:720px){.stepper{grid-template-columns:1fr}}
+.rail{display:flex;flex-direction:column;gap:.4rem}
+.seg{display:flex;gap:.7rem;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:.5rem .6rem;cursor:pointer;color:var(--text2);transition:.2s}
+.seg:hover{background:var(--raised)}.seg .sb{width:4px;border-radius:4px;background:var(--border2)}
+.seg .st{display:flex;flex-direction:column;font-size:.85rem;font-weight:600;line-height:1.25}
+.seg .sn{font-size:.66rem;font-family:ui-monospace,monospace;color:var(--muted)}
+.seg.active{background:var(--raised);border-color:var(--border);color:var(--text)}.seg.active .sb{background:var(--rc)}
+.seg.done .sb{background:var(--rc);opacity:.55}.seg.done .sn{color:var(--success)}
+.panel{background:var(--sunken);border:1px solid var(--border);border-left:4px solid var(--rc);border-radius:14px;padding:1.1rem 1.25rem;animation:rise .25s ease both}
+.panel .ph{display:flex;gap:.8rem;margin-bottom:.8rem}
+.panel .pn{font-family:ui-monospace,monospace;font-size:1.1rem;font-weight:700;color:#fff;background:var(--rc);border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.panel h3{margin:0;font-size:1.05rem;color:var(--text)}
+.panel code.c{display:inline-block;margin-top:.2rem;font-size:.76rem;color:var(--accent);background:var(--code);padding:.1rem .4rem;border-radius:5px}
+.panel ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem}
+.panel li{position:relative;padding-left:1.1rem;font-size:.84rem;color:var(--text2);line-height:1.5;font-family:ui-monospace,monospace}
+.panel li:before{content:'\25B8';position:absolute;left:0;color:var(--rc)}
+.branch{display:flex;gap:.5rem;align-items:center;margin-top:.9rem;padding:.55rem .75rem;border-radius:8px;font-size:.8rem;font-weight:600;background:var(--raised);color:var(--text2);border:1px solid var(--border)}
+.branch.exit{background:var(--warning-bg);color:var(--warning);border-color:transparent}
+.branch.error{background:var(--danger-bg);color:var(--danger);border-color:transparent}
+.branch.ok{background:var(--success-bg);color:var(--success);border-color:transparent}
+.ctrl{display:flex;justify-content:space-between;align-items:center;gap:.6rem;margin-top:1.1rem}
+.btn{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem .8rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:600;font-size:.82rem;cursor:pointer}
+.btn:hover:not(:disabled){background:var(--raised);color:var(--text)}.btn.p{background:var(--accent);color:var(--accent-contrast);border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}.cnt{font-size:.8rem;color:var(--muted);font-family:ui-monospace,monospace}
+.hint{font-size:.78rem;color:var(--muted);margin:.6rem 0 1rem}
+"""
+
+ENGINE = r"""
+const SUN='☀',MOON='☽';
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.querySelector('.thumb').textContent=t==='dark'?MOON:SUN;try{localStorage.setItem('st-diagram-theme',t)}catch(e){}}
+(function(){let t='dark';try{const s=localStorage.getItem('st-diagram-theme');if(s)t=s;else if(matchMedia('(prefers-color-scheme: light)').matches)t='light'}catch(e){}applyTheme(t)})();
+function toggleTheme(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')}
+const RC={branch:'--role-branch',central:'--role-central',member:'--role-member',safenet:'--role-safenet',config:'--role-config',purple:'--role-purple'};
+function rcv(r){return 'var('+(RC[r]||'--role-config')+')'}
+function rsv(r){return 'var('+(RC[r]||'--role-config')+'-soft)'}
+
+function buildPath(fx,fy,tx,ty){const dx=tx-fx,dy=ty-fy;if(Math.abs(dx)>=Math.abs(dy)){const mx=(fx+tx)/2;return `M ${fx} ${fy} C ${mx} ${fy}, ${mx} ${ty}, ${tx} ${ty}`}const my=(fy+ty)/2;return `M ${fx} ${fy} C ${fx} ${my}, ${tx} ${my}, ${tx} ${ty}`}
+
+function renderGraph(el,data){
+  let selected=null;
+  const rel={};data.nodes.forEach(n=>{const s=new Set([n.id]);data.edges.forEach(e=>{if(e.from===n.id)s.add(e.to);if(e.to===n.id)s.add(e.from)});rel[n.id]=s});
+  const canvas=document.createElement('div');canvas.className='canvas';canvas.style.aspectRatio=String(data.aspect||1.6);
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','csvg');
+  canvas.appendChild(svg);
+  const nodeEls={};
+  data.nodes.forEach(n=>{
+    const d=document.createElement('div');d.className='node';d.style.left=n.x+'%';d.style.top=n.y+'%';
+    d.appendChild(data.kind==='graph'&&n.fields?entCard(n):graphCard(n));
+    canvas.appendChild(d);nodeEls[n.id]=d;
+  });
+  el.appendChild(canvas);
+  const detailHost=document.createElement('div');el.appendChild(detailHost);
+  function graphCard(n){const b=document.createElement('button');b.className='gnode';b.style.width=(n.w||220)+'px';b.style.setProperty('--rc',rcv(n.role));b.style.setProperty('--rsoft',rsv(n.role));
+    let li=(n.items||[]).map(x=>`<li>${esc(x)}</li>`).join('');
+    b.innerHTML=`<div class="h"><span class="b"></span><div><div class="t">${esc(n.title)}</div><div class="s">${esc(n.sub||'')}</div></div></div><ul>${li}</ul>`;
+    b.onclick=()=>select(n.id);return b}
+  function entCard(n){const b=document.createElement('button');b.className='ent';b.style.width=(n.w||205)+'px';b.style.setProperty('--rc',rcv(n.role));
+    let li=n.fields.map(f=>`<li><span class="fn">${esc(f[0])}</span>${f[1]?`<span class="ft ${ftClass(f[1])}">${esc(f[1])}</span>`:''}</li>`).join('');
+    b.innerHTML=`<div class="h"><span class="n">${esc(n.title)}</span><span class="s">${esc(n.sub||'')}</span></div><ul>${li}</ul>`;
+    b.onclick=()=>select(n.id);return b}
+  function ftClass(t){t=(t||'').toLowerCase();if(t.includes('pk'))return 'pk';if(t.includes('fk'))return 'fk';if(t.includes('token'))return 'token';return ''}
+  function select(id){selected=selected===id?null:id;draw();renderNodes();renderDetail()}
+  function renderNodes(){data.nodes.forEach(n=>{const card=nodeEls[n.id].firstChild;const dim=selected&&!rel[selected].has(n.id);nodeEls[n.id].style.opacity=dim?0.32:1;card.classList.toggle('sel',selected===n.id)})}
+  function renderDetail(){detailHost.innerHTML='';if(!selected)return;const n=data.nodes.find(x=>x.id===selected);const det=n.detail||{tag:n.sub,desc:`${n.title} — ${(n.fields||[]).length} columns.`,facts:(n.fields||[]).map(f=>f[1]?f[0]+' · '+f[1]:f[0])};
+    const div=document.createElement('div');div.className='detail';
+    div.innerHTML=`<div class="dh"><div class="dt"><span class="dot" style="background:${rcv(n.role)}"></span><strong>${esc(n.title)}</strong>${det.tag?`<span class="tag" style="color:${rcv(n.role)}">${esc(det.tag)}</span>`:''}</div><button class="x">✕</button></div>${det.desc?`<p class="desc">${esc(det.desc)}</p>`:''}<ul class="facts">${(det.facts||[]).map(f=>`<li><code>${esc(f)}</code></li>`).join('')}</ul>`;
+    div.querySelector('.x').onclick=()=>{selected=null;draw();renderNodes();renderDetail()};detailHost.appendChild(div)}
+  function draw(){const W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;svg.setAttribute('width',W);svg.setAttribute('height',H);svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML='';
+    const map={};data.nodes.forEach(n=>map[n.id]=n);
+    data.edges.forEach((e,i)=>{const a=map[e.from],b=map[e.to];if(!a||!b)return;const fx=a.x/100*W,fy=a.y/100*H,tx=b.x/100*W,ty=b.y/100*H;const d=buildPath(fx,fy,tx,ty);
+      const isRel=selected&&rel[selected].has(e.from)&&rel[selected].has(e.to);const dim=selected&&!isRel;
+      const g=document.createElementNS(svg.namespaceURI,'g');g.setAttribute('opacity',dim?0.12:1);
+      const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',d);path.setAttribute('fill','none');path.setAttribute('stroke',isRel?'var(--chigh)':'var(--cline)');path.setAttribute('stroke-width',isRel?2.6:1.8);path.setAttribute('stroke-linecap','round');
+      const len=path.getTotalLength?0:0;path.style.strokeDasharray='1400';path.style.strokeDashoffset='1400';path.style.animation='draw-line 1.3s cubic-bezier(.4,0,.2,1) forwards';path.style.animationDelay=(0.4+i*0.06)+'s';
+      g.appendChild(path);
+      const c=document.createElementNS(svg.namespaceURI,'circle');c.setAttribute('r',isRel?3.2:2);c.setAttribute('fill',isRel?'var(--particle)':'var(--cline)');c.style.offsetPath=`path("${d}")`;c.style.animation=`orbit ${isRel?2.2:4}s linear infinite`;g.appendChild(c);
+      if(e.label){const fo=document.createElementNS(svg.namespaceURI,'foreignObject');fo.setAttribute('x',(fx+tx)/2-80);fo.setAttribute('y',(fy+ty)/2-14);fo.setAttribute('width',160);fo.setAttribute('height',28);fo.innerHTML=`<div xmlns="http://www.w3.org/1999/xhtml" class="elabel ${isRel?'rel':''}" style="opacity:${dim?0.15:1}">${esc(e.label)}</div>`;g.appendChild(fo)}
+      svg.appendChild(g)})}
+  const ro=new ResizeObserver(()=>draw());ro.observe(canvas);
+  requestAnimationFrame(draw);window.addEventListener('resize',draw);
+  renderNodes();
+}
+
+function renderStepper(el,data){
+  let active=0;const steps=data.steps;
+  const wrap=document.createElement('div');wrap.className='stepper';
+  const rail=document.createElement('div');rail.className='rail';
+  const panel=document.createElement('div');panel.className='panel';
+  wrap.appendChild(rail);wrap.appendChild(panel);el.appendChild(wrap);
+  function render(){
+    rail.innerHTML='';steps.forEach((s,i)=>{const st=i<active?'done':i===active?'active':'';const b=document.createElement('button');b.className='seg '+st;b.style.setProperty('--rc',rcv(s.role));
+      b.innerHTML=`<span class="sb"></span><span class="st"><span class="sn">${String(i+1).padStart(2,'0')}</span>${esc(s.title)}</span>`;b.onclick=()=>{active=i;render()};rail.appendChild(b)});
+    const s=steps[active];panel.style.setProperty('--rc',rcv(s.role));
+    panel.innerHTML=`<div class="ph"><span class="pn">${String(active+1).padStart(2,'0')}</span><div><h3>${esc(s.title)}</h3>${s.code?`<code class="c">${esc(s.code)}</code>`:''}</div></div><ul>${s.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>${s.branch?`<div class="branch ${s.branch.tone}">→ ${esc(s.branch.label)}</div>`:''}<div class="ctrl"><button class="btn" ${active===0?'disabled':''} onclick="window.__step(-1)">‹ Prev</button><span class="cnt">${active+1} / ${steps.length}</span><button class="btn p" ${active===steps.length-1?'disabled':''} onclick="window.__step(1)">Next ›</button></div>`;
+  }
+  window.__step=(d)=>{active=Math.max(0,Math.min(steps.length-1,active+d));render()};
+  render();
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function mount(data){const el=document.getElementById('diagram');if(data.kind==='stepper')renderStepper(el,data);else renderGraph(el,data)}
+"""
+
+def page_html(title, sub, data, home=True):
+    data_json = json.dumps(data, ensure_ascii=False)
+    home_link = '<a class="home-link" href="00_Index.html">← All diagrams</a>' if home else ''
+    return f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ServiceTransfer — {title}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>{CSS}</style></head>
+<body><div class="wrap">
+<div class="bar"><div><h1>{title}</h1><p>{sub}</p></div><div class="spacer"></div>{home_link}
+<button class="toggle" onclick="toggleTheme()" aria-label="Toggle theme"><span class="thumb"></span></button></div>
+<p class="hint">Interactive — click nodes/steps, switch theme (top-right). All content verified against the VB6 source.</p>
+<div class="card"><div id="diagram"></div></div>
+</div>
+<script>{ENGINE}
+mount({data_json});</script>
+</body></html>"""
+
+INDEX_CARDS = [
+    ("02_System_Architecture.html", "System Architecture", "3-DB topology + SafeNet", "branch"),
+    ("01_ER_Diagram.html", "ER Diagram", "Verified table schema", "central"),
+    ("03_Sync_Flow.html", "Data Sync Flow", "6-phase 500ms cycle", "member"),
+    ("04_Tokenization_Flow.html", "Tokenization Flow", "SP_PRCbToken()", "safenet"),
+    ("05_Member_Points_Flow.html", "Member Points Flow", "W_UPDxUpdatePoint()", "purple"),
+]
+
+def index_html():
+    cards = "\n".join(
+        f'<a class="ix" href="{href}" style="--rc:var(--role-{role})"><span class="b"></span><div><strong>{t}</strong><span>{d}</span></div></a>'
+        for href, t, d, role in INDEX_CARDS)
+    extra = """.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem}
+.ix{display:flex;gap:.8rem;align-items:center;padding:1.1rem;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--rc);border-radius:14px;text-decoration:none;color:var(--text);transition:.2s}
+.ix:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.ix .b{width:12px;height:12px;border-radius:4px;background:var(--rc);flex-shrink:0}
+.ix strong{display:block}.ix span{font-size:.8rem;color:var(--muted)}"""
+    return f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ServiceTransfer — Interactive Diagrams</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>{CSS}{extra}</style></head>
+<body><div class="wrap">
+<div class="bar"><div><h1>ServiceTransfer — Interactive Diagrams</h1><p>Reverse-engineering diagram set · v5.1810.1</p></div><div class="spacer"></div>
+<button class="toggle" onclick="toggleTheme()" aria-label="Toggle theme"><span class="thumb"></span></button></div>
+<p class="hint">Click a diagram to open it. Each is interactive with a dark/light theme toggle.</p>
+<div class="grid">{cards}</div>
+</div>
+<script>{ENGINE}</script>
+</body></html>"""
+
+if __name__ == '__main__':
+    for fname, title, sub, data in PAGES:
+        with open(os.path.join(OUT, fname), 'w', encoding='utf-8') as f:
+            f.write(page_html(title, sub, data))
+        print('wrote', fname)
+    with open(os.path.join(OUT, '00_Index.html'), 'w', encoding='utf-8') as f:
+        f.write(index_html())
+    print('wrote 00_Index.html')

@@ -29,6 +29,12 @@ otmForm_Timer()  <ทุก 500 ms>                [wMain.frm]
 
 ## 2. Main Processing Loops (Pseudocode)
 
+ลองกดดู Flow แบบ Interactive ทีละ Phase ของรอบการซิงค์ (otmForm_Timer) ได้ที่นี่:
+
+```diagram
+sync_flow
+```
+
 ### 2.1 Form_Load (เริ่มต้นระบบ)
 ```vb
 FUNCTION Form_Load()
@@ -181,6 +187,10 @@ END FUNCTION
 ---
 
 ## 4. Member Point Logic
+
+```diagram
+member_points
+```
 
 ### 4.1 W_UPDxUpdatePoint (คำนวณและส่งคะแนน)
 ```vb

@@ -1,5 +1,7 @@
 # ServiceTransfer: Data Dictionary
 
+> 🔗 **Interactive diagram:** explore the clickable [Entity-Relationship graph](../doc-claude-ver/Diagrams/01_ER_Diagram.html) (or the full [diagram index](../doc-claude-ver/Diagrams/00_Index.html)). The Mermaid ERD below renders natively on GitHub / GitLab / VS Code.
+
 เอกสารฉบับนี้รวบรวมโครงสร้างข้อมูลที่โปรแกรม ServiceTransfer เขียนและอ่าน เพื่อใช้เป็นแบบอ้างอิง (Schema Reference) สำหรับการพัฒนาใหม่
 
 ## 1. Naming Convention (กฎการตั้งชื่อฟิลด์)

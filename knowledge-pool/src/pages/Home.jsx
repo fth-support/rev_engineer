@@ -1,91 +1,78 @@
-import { Server, Database, Code, ShieldCheck, MapPin, DatabaseZap, Globe, Zap, FileText, Activity, Layers, Terminal } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import JourneyMap from '../components/JourneyMap'
-import '../Bento.css'
+import { Server, DatabaseZap, Code, ShieldCheck, Activity, Database, Layers, ArrowRight, Network } from 'lucide-react'
+import StatCounter from '../components/primitives/StatCounter'
+import ArchitectureGraph from '../components/diagrams/ArchitectureGraph'
+import './pages.css'
+
+const docCards = [
+  { area: 'doc1', to: '/docs/architecture-srs', icon: Server, color: 'var(--role-central)', soft: 'var(--role-central-soft)', title: 'Architecture & SRS', desc: 'System overview & requirements' },
+  { area: 'doc2', to: '/docs/data-dictionary', icon: DatabaseZap, color: 'var(--role-branch)', soft: 'var(--role-branch-soft)', title: 'Data Dictionary', desc: '11 core tables, verified schema' },
+  { area: 'doc3', to: '/docs/program-spec', icon: Code, color: 'var(--role-purple)', soft: 'var(--role-purple-soft)', title: 'Program Spec', desc: 'Functions & control flow' },
+  { area: 'doc4', to: '/docs/security', icon: ShieldCheck, color: 'var(--role-safenet)', soft: 'var(--role-safenet-soft)', title: 'Security & Tokens', desc: 'SafeNet tokenization' },
+]
 
 function Home() {
   return (
-    <div className="home-page" style={{ width: '100%', maxWidth: '1400px', margin: '0 auto' }}>
-      <div className="bento" aria-label="Bento grid layout">
-        
-        {/* HERO CELL */}
-        <div className="cell cell--hero">
-          <span className="cell__tag">HERO</span>
+    <div className="home">
+      <div className="bento">
+        <section className="cell cell--hero">
+          <span className="cell__tag">OVERVIEW</span>
           <h1>ServiceTransfer</h1>
-          <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>
-            Knowledge Pool & Documentation Hub for the ServiceTransfer Revamp Project.
-          </p>
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-            <span style={{ background: 'rgba(96, 165, 250, 0.2)', color: '#60a5fa', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '600' }}>Event-Driven</span>
-            <span style={{ background: 'rgba(52, 211, 153, 0.2)', color: '#34d399', padding: '0.4rem 1rem', borderRadius: '20px', fontSize: '0.85rem', fontWeight: '600' }}>API Gateway</span>
+          <p>Interactive knowledge portal for the reverse-engineering &amp; revamp of the legacy VB6 background sync agent.</p>
+          <div className="hero-chips">
+            <span className="chip">VB6 → Modern</span>
+            <span className="chip">Event-Driven</span>
+            <span className="chip">API Gateway</span>
           </div>
-        </div>
+          <div className="hero-cta">
+            <Link to="/flows" className="btn primary"><Network size={16} /> Explore Flows</Link>
+            <Link to="/docs/architecture-srs" className="btn ghost">Read the SRS <ArrowRight size={15} /></Link>
+          </div>
+        </section>
 
-        {/* ABOUT CELL */}
-        <div className="cell cell--about">
+        <section className="cell cell--stat1 cell--stat">
+          <span className="cell__tag">POLLING</span>
+          <Activity size={26} color="var(--warning)" className="stat-icon" />
+          <div className="stat-num"><StatCounter value={500} /><small>ms</small></div>
+          <div className="stat-label">Legacy timer loop — replaced by real-time events</div>
+        </section>
+
+        <section className="cell cell--stat2 cell--stat">
+          <span className="cell__tag">DATA</span>
+          <Database size={26} color="var(--role-central)" className="stat-icon" />
+          <div className="stat-num"><StatCounter value={3} /><small> DBs</small></div>
+          <div className="stat-label">Local · Central (HQ) · Member — + SafeNet tokenizer</div>
+        </section>
+
+        <section className="cell cell--about">
           <span className="cell__tag">ABOUT</span>
-          <h2>Introduction</h2>
-          <p style={{ marginTop: '0.5rem' }}>
-            ServiceTransfer คือ Background Agent ที่ทำหน้าที่ดึงข้อมูลยอดขายจากเครื่อง POS สาขา ส่งขึ้นไปยังฐานข้อมูลส่วนกลาง (Head Office) พร้อมกลไก Tokenization เพื่อปกปิดข้อมูลบัตรเครดิต
-          </p>
-        </div>
+          <h3>What it does</h3>
+          <p>A background agent on every branch POS that pushes pending sales (flagged <code>FTStaSentOnOff='0'</code>) to the central server, tokenizes card data via SafeNet, and accrues member loyalty points — all on a 500ms timer.</p>
+        </section>
 
-        {/* STATS CELL */}
-        <div className="cell cell--stats">
-          <span className="cell__tag">STATS</span>
-          <Activity size={48} className="cell-icon" color="#fbbf24" />
-          <h2 style={{ fontSize: '3rem', margin: '0.5rem 0' }}>500<span style={{ fontSize: '1rem', color: 'var(--text-secondary)' }}>ms</span></h2>
-          <p>Legacy Polling Time to be replaced by Real-time Events</p>
-        </div>
+        <section className="cell cell--live">
+          <span className="cell__tag">LIVE DIAGRAM</span>
+          <ArchitectureGraph />
+        </section>
 
-        {/* JOURNEY / FEAT CELL */}
-        <div className="cell cell--feat" style={{ padding: 0, overflow: 'hidden', minHeight: '400px' }}>
-          <span className="cell__tag" style={{ left: '20px', top: 0, borderRadius: '0 0 8px 8px' }}>JOURNEY</span>
-          <div style={{ padding: '3rem 1.5rem 1.5rem 1.5rem', width: '100%' }}>
-            <JourneyMap />
-          </div>
-        </div>
+        {docCards.map(({ area, to, icon: Icon, color, soft, title, desc }) => (
+          <Link key={area} to={to} className={`cell cell--link cell--${area} doc-card`}>
+            <span className="cell__tag">DOCS</span>
+            <span className="doc-icon" style={{ background: soft, color }}><Icon size={22} /></span>
+            <h4>{title}</h4>
+            <p>{desc}</p>
+          </Link>
+        ))}
 
-        {/* PROMO / FLOWS CELL */}
-        <Link to="/flows" className="cell cell--promo doc-link-card" style={{ textDecoration: 'none' }}>
+        <Link to="/flows" className="cell cell--link cell--flows">
           <span className="cell__tag">SYSTEM FLOWS</span>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <Layers size={56} className="cell-icon" color="#fbbf24" style={{ margin: 0 }} />
-            <div>
-              <h3>Interactive Diagrams</h3>
-              <p style={{ marginTop: '0.5rem' }}>Explore ER Diagrams, Architecture, and Tokenization Flows directly.</p>
-            </div>
+          <span className="flows-icon"><Layers size={28} /></span>
+          <div>
+            <h3>Interactive Diagrams</h3>
+            <p>Step through the sync cycle, tokenization, member points, and the ER schema — all clickable.</p>
           </div>
+          <ArrowRight size={22} color="var(--accent)" style={{ marginLeft: 'auto' }} />
         </Link>
-
-        {/* MEDIA / ARCHITECTURE DOC */}
-        <Link to="/docs/architecture-srs" className="cell cell--media doc-link-card">
-          <span className="cell__tag">DOCS</span>
-          <Server size={48} className="cell-icon" color="#34d399" />
-          <h4>Architecture & SRS</h4>
-        </Link>
-
-        {/* FEED / DATA DICT DOC */}
-        <Link to="/docs/data-dictionary" className="cell cell--feed doc-link-card">
-          <span className="cell__tag">DOCS</span>
-          <DatabaseZap size={48} className="cell-icon" color="#34d399" />
-          <h4>Database Schema</h4>
-        </Link>
-
-        {/* TASKS / PROGRAM SPEC DOC */}
-        <Link to="/docs/program-spec" className="cell cell--tasks doc-link-card">
-          <span className="cell__tag">DOCS</span>
-          <Code size={48} className="cell-icon" color="#60a5fa" />
-          <h4>Program Spec</h4>
-        </Link>
-
-        {/* CARD / SECURITY DOC */}
-        <Link to="/docs/security" className="cell cell--card doc-link-card">
-          <span className="cell__tag">DOCS</span>
-          <ShieldCheck size={48} className="cell-icon" color="#f87171" />
-          <h4>Security Matrix</h4>
-        </Link>
-
       </div>
     </div>
   )

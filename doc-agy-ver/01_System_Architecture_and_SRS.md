@@ -1,5 +1,7 @@
 # ServiceTransfer: Software Requirements Specification & Architecture
 
+> 🔗 **Interactive diagrams:** open the live, theme-aware versions in [`Diagrams/00_Index.html`](../doc-claude-ver/Diagrams/00_Index.html) — e.g. the clickable [System Architecture graph](../doc-claude-ver/Diagrams/02_System_Architecture.html). The Mermaid diagrams below render natively on GitHub / GitLab / VS Code.
+
 ## 1. Executive Summary
 **ServiceTransfer** is a background data-synchronization agent originally written in Visual Basic 6.0. It runs on every POS terminal at branch stores, operating via a 500ms timer loop. Its primary duties are:
 1. **Sales Synchronization:** Transfers pending sales transactions (header, detail, receipt, card, deposit, hold, voucher, and points) flagged with `FTStaSentOnOff = '0'` from the local SQL Server Express database to the central SQL Server at the Head Office.

@@ -1,176 +1,160 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServiceTransfer — ER Diagram</title>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ServiceTransfer — Entity-Relationship Diagram</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,-apple-system,sans-serif;background:#f0f4f8;padding:2rem}
-h1{text-align:center;color:#0d47a1;margin-bottom:.5rem}
-.subtitle{text-align:center;color:#666;margin-bottom:2rem}
-.canvas{max-width:1100px;margin:0 auto;position:relative}
-.entity{position:absolute;background:#fff;border:2px solid #1565c0;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.12);min-width:220px;font-size:13px}
-.entity.config{border-color:#78909c}
-.entity.member{border-color:#2e7d32}
-.entity.token{border-color:#c62828}
-.entity-title{background:#1565c0;color:#fff;padding:6px 12px;border-radius:5px 5px 0 0;font-weight:700;text-align:center}
-.entity.config .entity-title{background:#78909c}
-.entity.member .entity-title{background:#2e7d32}
-.entity.token .entity-title{background:#c62828}
-.entity-body{padding:8px 12px}
-.field{display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid #f0f0f0}
-.field:last-child{border-bottom:none}
-.field-name{font-family:monospace;font-size:12px}
-.field-type{color:#888;font-size:11px}
-.pk{color:#e65100;font-weight:700}
-.fk{color:#1565c0}
-.tok{background:#fff3e0;border-radius:3px;padding:0 4px}
-.separator{border-top:2px solid #e0e0e0;margin:4px 0}
-svg.lines{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
-.legend{max-width:1100px;margin:2rem auto 0;background:#fff;border-radius:8px;padding:1rem 1.5rem;box-shadow:0 1px 4px rgba(0,0,0,.08);display:flex;gap:2rem;flex-wrap:wrap;font-size:13px}
-.legend-item{display:flex;align-items:center;gap:.5rem}
-.legend-color{width:16px;height:16px;border-radius:3px;border:2px solid}
-</style>
-</head>
-<body>
-<h1>Entity Relationship Diagram</h1>
-<p class="subtitle">ServiceTransfer v5.1810.1 — Database Schema</p>
-
-<div class="canvas" style="height:900px">
-<svg class="lines" viewBox="0 0 1100 900">
-<defs><marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#1565c0"/></marker></defs>
-<!-- HD → DT --><line x1="240" y1="290" x2="420" y2="80" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow)"/>
-<!-- HD → RC --><line x1="240" y1="290" x2="420" y2="250" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow)"/>
-<!-- HD → CD --><line x1="240" y1="340" x2="420" y2="420" stroke="#1565c0" stroke-width="1.5" marker-end="url(#arrow)"/>
-<!-- HD → SP --><line x1="240" y1="380" x2="420" y2="600" stroke="#2e7d32" stroke-width="1.5" marker-end="url(#arrow)"/>
-<!-- SP → MC --><line x1="640" y1="640" x2="820" y2="200" stroke="#2e7d32" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow)"/>
-<!-- MC → BH --><line x1="920" y1="330" x2="920" y2="450" stroke="#2e7d32" stroke-width="1.5" marker-end="url(#arrow)"/>
-<text x="300" y="170" fill="#1565c0" font-size="11">1:N</text>
-<text x="300" y="270" fill="#1565c0" font-size="11">1:N</text>
-<text x="300" y="390" fill="#1565c0" font-size="11">1:N</text>
-<text x="300" y="510" fill="#2e7d32" font-size="11">1:N</text>
-<text x="720" y="400" fill="#2e7d32" font-size="11">Lookup</text>
-<text x="930" y="400" fill="#2e7d32" font-size="11">1:N</text>
-</svg>
-
-<!-- TPSTSalHD -->
-<div class="entity" style="left:20px;top:230px">
-<div class="entity-title">TPSTSalHD (Sales Header)</div>
-<div class="entity-body">
-<div class="field"><span class="field-name pk">* FTTmnNum</span><span class="field-type">VARCHAR PK</span></div>
-<div class="field"><span class="field-name pk">* FTShdTransNo</span><span class="field-type">VARCHAR PK</span></div>
-<div class="field"><span class="field-name pk">* FDShdTransDate</span><span class="field-type">DATE PK</span></div>
-<div class="separator"></div>
-<div class="field"><span class="field-name">FTShdTransType</span><span class="field-type">VARCHAR</span></div>
-<div class="field"><span class="field-name">FTStaSentOnOff</span><span class="field-type">VARCHAR</span></div>
-<div class="field"><span class="field-name tok">FTCstCardCode</span><span class="field-type">Tokenized</span></div>
-</div></div>
-
-<!-- TPSTSalDT -->
-<div class="entity" style="left:400px;top:20px">
-<div class="entity-title">TPSTSalDT (Sales Detail)</div>
-<div class="entity-body">
-<div class="field"><span class="field-name fk">* FTTmnNum</span><span class="field-type">FK</span></div>
-<div class="field"><span class="field-name fk">* FTShdTransNo</span><span class="field-type">FK</span></div>
-<div class="field"><span class="field-name fk">* FDShdTransDate</span><span class="field-type">FK</span></div>
-<div class="field"><span class="field-name pk">* FNSdtSeqNo</span><span class="field-type">PK</span></div>
-<div class="separator"></div>
-<div class="field"><span class="field-name">FTStaSentOnOff</span><span class="field-type">VARCHAR</span></div>
-</div></div>
-
-<!-- TPSTSalRC -->
-<div class="entity" style="left:400px;top:200px">
-<div class="entity-title">TPSTSalRC (Sales Receipt)</div>
-<div class="entity-body">
-<div class="field"><span class="field-name fk">* FTTmnNum / TransNo / Date</span><span class="field-type">FK</span></div>
-<div class="field"><span class="field-name pk">* FNSrcSeqNo</span><span class="field-type">PK</span></div>
-<div class="separator"></div>
-<div class="field"><span class="field-name">FTTdmCode</span><span class="field-type">VARCHAR</span></div>
-<div class="field"><span class="field-name tok">FTSrcCardNo</span><span class="field-type">Tokenized</span></div>
-</div></div>
-
-<!-- TPSTSalCD -->
-<div class="entity" style="left:400px;top:380px">
-<div class="entity-title">TPSTSalCD (Sales Card)</div>
-<div class="entity-body">
-<div class="field"><span class="field-name fk">* FTTmnNum / TransNo / Date</span><span class="field-type">FK</span></div>
-<div class="field"><span class="field-name pk">* FNSdtSeqNo / FNScdSeqNo</span><span class="field-type">PK</span></div>
-<div class="separator"></div>
-<div class="field"><span class="field-name tok">FTScdCardID</span><span class="field-type">Tokenized</span></div>
-<div class="field"><span class="field-name">FNDctNo</span><span class="field-type">NUMERIC</span></div>
-</div></div>
-
-<!-- TPSTSalePoint -->
-<div class="entity" style="left:400px;top:550px">
-<div class="entity-title" style="background:#2e7d32">TPSTSalePoint (Points)</div>
-<div class="entity-body">
-<div class="field"><span class="field-name fk">* FTTmnNum / TransNo / Date</span><span class="field-type">FK</span></div>
-<div class="field"><span class="field-name pk tok">* FTSpoMemID</span><span class="field-type">PK, Tokenized</span></div>
-<div class="separator"></div>
-<div class="field"><span class="field-name">FCSpoPoint</span><span class="field-type">NUMERIC</span></div>
-<div class="field"><span class="field-name">FTRemark</span><span class="field-type">0=pending 1=done</span></div>
-</div></div>
-
-<!-- TCNMMallCard -->
-<div class="entity member" style="left:780px;top:100px">
-<div class="entity-title">TCNMMallCard (Member)</div>
-<div class="entity-body">
-<div class="field"><span class="field-name pk">* FTMcdCode</span><span class="field-type">Token PK</span></div>
-<div class="field"><span class="field-name pk">* FDMcdExpDate</span><span class="field-type">DATE PK</span></div>
-<div class="separator"></div>
-<div class="field"><span class="field-name">FTMcdStaAct</span><span class="field-type">'A'=Active</span></div>
-<div class="field"><span class="field-name">FCEarned</span><span class="field-type">NUMERIC</span></div>
-<div class="field"><span class="field-name">FCBalance</span><span class="field-type">NUMERIC</span></div>
-</div></div>
-
-<!-- TPSTBPHis -->
-<div class="entity member" style="left:780px;top:450px">
-<div class="entity-title">TPSTBPHis (Point History)</div>
-<div class="entity-body">
-<div class="field"><span class="field-name pk">* TmnNum/TransNo/Date/MemberID</span><span class="field-type">PK</span></div>
-<div class="separator"></div>
-<div class="field"><span class="field-name">FCCstCardPoint</span><span class="field-type">NUMERIC +/-</span></div>
-<div class="field"><span class="field-name">FCTotalBP / FCBalanceBP</span><span class="field-type">NUMERIC</span></div>
-</div></div>
-
-<!-- TPSTTokenLst -->
-<div class="entity token" style="left:780px;top:620px">
-<div class="entity-title">TPSTTokenLst (Token Map)</div>
-<div class="entity-body">
-<div class="field"><span class="field-name pk">* FTToken / FTValue / TblName / FldName</span><span class="field-type">PK</span></div>
-<div class="separator"></div>
-<div class="field"><span class="field-name">FDDateIns</span><span class="field-type">DATE</span></div>
-<div class="field"><span class="field-name">FNStatus</span><span class="field-type">1=Active</span></div>
-</div></div>
-
-<!-- TSysSync -->
-<div class="entity config" style="left:20px;top:600px">
-<div class="entity-title">TSysSync (Sync Config)</div>
-<div class="entity-body">
-<div class="field"><span class="field-name pk">* FTSscTable / DocType / Dest</span><span class="field-type">PK</span></div>
-<div class="separator"></div>
-<div class="field"><span class="field-name">FTSscCondScript</span><span class="field-type">WHERE clause</span></div>
-<div class="field"><span class="field-name">FTSscStaActive</span><span class="field-type">'1'=Active</span></div>
-</div></div>
-
-<!-- TCNMTerminalMtn -->
-<div class="entity config" style="left:20px;top:770px">
-<div class="entity-title">TCNMTerminalMtn (Terminal)</div>
-<div class="entity-body">
-<div class="field"><span class="field-name pk">* FTTmnCode</span><span class="field-type">PK</span></div>
-<div class="separator"></div>
-<div class="field"><span class="field-name">FTTmnNum</span><span class="field-type">Terminal #</span></div>
-<div class="field"><span class="field-name">FTTmnName</span><span class="field-type">Computer Name</span></div>
-</div></div>
+:root{--role-branch:#60a5fa;--role-branch-soft:rgba(96,165,250,.14);--role-central:#34d399;--role-central-soft:rgba(52,211,153,.14);--role-member:#fbbf24;--role-member-soft:rgba(251,191,36,.14);--role-safenet:#f87171;--role-safenet-soft:rgba(248,113,113,.14);--role-config:#94a3b8;--role-config-soft:rgba(148,163,184,.14);--role-purple:#c084fc;--role-purple-soft:rgba(192,132,252,.14);
+--page:#0b1120;--surface:rgba(30,41,59,.72);--sunken:rgba(2,6,23,.45);--raised:rgba(51,65,85,.55);--border:rgba(148,163,184,.16);--border2:rgba(148,163,184,.32);--text:#f1f5f9;--text2:#94a3b8;--muted:#64748b;--accent:#60a5fa;--accent2:#3b82f6;--accent-soft:rgba(59,130,246,.16);--accent-contrast:#0b1120;--node:rgba(30,41,59,.85);--nodeb:rgba(148,163,184,.22);--nshadow:0 6px 22px rgba(0,0,0,.45);--nglow:0 0 26px rgba(96,165,250,.22);--nselb:rgba(96,165,250,.7);--nselg:0 0 30px rgba(96,165,250,.28),0 0 0 1px rgba(96,165,250,.4);--cline:rgba(148,163,184,.35);--chigh:rgba(96,165,250,.85);--particle:rgba(96,165,250,.9);--dot:rgba(148,163,184,.06);--success:#34d399;--success-bg:rgba(52,211,153,.12);--warning:#fbbf24;--warning-bg:rgba(251,191,36,.12);--danger:#f87171;--danger-bg:rgba(248,113,113,.12);--info:#60a5fa;--info-bg:rgba(96,165,250,.12);--code:rgba(2,6,23,.6);--shadow:0 8px 30px rgba(0,0,0,.35);}
+[data-theme=light]{--page:#eef2f8;--surface:rgba(255,255,255,.86);--sunken:#f1f5f9;--raised:#fff;--border:rgba(15,23,42,.1);--border2:rgba(15,23,42,.2);--text:#0f172a;--text2:#475569;--muted:#64748b;--accent:#2563eb;--accent2:#1d4ed8;--accent-soft:rgba(37,99,235,.1);--accent-contrast:#fff;--node:#fff;--nodeb:rgba(15,23,42,.14);--nshadow:0 4px 16px rgba(15,23,42,.08);--nglow:0 0 18px rgba(37,99,235,.16);--nselb:#2563eb;--nselg:0 0 22px rgba(37,99,235,.18),0 0 0 1.5px #2563eb;--cline:rgba(100,116,139,.5);--chigh:#2563eb;--particle:#2563eb;--dot:rgba(15,23,42,.05);--success:#059669;--success-bg:rgba(5,150,105,.1);--warning:#b45309;--warning-bg:rgba(180,83,9,.1);--danger:#dc2626;--danger-bg:rgba(220,38,38,.08);--role-branch:#1d4ed8;--role-central:#047857;--role-member:#b45309;--role-safenet:#b91c1c;--role-purple:#7c3aed;--code:#f1f5f9;--shadow:0 8px 30px rgba(15,23,42,.1);}
+@keyframes draw-line{to{stroke-dashoffset:0}}@keyframes orbit{from{offset-distance:0%}to{offset-distance:100%}}@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+*{box-sizing:border-box}body{margin:0;font-family:'Inter',system-ui,Segoe UI,sans-serif;background:radial-gradient(1000px 500px at 100% -10%,var(--accent-soft),transparent 60%),var(--page);color:var(--text);min-height:100vh;transition:background .25s,color .25s}
+.wrap{max-width:1080px;margin:0 auto;padding:1.5rem}
+.bar{display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem}
+.bar h1{font-size:1.5rem;margin:0}.bar p{margin:.2rem 0 0;color:var(--muted);font-size:.9rem}
+.spacer{flex:1}
+.home-link{font-size:.8rem;color:var(--accent);text-decoration:none;border:1px solid var(--border);padding:.4rem .7rem;border-radius:8px}
+.toggle{position:relative;width:62px;height:30px;border-radius:999px;border:1px solid var(--border2);background:var(--sunken);cursor:pointer;padding:0 4px}
+.toggle .thumb{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-contrast);display:flex;align-items:center;justify-content:center;left:4px;top:3px;transition:transform .25s;font-size:13px}
+[data-theme=light] .toggle .thumb{transform:translateX(31px)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;backdrop-filter:blur(12px)}
+.canvas{position:relative;width:100%;border-radius:14px;border:1px solid var(--border);background:radial-gradient(var(--dot) 1px,transparent 1px) 0 0/22px 22px,var(--sunken);overflow:hidden}
+.csvg{position:absolute;inset:0;pointer-events:none;z-index:1}
+.elabel{font-size:10.5px;font-weight:600;text-align:center;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px 6px;white-space:nowrap}
+.elabel.rel{color:var(--accent);border-color:var(--accent)}
+.node{position:absolute;transform:translate(-50%,-50%);z-index:2;transition:opacity .25s}
+.gnode{text-align:left;background:var(--node);border:1.5px solid var(--nodeb);border-radius:14px;box-shadow:var(--nshadow);cursor:pointer;transition:.25s;overflow:hidden}
+.gnode:hover{box-shadow:var(--nglow),var(--nshadow);transform:translateY(-2px)}
+.gnode.sel{border-color:var(--nselb);box-shadow:var(--nselg)}
+.gnode .h{display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;border-bottom:1px solid var(--border);background:var(--rsoft)}
+.gnode .b{width:10px;height:10px;border-radius:3px;background:var(--rc);flex-shrink:0}
+.gnode .t{font-size:.92rem;font-weight:700;color:var(--text);line-height:1.2}
+.gnode .s{font-size:.72rem;color:var(--muted)}
+.gnode ul{list-style:none;margin:0;padding:.5rem .8rem .7rem}
+.gnode li{font-size:.74rem;color:var(--text2);font-family:ui-monospace,monospace;padding:.18rem 0;border-bottom:1px dashed var(--border)}
+.gnode li:last-child{border-bottom:none}
+.ent{background:var(--node);border:1.5px solid var(--nodeb);border-radius:10px;box-shadow:var(--nshadow);cursor:pointer;overflow:hidden;transition:.25s}
+.ent:hover{box-shadow:var(--nglow),var(--nshadow);transform:translateY(-2px)}.ent.sel{border-color:var(--nselb);box-shadow:var(--nselg)}
+.ent .h{display:flex;justify-content:space-between;gap:.4rem;padding:.45rem .7rem;color:#fff;background:var(--rc)}
+.ent .h .n{font-weight:700;font-size:.84rem}.ent .h .s{font-size:.68rem;opacity:.9}
+.ent ul{list-style:none;margin:0;padding:0}
+.ent li{display:flex;justify-content:space-between;gap:.5rem;padding:.3rem .7rem;border-bottom:1px solid var(--border);font-size:.72rem;color:var(--text2)}
+.ent li:last-child{border-bottom:none}.ent .fn{font-family:ui-monospace,monospace}
+.ft{font-size:.64rem;padding:1px 6px;border-radius:999px;background:var(--raised);color:var(--muted);white-space:nowrap}
+.ft.pk{background:var(--danger-bg);color:var(--danger);font-weight:700}.ft.fk{background:var(--info-bg);color:var(--info);font-weight:700}.ft.token{background:var(--warning-bg);color:var(--warning);font-weight:700}
+.detail{margin-top:.9rem;padding:.9rem 1.1rem;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow);animation:rise .3s ease both}
+.detail .dh{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.detail .dt{display:flex;align-items:center;gap:.5rem}.detail .dt .dot{width:12px;height:12px;border-radius:4px}
+.detail .dt strong{color:var(--text)}.detail .tag{font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:999px;background:var(--raised)}
+.detail .x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px}
+.detail .desc{color:var(--text2);font-size:.86rem;margin:.6rem 0 .7rem;line-height:1.6}
+.detail .facts{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.4rem}
+.detail .facts code{font-size:.72rem;background:var(--code);color:var(--text2);padding:.25rem .5rem;border-radius:6px;border:1px solid var(--border)}
+.stepper{display:grid;grid-template-columns:260px 1fr;gap:1.25rem;align-items:start}
+@media(max-width:720px){.stepper{grid-template-columns:1fr}}
+.rail{display:flex;flex-direction:column;gap:.4rem}
+.seg{display:flex;gap:.7rem;text-align:left;background:none;border:1px solid transparent;border-radius:8px;padding:.5rem .6rem;cursor:pointer;color:var(--text2);transition:.2s}
+.seg:hover{background:var(--raised)}.seg .sb{width:4px;border-radius:4px;background:var(--border2)}
+.seg .st{display:flex;flex-direction:column;font-size:.85rem;font-weight:600;line-height:1.25}
+.seg .sn{font-size:.66rem;font-family:ui-monospace,monospace;color:var(--muted)}
+.seg.active{background:var(--raised);border-color:var(--border);color:var(--text)}.seg.active .sb{background:var(--rc)}
+.seg.done .sb{background:var(--rc);opacity:.55}.seg.done .sn{color:var(--success)}
+.panel{background:var(--sunken);border:1px solid var(--border);border-left:4px solid var(--rc);border-radius:14px;padding:1.1rem 1.25rem;animation:rise .25s ease both}
+.panel .ph{display:flex;gap:.8rem;margin-bottom:.8rem}
+.panel .pn{font-family:ui-monospace,monospace;font-size:1.1rem;font-weight:700;color:#fff;background:var(--rc);border-radius:10px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.panel h3{margin:0;font-size:1.05rem;color:var(--text)}
+.panel code.c{display:inline-block;margin-top:.2rem;font-size:.76rem;color:var(--accent);background:var(--code);padding:.1rem .4rem;border-radius:5px}
+.panel ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem}
+.panel li{position:relative;padding-left:1.1rem;font-size:.84rem;color:var(--text2);line-height:1.5;font-family:ui-monospace,monospace}
+.panel li:before{content:'\25B8';position:absolute;left:0;color:var(--rc)}
+.branch{display:flex;gap:.5rem;align-items:center;margin-top:.9rem;padding:.55rem .75rem;border-radius:8px;font-size:.8rem;font-weight:600;background:var(--raised);color:var(--text2);border:1px solid var(--border)}
+.branch.exit{background:var(--warning-bg);color:var(--warning);border-color:transparent}
+.branch.error{background:var(--danger-bg);color:var(--danger);border-color:transparent}
+.branch.ok{background:var(--success-bg);color:var(--success);border-color:transparent}
+.ctrl{display:flex;justify-content:space-between;align-items:center;gap:.6rem;margin-top:1.1rem}
+.btn{display:inline-flex;align-items:center;gap:.3rem;padding:.45rem .8rem;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);font-weight:600;font-size:.82rem;cursor:pointer}
+.btn:hover:not(:disabled){background:var(--raised);color:var(--text)}.btn.p{background:var(--accent);color:var(--accent-contrast);border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}.cnt{font-size:.8rem;color:var(--muted);font-family:ui-monospace,monospace}
+.hint{font-size:.78rem;color:var(--muted);margin:.6rem 0 1rem}
+</style></head>
+<body><div class="wrap">
+<div class="bar"><div><h1>Entity-Relationship Diagram</h1><p>Core sales, member & tokenization tables — verified schema</p></div><div class="spacer"></div><a class="home-link" href="00_Index.html">← All diagrams</a>
+<button class="toggle" onclick="toggleTheme()" aria-label="Toggle theme"><span class="thumb"></span></button></div>
+<p class="hint">Interactive — click nodes/steps, switch theme (top-right). All content verified against the VB6 source.</p>
+<div class="card"><div id="diagram"></div></div>
 </div>
+<script>
+const SUN='☀',MOON='☽';
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);document.querySelector('.thumb').textContent=t==='dark'?MOON:SUN;try{localStorage.setItem('st-diagram-theme',t)}catch(e){}}
+(function(){let t='dark';try{const s=localStorage.getItem('st-diagram-theme');if(s)t=s;else if(matchMedia('(prefers-color-scheme: light)').matches)t='light'}catch(e){}applyTheme(t)})();
+function toggleTheme(){applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark')}
+const RC={branch:'--role-branch',central:'--role-central',member:'--role-member',safenet:'--role-safenet',config:'--role-config',purple:'--role-purple'};
+function rcv(r){return 'var('+(RC[r]||'--role-config')+')'}
+function rsv(r){return 'var('+(RC[r]||'--role-config')+'-soft)'}
 
-<div class="legend">
-<div class="legend-item"><div class="legend-color" style="border-color:#1565c0;background:#e3f2fd"></div>Sales Transaction Tables</div>
-<div class="legend-item"><div class="legend-color" style="border-color:#2e7d32;background:#e8f5e9"></div>Member & Points Tables</div>
-<div class="legend-item"><div class="legend-color" style="border-color:#c62828;background:#ffebee"></div>Token Tables</div>
-<div class="legend-item"><div class="legend-color" style="border-color:#78909c;background:#eceff1"></div>Configuration Tables</div>
-<div class="legend-item"><span style="background:#fff3e0;padding:2px 8px;border-radius:3px;font-family:monospace;font-size:12px">Tokenized</span> Fields that undergo tokenization</div>
-</div>
-</body>
-</html>
+function buildPath(fx,fy,tx,ty){const dx=tx-fx,dy=ty-fy;if(Math.abs(dx)>=Math.abs(dy)){const mx=(fx+tx)/2;return `M ${fx} ${fy} C ${mx} ${fy}, ${mx} ${ty}, ${tx} ${ty}`}const my=(fy+ty)/2;return `M ${fx} ${fy} C ${fx} ${my}, ${tx} ${my}, ${tx} ${ty}`}
+
+function renderGraph(el,data){
+  let selected=null;
+  const rel={};data.nodes.forEach(n=>{const s=new Set([n.id]);data.edges.forEach(e=>{if(e.from===n.id)s.add(e.to);if(e.to===n.id)s.add(e.from)});rel[n.id]=s});
+  const canvas=document.createElement('div');canvas.className='canvas';canvas.style.aspectRatio=String(data.aspect||1.6);
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','csvg');
+  canvas.appendChild(svg);
+  const nodeEls={};
+  data.nodes.forEach(n=>{
+    const d=document.createElement('div');d.className='node';d.style.left=n.x+'%';d.style.top=n.y+'%';
+    d.appendChild(data.kind==='graph'&&n.fields?entCard(n):graphCard(n));
+    canvas.appendChild(d);nodeEls[n.id]=d;
+  });
+  el.appendChild(canvas);
+  const detailHost=document.createElement('div');el.appendChild(detailHost);
+  function graphCard(n){const b=document.createElement('button');b.className='gnode';b.style.width=(n.w||220)+'px';b.style.setProperty('--rc',rcv(n.role));b.style.setProperty('--rsoft',rsv(n.role));
+    let li=(n.items||[]).map(x=>`<li>${esc(x)}</li>`).join('');
+    b.innerHTML=`<div class="h"><span class="b"></span><div><div class="t">${esc(n.title)}</div><div class="s">${esc(n.sub||'')}</div></div></div><ul>${li}</ul>`;
+    b.onclick=()=>select(n.id);return b}
+  function entCard(n){const b=document.createElement('button');b.className='ent';b.style.width=(n.w||205)+'px';b.style.setProperty('--rc',rcv(n.role));
+    let li=n.fields.map(f=>`<li><span class="fn">${esc(f[0])}</span>${f[1]?`<span class="ft ${ftClass(f[1])}">${esc(f[1])}</span>`:''}</li>`).join('');
+    b.innerHTML=`<div class="h"><span class="n">${esc(n.title)}</span><span class="s">${esc(n.sub||'')}</span></div><ul>${li}</ul>`;
+    b.onclick=()=>select(n.id);return b}
+  function ftClass(t){t=(t||'').toLowerCase();if(t.includes('pk'))return 'pk';if(t.includes('fk'))return 'fk';if(t.includes('token'))return 'token';return ''}
+  function select(id){selected=selected===id?null:id;draw();renderNodes();renderDetail()}
+  function renderNodes(){data.nodes.forEach(n=>{const card=nodeEls[n.id].firstChild;const dim=selected&&!rel[selected].has(n.id);nodeEls[n.id].style.opacity=dim?0.32:1;card.classList.toggle('sel',selected===n.id)})}
+  function renderDetail(){detailHost.innerHTML='';if(!selected)return;const n=data.nodes.find(x=>x.id===selected);const det=n.detail||{tag:n.sub,desc:`${n.title} — ${(n.fields||[]).length} columns.`,facts:(n.fields||[]).map(f=>f[1]?f[0]+' · '+f[1]:f[0])};
+    const div=document.createElement('div');div.className='detail';
+    div.innerHTML=`<div class="dh"><div class="dt"><span class="dot" style="background:${rcv(n.role)}"></span><strong>${esc(n.title)}</strong>${det.tag?`<span class="tag" style="color:${rcv(n.role)}">${esc(det.tag)}</span>`:''}</div><button class="x">✕</button></div>${det.desc?`<p class="desc">${esc(det.desc)}</p>`:''}<ul class="facts">${(det.facts||[]).map(f=>`<li><code>${esc(f)}</code></li>`).join('')}</ul>`;
+    div.querySelector('.x').onclick=()=>{selected=null;draw();renderNodes();renderDetail()};detailHost.appendChild(div)}
+  function draw(){const W=canvas.clientWidth,H=canvas.clientHeight;if(!W||!H)return;svg.setAttribute('width',W);svg.setAttribute('height',H);svg.setAttribute('viewBox',`0 0 ${W} ${H}`);svg.innerHTML='';
+    const map={};data.nodes.forEach(n=>map[n.id]=n);
+    data.edges.forEach((e,i)=>{const a=map[e.from],b=map[e.to];if(!a||!b)return;const fx=a.x/100*W,fy=a.y/100*H,tx=b.x/100*W,ty=b.y/100*H;const d=buildPath(fx,fy,tx,ty);
+      const isRel=selected&&rel[selected].has(e.from)&&rel[selected].has(e.to);const dim=selected&&!isRel;
+      const g=document.createElementNS(svg.namespaceURI,'g');g.setAttribute('opacity',dim?0.12:1);
+      const path=document.createElementNS(svg.namespaceURI,'path');path.setAttribute('d',d);path.setAttribute('fill','none');path.setAttribute('stroke',isRel?'var(--chigh)':'var(--cline)');path.setAttribute('stroke-width',isRel?2.6:1.8);path.setAttribute('stroke-linecap','round');
+      const len=path.getTotalLength?0:0;path.style.strokeDasharray='1400';path.style.strokeDashoffset='1400';path.style.animation='draw-line 1.3s cubic-bezier(.4,0,.2,1) forwards';path.style.animationDelay=(0.4+i*0.06)+'s';
+      g.appendChild(path);
+      const c=document.createElementNS(svg.namespaceURI,'circle');c.setAttribute('r',isRel?3.2:2);c.setAttribute('fill',isRel?'var(--particle)':'var(--cline)');c.style.offsetPath=`path("${d}")`;c.style.animation=`orbit ${isRel?2.2:4}s linear infinite`;g.appendChild(c);
+      if(e.label){const fo=document.createElementNS(svg.namespaceURI,'foreignObject');fo.setAttribute('x',(fx+tx)/2-80);fo.setAttribute('y',(fy+ty)/2-14);fo.setAttribute('width',160);fo.setAttribute('height',28);fo.innerHTML=`<div xmlns="http://www.w3.org/1999/xhtml" class="elabel ${isRel?'rel':''}" style="opacity:${dim?0.15:1}">${esc(e.label)}</div>`;g.appendChild(fo)}
+      svg.appendChild(g)})}
+  const ro=new ResizeObserver(()=>draw());ro.observe(canvas);
+  requestAnimationFrame(draw);window.addEventListener('resize',draw);
+  renderNodes();
+}
+
+function renderStepper(el,data){
+  let active=0;const steps=data.steps;
+  const wrap=document.createElement('div');wrap.className='stepper';
+  const rail=document.createElement('div');rail.className='rail';
+  const panel=document.createElement('div');panel.className='panel';
+  wrap.appendChild(rail);wrap.appendChild(panel);el.appendChild(wrap);
+  function render(){
+    rail.innerHTML='';steps.forEach((s,i)=>{const st=i<active?'done':i===active?'active':'';const b=document.createElement('button');b.className='seg '+st;b.style.setProperty('--rc',rcv(s.role));
+      b.innerHTML=`<span class="sb"></span><span class="st"><span class="sn">${String(i+1).padStart(2,'0')}</span>${esc(s.title)}</span>`;b.onclick=()=>{active=i;render()};rail.appendChild(b)});
+    const s=steps[active];panel.style.setProperty('--rc',rcv(s.role));
+    panel.innerHTML=`<div class="ph"><span class="pn">${String(active+1).padStart(2,'0')}</span><div><h3>${esc(s.title)}</h3>${s.code?`<code class="c">${esc(s.code)}</code>`:''}</div></div><ul>${s.lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>${s.branch?`<div class="branch ${s.branch.tone}">→ ${esc(s.branch.label)}</div>`:''}<div class="ctrl"><button class="btn" ${active===0?'disabled':''} onclick="window.__step(-1)">‹ Prev</button><span class="cnt">${active+1} / ${steps.length}</span><button class="btn p" ${active===steps.length-1?'disabled':''} onclick="window.__step(1)">Next ›</button></div>`;
+  }
+  window.__step=(d)=>{active=Math.max(0,Math.min(steps.length-1,active+d));render()};
+  render();
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function mount(data){const el=document.getElementById('diagram');if(data.kind==='stepper')renderStepper(el,data);else renderGraph(el,data)}
+
+mount({"kind": "graph", "aspect": 1.45, "nodes": [{"id": "hd", "role": "branch", "x": 16, "y": 16, "w": 215, "title": "TPSTSalHD", "sub": "Sales Header", "fields": [["FTTmnNum", "PK"], ["FTShdTransNo", "PK"], ["FDShdTransDate", "PK"], ["FTShdTransType", ""], ["FTStaSentOnOff", "0/1/3"], ["FTCstCardCode", "TOKEN"], ["FTShdStaDoc", ""]]}, {"id": "dt", "role": "branch", "x": 50, "y": 10, "w": 205, "title": "TPSTSalDT", "sub": "Sales Detail", "fields": [["FTTmnNum+TransNo+Date", "FK"], ["FNSdtSeqNo", "PK"], ["FTStaSentOnOff", "0/1/3"]]}, {"id": "rc", "role": "branch", "x": 50, "y": 35, "w": 205, "title": "TPSTSalRC", "sub": "Receipt / Tender", "fields": [["FNSrcSeqNo", "PK"], ["FTTdmCode", "Tender"], ["FTSrcCardNo", "TOKEN"]]}, {"id": "cd", "role": "branch", "x": 50, "y": 60, "w": 205, "title": "TPSTSalCD", "sub": "Card Detail", "fields": [["FNSdtSeqNo+FNScdSeqNo", "PK"], ["FNDctNo", "Discount"], ["FTScdCardID", "TOKEN"]]}, {"id": "sp", "role": "central", "x": 50, "y": 84, "w": 205, "title": "TPSTSalePoint", "sub": "Transaction Points", "fields": [["FTSpoMemID", "TOKEN"], ["FCSpoPoint", "+/-"], ["FTRemark", "0/1"]]}, {"id": "mall", "role": "member", "x": 84, "y": 42, "w": 215, "title": "TCNMMallCard", "sub": "Member Master", "fields": [["FTMcdCode", "PK token"], ["FDMcdExpDate", "PK"], ["FTMcdStaAct", "A"], ["FCMcdTotalPoint", ""], ["FCEarned / FCBalance", ""]]}, {"id": "bphis", "role": "member", "x": 84, "y": 70, "w": 215, "title": "TPSTBPHis", "sub": "Point History", "fields": [["FTShdMemberID", "PK token"], ["FCCstCardPoint", "+/-"], ["FCTotalBP / FCBalanceBP", ""]]}, {"id": "token", "role": "safenet", "x": 84, "y": 14, "w": 215, "title": "TPSTTokenLst", "sub": "Token Mapping", "fields": [["FTToken", "PK"], ["FTValue", "real card"], ["FTTblName / FTFldName", ""], ["FNStatus", "1=active"]]}], "edges": [{"from": "hd", "to": "dt", "label": "1:N"}, {"from": "hd", "to": "rc", "label": "1:N"}, {"from": "hd", "to": "cd", "label": "1:N"}, {"from": "hd", "to": "sp", "label": "1:N"}, {"from": "sp", "to": "mall", "label": "lookup"}, {"from": "mall", "to": "bphis", "label": "1:N"}, {"from": "hd", "to": "token", "label": "tokenize"}]});</script>
+</body></html>

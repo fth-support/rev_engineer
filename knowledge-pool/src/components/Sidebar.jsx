@@ -47,6 +47,9 @@ function Sidebar({ isOpen, onClose }) {
           <NavLink to="/docs/security" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 1024 && onClose()}>
             <ShieldCheck size={18} /> Security & Tokens
           </NavLink>
+          <NavLink to="/docs/website-guide" className={({isActive}) => `nav-item ${isActive ? 'active' : ''}`} onClick={() => window.innerWidth < 1024 && onClose()}>
+            <Code size={18} /> Website Dev Guide
+          </NavLink>
         </div>
 
         <div className="sidebar-footer">
