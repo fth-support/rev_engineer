@@ -1,7 +1,11 @@
 import { FileText, Presentation, Globe, Download, HardDrive, Package } from 'lucide-react'
 import './pages.css'
 
-const BASE = '/doc-claude-ver'
+// Base-relative so links resolve under the GitHub Pages project subpath
+// (e.g. /rev_engineer/). import.meta.env.BASE_URL reflects vite `base`.
+const PUBLIC = import.meta.env.BASE_URL // './' with current config
+const BASE = `${PUBLIC}doc-claude-ver`
+const ZIP = `${PUBLIC}downloads/doc-claude-ver.zip`
 
 const groups = [
   {
@@ -67,7 +71,7 @@ function Downloads() {
         <div className="dl-row">
           <span className="dl-row__name"><span className="ext">ZIP</span> doc-claude-ver.zip</span>
           <span className="dl-actions">
-            <a className="dl-btn primary" href="/downloads/doc-claude-ver.zip" download><Download size={14} /> Download all</a>
+            <a className="dl-btn primary" href={ZIP} download><Download size={14} /> Download all</a>
           </span>
         </div>
       </div>
