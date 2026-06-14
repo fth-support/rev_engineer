@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServiceTransfer — Build Brief & Re-implementation Directive</title>
+<style>
+:root{
+  --bg:#f6f8fc; --panel:#ffffff; --ink:#0f1c30; --ink2:#3b4a60; --muted:#6b7a90;
+  --line:#e2e8f2; --accent:#2563eb; --accent2:#1d4ed8; --accent-soft:#eaf1ff;
+  --branch:#1d4ed8; --central:#047857; --member:#b45309; --safenet:#b91c1c; --purple:#7c3aed; --config:#475569;
+  --ok:#0f7a43; --okbg:#e7f6ed; --warn:#9a5b00; --warnbg:#fff3e0; --danger:#b3261e; --dangerbg:#fdeceb;
+  --code-bg:#0f1c30; --code-ink:#dbe6f5;
+  --radius:12px; --mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;
+}
+html[data-theme="dark"]{
+  --bg:#0b1120; --panel:#111c33; --ink:#eef2f8; --ink2:#b8c4d6; --muted:#7e8ca3;
+  --line:#22304a; --accent:#60a5fa; --accent2:#93c5fd; --accent-soft:#15233c;
+  --branch:#60a5fa; --central:#34d399; --member:#fbbf24; --safenet:#f87171; --purple:#c084fc; --config:#94a3b8;
+  --ok:#34d399; --okbg:#10241b; --warn:#fbbf24; --warnbg:#251c08; --danger:#f87171; --dangerbg:#2a1414;
+  --code-bg:#060c18; --code-ink:#cdd9ec;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.65;font-size:15px}
+.wrap{display:grid;grid-template-columns:288px 1fr;max-width:1500px;margin:0 auto;gap:0}
+@media(max-width:980px){.wrap{grid-template-columns:1fr}.toc{display:none}}
+
+/* sidebar TOC */
+.toc{position:sticky;top:0;align-self:start;height:100vh;overflow-y:auto;padding:1.6rem 1.1rem;border-right:1px solid var(--line);background:var(--panel)}
+.toc .brand{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
+.toc .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--purple));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800}
+.toc .brand b{font-size:1rem}.toc .brand span{display:block;font-size:.7rem;color:var(--muted)}
+.toc a{display:block;color:var(--ink2);text-decoration:none;font-size:.86rem;padding:.28rem .6rem;border-radius:7px;border-left:2px solid transparent}
+.toc a:hover{background:var(--accent-soft);color:var(--accent)}
+.toc a.sub{padding-left:1.4rem;font-size:.8rem;color:var(--muted)}
+.toc .grp{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:1rem .6rem .3rem}
+
+main{padding:2.2rem 2.6rem 5rem;min-width:0}
+@media(max-width:980px){main{padding:1.4rem}}
+.topbar{display:flex;align-items:center;gap:1rem;margin-bottom:1.6rem}
+.toggle{margin-left:auto;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink2);border-radius:999px;padding:.4rem .8rem;font-size:.8rem;font-weight:600}
+
+h1{font-size:2.1rem;line-height:1.2;margin:.2rem 0 .4rem}
+h2{font-size:1.5rem;margin:2.4rem 0 .8rem;padding-top:.6rem;border-top:2px solid var(--line)}
+h3{font-size:1.15rem;margin:1.5rem 0 .5rem;color:var(--accent2)}
+h4{font-size:1rem;margin:1.1rem 0 .35rem}
+p{color:var(--ink2);margin:.5rem 0}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.86em;background:var(--accent-soft);color:var(--accent2);padding:.1em .4em;border-radius:5px}
+pre{background:var(--code-bg);color:var(--code-ink);padding:1rem 1.2rem;border-radius:var(--radius);overflow-x:auto;font-family:var(--mono);font-size:.82rem;line-height:1.55;border:1px solid var(--line)}
+pre code{background:none;color:inherit;padding:0}
+ul,ol{color:var(--ink2);padding-left:1.3rem}li{margin:.28rem 0}
+.lead{font-size:1.08rem;color:var(--ink2)}
+
+table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.86rem;background:var(--panel);border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+th,td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--accent);color:#fff;font-weight:600}
+html[data-theme="dark"] th{background:#16243d}
+tr:nth-child(even) td{background:rgba(127,127,127,.04)}
+td code{font-size:.82em}
+
+.tag{display:inline-block;font-size:.66rem;font-weight:700;padding:.08rem .45rem;border-radius:999px;vertical-align:middle}
+.pk{background:var(--dangerbg);color:var(--danger)} .fk{background:var(--accent-soft);color:var(--accent2)}
+.tkn{background:var(--warnbg);color:var(--warn)}
+
+.callout{border-radius:var(--radius);padding:.85rem 1.1rem;margin:1rem 0;border-left:5px solid var(--accent);background:var(--accent-soft)}
+.callout.must{border-color:var(--danger);background:var(--dangerbg)}
+.callout.should{border-color:var(--warn);background:var(--warnbg)}
+.callout.keep{border-color:var(--ok);background:var(--okbg)}
+.callout b{color:var(--ink)}
+.callout .lbl{font-size:.7rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:.2rem}
+.callout.must .lbl{color:var(--danger)} .callout.should .lbl{color:var(--warn)} .callout.keep .lbl{color:var(--ok)} .callout .lbl{color:var(--accent2)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:1rem 1.2rem}
+.card h4{margin-top:0}
+.pill{display:inline-block;font-size:.72rem;font-weight:700;padding:.15rem .6rem;border-radius:999px;background:var(--accent-soft);color:var(--accent2);margin:.15rem .3rem .15rem 0}
+.role-branch{color:var(--branch)} .role-central{color:var(--central)} .role-member{color:var(--member)} .role-safenet{color:var(--safenet)} .role-purple{color:var(--purple)}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:.9rem;margin:1rem 0}
+@media(max-width:760px){.kpis{grid-template-columns:1fr 1fr}}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:.9rem 1rem}
+.kpi b{display:block;font-size:1.7rem;line-height:1;color:var(--accent)}
+.kpi span{font-size:.78rem;color:var(--muted)}
+
+svg{max-width:100%;height:auto;display:block;margin:1rem auto}
+.step{display:flex;gap:.8rem;align-items:flex-start;margin:.5rem 0;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:.6rem .8rem}
+.step .n{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.82rem}
+.step .b{min-width:0}.step .b b{color:var(--ink)}.step .b div{font-size:.85rem;color:var(--ink2)}
+footer{border-top:1px solid var(--line);margin-top:3rem;padding-top:1.2rem;color:var(--muted);font-size:.82rem}
+.hr{height:1px;background:var(--line);margin:2rem 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ============ TOC ============ -->
+<nav class="toc">
+  <div class="brand"><div class="logo">ST</div><div><b>ServiceTransfer</b><span>Build Brief · v1.0</span></div></div>
+  <div class="grp">Start here</div>
+  <a href="#mission">0 · Mission &amp; How to use</a>
+  <a href="#repo">0.1 · Repository map</a>
+  <div class="grp">Understand</div>
+  <a href="#overview">1 · System overview</a>
+  <a href="#business">2 · Business context</a>
+  <a href="#architecture">3 · Architecture (legacy)</a>
+  <a href="#data">4 · Data model &amp; relationships</a>
+  <div class="grp">Logic</div>
+  <a href="#startup">5 · Startup sequence</a>
+  <a href="#syncloop">6 · Sync cycle (500ms)</a>
+  <a href="#insert">7 · Insert logic</a>
+  <a href="#token">8 · Tokenization</a>
+  <a href="#points">9 · Member points</a>
+  <a href="#errors">10 · Error handling</a>
+  <a href="#config">11 · Configuration</a>
+  <div class="grp">Build</div>
+  <a href="#nfr">12 · Non-functional reqs</a>
+  <a href="#security">13 · Security mandate</a>
+  <a href="#target">14 · Target architecture</a>
+  <a href="#directive">15 · Build directive</a>
+  <a href="#milestones">16 · Milestones</a>
+  <a href="#acceptance">17 · Acceptance criteria</a>
+  <a href="#glossary">18 · Glossary</a>
+</nav>
+
+<!-- ============ MAIN ============ -->
+<main>
+<div class="topbar">
+  <div>
+    <div class="pill">RE-IMPLEMENTATION DIRECTIVE</div>
+    <div class="pill" style="background:var(--okbg);color:var(--ok)">Language-agnostic</div>
+  </div>
+  <button class="toggle" onclick="tg()">◐ Theme</button>
+</div>
+
+<!-- 0 MISSION -->
+<section id="mission">
+<h1>ServiceTransfer — Build Brief</h1>
+<p class="lead">This single document is your <b>directive to (re)build ServiceTransfer from scratch in any language</b>.
+It captures the full system — design, business logic, data relationships, configuration and security mandate —
+reverse-engineered from the original Visual Basic 6 source. Pair it with the repository folder it ships in and you
+have everything required to start implementation immediately, on any stack (Go, C#/.NET, Java, Node/TypeScript, Rust, Python…).</p>
+
+<div class="callout">
+  <span class="lbl">What you are building</span>
+  <b>ServiceTransfer</b> — a resilient background <b>data-synchronization agent</b> for a retail POS network.
+  It runs at every branch, continuously pushing completed sales transactions from a local database up to a central
+  headquarters database, tokenizing sensitive card data on the way, and posting member loyalty points to a member database.
+</div>
+
+<h3>How to use this brief</h3>
+<ol>
+  <li><b>Read sections 1–11</b> to fully understand the existing behaviour (the "what" and "why").</li>
+  <li><b>Treat sections 12–13</b> (non-functional + security) as hard requirements for the new build.</li>
+  <li><b>Follow sections 14–17</b> to design the target system, sequence the work, and verify you are done.</li>
+  <li><b>Use the repository</b> (see the map below) to confirm any detail directly against the original source.</li>
+</ol>
+<div class="callout keep"><span class="lbl">Golden rule</span>
+This is <b>not a line-by-line port</b>. Preserve the <i>business rules</i> exactly; replace the <i>architecture</i>
+(polling, direct DB access, string-built SQL, plain-text secrets) with the modern equivalents in §14–15.</div>
+</section>
+
+<!-- 0.1 REPO -->
+<section id="repo">
+<h2>0.1 · Repository map — where to verify each detail</h2>
+<table>
+<tr><th>Path</th><th>What it is</th><th>Use it for</th></tr>
+<tr><td><code>legacy_source/</code></td><td>Original VB6 project (source of truth)</td><td>Confirming exact logic &amp; field names</td></tr>
+<tr><td><code>legacy_source/Forms/wMain.frm</code></td><td>Main form — the 500ms timer loop &amp; sync/insert/points functions (~1,763 lines)</td><td>§6 §7 §9 §10</td></tr>
+<tr><td><code>legacy_source/Modules/mMain.bas</code></td><td>Shared module — config read, tokenization, SOAP, helpers (~1,099 lines)</td><td>§5 §8 §11</td></tr>
+<tr><td><code>legacy_source/Modules/Module4.bas</code></td><td>Win32 <code>SleepEx</code> declaration (object-clear delay)</td><td>§5</td></tr>
+<tr><td><code>doc-agy-ver/*.md</code></td><td>Markdown docs (Mermaid diagrams, GitHub-renderable)</td><td>Quick reference</td></tr>
+<tr><td><code>doc-claude-ver/</code></td><td>Word specs, slide deck, standalone interactive HTML diagrams</td><td>Stakeholder-facing</td></tr>
+<tr><td><code>knowledge-pool/</code></td><td>Interactive documentation portal (React) + verified diagram data (<code>src/data/diagramData.js</code>)</td><td>Visual exploration</td></tr>
+<tr><td><code>modern_go_source/main.go</code></td><td>A Go/Fyne prototype (one possible target — reference only, logic is simulated)</td><td>Inspiration, not a mandate</td></tr>
+</table>
+</section>
+
+<!-- 1 OVERVIEW -->
+<section id="overview">
+<h2>1 · System overview</h2>
+<p>ServiceTransfer is a headless background service (the original hides its window and runs as a single instance).
+On a fixed timer it performs one work cycle: verify it should run, read which tables to sync, pull unsent rows from the
+local DB, write them to the central DB (tokenizing card fields en route), then post accumulated member points.</p>
+<div class="kpis">
+  <div class="kpi"><b>500ms</b><span>Timer poll interval (legacy)</span></div>
+  <div class="kpi"><b>3</b><span>Databases: Local · Central · Member</span></div>
+  <div class="kpi"><b>0/1/3</b><span><code>FTStaSentOnOff</code> sync flags</span></div>
+  <div class="kpi"><b>SOAP</b><span>SafeNet tokenizer (external)</span></div>
+</div>
+<h3>Core responsibilities</h3>
+<ul>
+  <li><b>Sales synchronization</b> — move pending sales (header, detail, receipt, card, points, plus deposit/hold/voucher variants) from Local → Central.</li>
+  <li><b>Tokenization</b> — replace raw card/member numbers with tokens via SafeNet before any sensitive value leaves the branch.</li>
+  <li><b>Member points</b> — aggregate loyalty points per member and post them (with history) to the Member DB.</li>
+  <li><b>Resilience</b> — survive offline periods, duplicate keys, timeouts; never send a header before its child rows.</li>
+</ul>
+</section>
+
+<!-- 2 BUSINESS -->
+<section id="business">
+<h2>2 · Business context</h2>
+<h3>2.1 Stakeholders &amp; expectations</h3>
+<table>
+<tr><th>Stakeholder</th><th>Expectation the system must satisfy</th></tr>
+<tr><td>Branch Operations</td><td>POS keeps working offline; data auto-syncs when connectivity returns.</td></tr>
+<tr><td>HQ Management</td><td>Near-real-time, centralized sales data for reporting &amp; analytics.</td></tr>
+<tr><td>Members / Customers</td><td>Loyalty points are updated and usable promptly after a purchase.</td></tr>
+<tr><td>Compliance (PCI-DSS)</td><td>Raw card data is <b>never</b> stored or transmitted centrally — always tokenized first.</td></tr>
+<tr><td>IT Operations</td><td>Self-recovering, observable, minimal manual intervention.</td></tr>
+</table>
+<h3>2.2 End-to-end business flow</h3>
+<div class="grid2">
+  <div class="step"><div class="n">1</div><div class="b"><b class="role-branch">Customer transaction</b><div>POS records a sale (header + detail + receipt + card + points) to the Local DB.</div></div></div>
+  <div class="step"><div class="n">2</div><div class="b"><b class="role-central">Local recording</b><div>Rows are stored offline-capable, flagged <code>FTStaSentOnOff='0'</code> (pending).</div></div></div>
+  <div class="step"><div class="n">3</div><div class="b"><b class="role-member">Background sync</b><div>The agent's timer picks up pending rows.</div></div></div>
+  <div class="step"><div class="n">4</div><div class="b"><b class="role-safenet">Data protection</b><div>Card/member fields are tokenized via SafeNet.</div></div></div>
+  <div class="step"><div class="n">5</div><div class="b"><b class="role-purple">HQ consolidation</b><div>Rows are inserted into the Central DB.</div></div></div>
+  <div class="step"><div class="n">6</div><div class="b"><b class="role-central">Member rewards</b><div>Points are accrued to the Member DB with full history.</div></div></div>
+</div>
+</section>
+
+<!-- 3 ARCHITECTURE -->
+<section id="architecture">
+<h2>3 · Architecture (legacy — the "as-is")</h2>
+<p>Each branch POS runs the agent, which opens <b>direct database connections across the network</b> (ADODB / OLEDB)
+to three SQL Server databases, and calls one external SOAP tokenizer.</p>
+<svg viewBox="0 0 920 360" role="img" aria-label="Legacy architecture">
+  <defs><style>.b{fill:var(--panel);stroke-width:2}.t{font:600 13px Inter,sans-serif;fill:var(--ink)}.s{font:11px Inter,sans-serif;fill:var(--muted)}.l{stroke:var(--config);stroke-width:1.6;fill:none}.lab{font:10px Inter,sans-serif;fill:var(--ink2)}</style></defs>
+  <line class="l" x1="250" y1="120" x2="560" y2="80" style="stroke:var(--branch)"/>
+  <line class="l" x1="250" y1="150" x2="700" y2="250" style="stroke:var(--member)"/>
+  <line class="l" x1="180" y1="200" x2="360" y2="270" style="stroke:var(--safenet)"/>
+  <rect class="b" x="40" y="80" width="210" height="150" rx="12" style="stroke:var(--branch)"/>
+  <text class="t" x="60" y="108">POS Terminal (Branch)</text><text class="s" x="60" y="126">ServiceTransfer agent · 500ms</text>
+  <text class="s" x="60" y="152">Local DB (SQL Express)</text><text class="s" x="60" y="172">Config: AdaIni.Ada + Registry</text><text class="s" x="60" y="192">Logs: LOG\TransferOffline*.Log</text>
+  <rect class="b" x="560" y="40" width="200" height="100" rx="12" style="stroke:var(--central)"/>
+  <text class="t" x="578" y="68">Central Server (HQ)</text><text class="s" x="578" y="88">TPSTSal* · TSysSync</text><text class="s" x="578" y="106">TSysConfig · TCNMTerminalMtn</text>
+  <rect class="b" x="700" y="200" width="190" height="110" rx="12" style="stroke:var(--member)"/>
+  <text class="t" x="718" y="228">Member DB</text><text class="s" x="718" y="248">TCNMMallCard</text><text class="s" x="718" y="266">TPSTBPHis · TPSTTokenLst</text>
+  <rect class="b" x="300" y="250" width="210" height="95" rx="12" style="stroke:var(--safenet)"/>
+  <text class="t" x="318" y="278">SafeNet Tokenizer</text><text class="s" x="318" y="298">SOAP · MSSOAP.SoapClient30</text><text class="s" x="318" y="316">FIRST_SIX_TOKEN · 10,000ms</text>
+  <text class="lab" x="360" y="92">SQLOLEDB — INSERT/UPDATE</text>
+  <text class="lab" x="430" y="210">points → Member DB</text>
+  <text class="lab" x="150" y="245">SOAP tokenize</text>
+</svg>
+<table>
+<tr><th>Node</th><th>Role</th><th>Holds / does</th></tr>
+<tr><td class="role-branch">Local DB</td><td>Branch SQL Server Express</td><td>Source of truth at the branch; rows flagged pending until synced.</td></tr>
+<tr><td class="role-central">Central DB</td><td>HQ SQL Server</td><td>Consolidated sales; also holds sync config (<code>TSysSync</code>), tokenizer config (<code>TSysConfig</code>), terminal map.</td></tr>
+<tr><td class="role-member">Member DB</td><td>Loyalty SQL Server (separate connection)</td><td><code>TCNMMallCard</code> balances, <code>TPSTBPHis</code> history, member-side token map.</td></tr>
+<tr><td class="role-safenet">SafeNet Tokenizer</td><td>External SOAP web service</td><td><code>InsertToken()</code> / <code>GetValue()</code>; format <code>FIRST_SIX_TOKEN</code>.</td></tr>
+</table>
+</section>
+
+<!-- 4 DATA -->
+<section id="data">
+<h2>4 · Data model &amp; relationships</h2>
+<h3>4.1 Field naming convention (Hungarian)</h3>
+<p>The first two letters of every column encode its type. The legacy dynamic-SQL builder relies on this to decide
+quoting / date formatting — your new build should instead use typed parameters, but you still need to read the prefixes.</p>
+<table>
+<tr><th>Prefix</th><th>Type</th><th>SQL</th><th>Examples</th></tr>
+<tr><td><code>FT</code></td><td>Text</td><td>VARCHAR</td><td><code>FTTmnNum</code>, <code>FTShdTransNo</code></td></tr>
+<tr><td><code>FD</code></td><td>Date</td><td>DATE/DATETIME</td><td><code>FDShdTransDate</code></td></tr>
+<tr><td><code>FC</code></td><td>Currency/Count</td><td>NUMERIC</td><td><code>FCSpoPoint</code>, <code>FCBalance</code></td></tr>
+<tr><td><code>FN</code></td><td>Number (int)</td><td>NUMERIC/INT</td><td><code>FNSdtSeqNo</code></td></tr>
+</table>
+
+<h3>4.2 Relationships (ER)</h3>
+<pre>TPSTSalHD (header)  1 ──┬── N  TPSTSalDT   (line items)
+   PK: FTTmnNum,         ├── N  TPSTSalRC   (receipt / tender)
+       FTShdTransNo,     ├── N  TPSTSalCD   (discount card)
+       FDShdTransDate    └── N  TPSTSalePoint (points)  ──► TCNMMallCard ──1:N──► TPSTBPHis
+
+TPSTTokenLst  ◄── maps FTValue (raw)  ↔  FTToken  for HD/RC/CD/SalePoint card fields
+TSysSync = which tables to sync   ·   TCNMTerminalMtn = computer-name → terminal-number</pre>
+<div class="callout"><span class="lbl">Composite key</span>
+Every sales table shares the same three-part key — <code>FTTmnNum</code> + <code>FTShdTransNo</code> + <code>FDShdTransDate</code> —
+plus a sync flag <code>FTStaSentOnOff</code> (<code>0</code>=pending, <code>1</code>=synced, <code>3</code>=needs-update).</div>
+
+<h3>4.3 Sales transaction tables</h3>
+<h4>TPSTSalHD — Sales Header</h4>
+<table>
+<tr><th>Column</th><th>Type</th><th>Key</th><th>Meaning</th></tr>
+<tr><td><code>FTTmnNum</code></td><td>VARCHAR</td><td><span class="tag pk">PK</span></td><td>Terminal number</td></tr>
+<tr><td><code>FTShdTransNo</code></td><td>VARCHAR</td><td><span class="tag pk">PK</span></td><td>Transaction number (daily running)</td></tr>
+<tr><td><code>FDShdTransDate</code></td><td>DATE</td><td><span class="tag pk">PK</span></td><td>Transaction date</td></tr>
+<tr><td><code>FTShdTransType</code></td><td>VARCHAR</td><td></td><td>Transaction type code (see §9 table)</td></tr>
+<tr><td><code>FTShdStaDoc</code></td><td>VARCHAR</td><td></td><td>Document status — <code>'1'</code> = complete</td></tr>
+<tr><td><code>FTStaSentOnOff</code></td><td>VARCHAR</td><td></td><td>Sync flag 0/1/3</td></tr>
+<tr><td><code>FTCstCardCode</code></td><td>VARCHAR</td><td><span class="tag tkn">TKN</span></td><td>Customer card — <b>always tokenized</b></td></tr>
+</table>
+<h4>Child tables (same composite key + own sequence)</h4>
+<table>
+<tr><th>Table</th><th>Own key</th><th>Token field &amp; condition</th></tr>
+<tr><td><code>TPSTSalDT</code> (detail)</td><td><code>FNSdtSeqNo</code></td><td>— (line items)</td></tr>
+<tr><td><code>TPSTSalRC</code> (receipt)</td><td><code>FNSrcSeqNo</code></td><td><code>FTSrcCardNo</code> when <code>FTTdmCode</code> ∈ {T002, T003, T017}</td></tr>
+<tr><td><code>TPSTSalCD</code> (card)</td><td><code>FNScdSeqNo</code></td><td><code>FTScdCardID</code> when <code>FNDctNo</code> ∈ {11, 12, 15, 28}</td></tr>
+<tr><td><code>TPSTSalePoint</code> (points)</td><td><code>FTSpoMemID</code></td><td><code>FTSpoMemID</code> <b>always</b>; <code>FCSpoPoint</code>=points, <code>FTRemark</code>=0/1</td></tr>
+</table>
+<p class="lead" style="font-size:.92rem">The same shape repeats for <code>TPSTDepositHD/DT/RC/CD</code>, <code>TPSTHoldHD/DT/CD</code>, <code>TPSTVoucherHD/RC</code>, <code>TPSTCV</code> — all listed in <code>TSysSync</code>.</p>
+
+<h3>4.4 Member, points &amp; token tables</h3>
+<table>
+<tr><th>Table</th><th>Key columns</th><th>Notable columns</th></tr>
+<tr><td><code>TCNMMallCard</code> (member master)</td><td><code>FTMcdCode</code> (PK, a token), <code>FDMcdExpDate</code> (PK)</td><td><code>FTMcdStaAct</code> ('A'=active), <code>FCEarned</code>, <code>FCBalance</code> (= prior total + earned)</td></tr>
+<tr><td><code>TPSTBPHis</code> (point history)</td><td>TmnNum/TransNo/Date/MemberID (PK)</td><td><code>FCCstCardPoint</code> (±), <code>FCTotalBP</code>, <code>FCBalanceBP</code></td></tr>
+<tr><td><code>TPSTTokenLst</code> (token map)</td><td><code>FTToken</code>, <code>FTValue</code>, <code>FTTblName</code>, <code>FTFldName</code> (PK)</td><td><code>FNStatus</code> (1=active). If <code>FTValue==FTToken</code> → that field was skipped.</td></tr>
+</table>
+
+<h3>4.5 Configuration / control tables</h3>
+<table>
+<tr><th>Table</th><th>Purpose</th></tr>
+<tr><td><code>TSysSync</code></td><td>Drives the sync loop: source table, dest table, ordering, WHERE condition (<code>FTSscCondScript</code>), active flag (<code>FTSscStaActive='1'</code>).</td></tr>
+<tr><td><code>TSysConfig</code></td><td>Tokenizer config under code <code>TKToken</code> (seq 001–008 — see §11).</td></tr>
+<tr><td><code>TCNMStorePara</code></td><td><code>FTStpCode='29'</code> → token on/off (<code>FTStpStaAlw</code> 'Y'/'N').</td></tr>
+<tr><td><code>TCNMTerminalMtn</code></td><td>Maps computer name → terminal number; also a connection health-check target.</td></tr>
+<tr><td><code>TSysChgDateTime</code></td><td>Holds the operation/sale date (<code>FDCdtDate</code>) that bounds what gets synced.</td></tr>
+<tr><td><code>TsysTerminalSta</code></td><td>Store-open state (<code>FTTmsOpnStore</code> 'Y'/'N').</td></tr>
+</table>
+</section>
+
+<!-- 5 STARTUP -->
+<section id="startup">
+<h2>5 · Startup sequence</h2>
+<pre>FUNCTION Startup():
+  IF another instance is running: EXIT          // single-instance guard
+  config = ReadConfig(AdaIni.Ada)               // 3 DB connection strings (see §11)
+  IF config invalid: set Registry SentStaOn='0'; EXIT
+  Save Registry: SentStartDate, SentStartTime, SentStaOn='1'
+  Connect(Central); Connect(Local)              // open persistent connections
+  CreateLogFile("LOG/TransferOffline{yyyyMMdd}{HHmmss}.Log")
+  tokenCfg = ReadTokenConfig()                  // TCNMStorePara #29 + TSysConfig TKToken
+  InitSoapClient(tokenCfg.url)
+  StartTimer(every 500ms → SyncCycle)           // §6</pre>
+<div class="callout should"><span class="lbl">Modernize</span>Keep the single-instance + config-load + connect + log steps, but replace the Registry state with a proper
+config/secret store, and the 500ms timer with an event trigger (§14).</div>
+</section>
+
+<!-- 6 SYNC -->
+<section id="syncloop">
+<h2>6 · Sync cycle — the 500ms loop</h2>
+<p>One cycle (the original disables the timer while running to prevent re-entrancy):</p>
+<div class="step"><div class="n">1</div><div class="b"><b>Pre-check</b><div>Read Registry <code>SentSale</code>/<code>Online</code>. If either ≠ <code>'1'</code> → skip to Cleanup.</div></div></div>
+<div class="step"><div class="n">2</div><div class="b"><b>Connect &amp; validate</b><div>Verify/repair Central &amp; Local connections (health-check <code>SELECT FTTmnCode FROM TCNMTerminalMtn</code>); check store-open (<code>FTTmsOpnStore='Y'</code>). Any failure → Cleanup.</div></div></div>
+<div class="step"><div class="n">3</div><div class="b"><b>Configuration</b><div>Load active tables from <code>TSysSync</code> (ordered); resolve terminal number; load sale date from <code>TSysChgDateTime</code>.</div></div></div>
+<div class="step"><div class="n">4</div><div class="b"><b>Sync loop</b><div>FOR each table → fetch Local rows where <code>FTStaSentOnOff='0' AND FDShdTransDate ≤ saleDate</code> → FOR each row → <b>Insert</b> (§7); on success set the Local row's flag to <code>'1'</code>.</div></div></div>
+<div class="step"><div class="n">5</div><div class="b"><b>Member points</b><div>Call the points routine (§9).</div></div></div>
+<div class="step"><div class="n">6</div><div class="b"><b>Cleanup</b><div>Persist run state; re-enable the timer for the next cycle.</div></div></div>
+<pre>FOR each table IN activeSyncTables:
+    rows = SELECT * FROM local.[table]
+           WHERE FTStaSentOnOff = '0' AND FDShdTransDate &lt;= saleDate
+           ORDER BY &lt;table PK&gt;
+    FOR each row IN rows:
+        ok, err = InsertToServer(row, table)         // §7
+        IF err == CONNECTION_LOST: GOTO Cleanup       // abort cycle
+        IF err == DUPLICATE_KEY:  ok = UpdateOnServer(row, table)  // only if flag=='3'
+        IF ok: SET local.[table].FTStaSentOnOff = '1' WHERE &lt;row PK&gt;</pre>
+</section>
+
+<!-- 7 INSERT -->
+<section id="insert">
+<h2>7 · Insert logic (the most safety-critical routine)</h2>
+<pre>FUNCTION InsertToServer(row, table) -> (ok, errorCode):
+  // (a) HD-FIRST RULE — a header may only go up after ALL its children are sent
+  IF table is a Header (e.g. TPSTSalHD / TPSTDepositHD):
+     FOR child IN [DT, RC, CD, SalePoint of this header]:
+        IF EXISTS local child WHERE same keys AND FTStaSentOnOff &lt;&gt; '1':
+           RETURN (false, 555)        // children not ready → skip header this cycle
+
+  // (b) DELETE-BEFORE-INSERT — clean a stale partial record on the server
+  IF EXISTS server row WHERE same keys AND FTShdStaDoc &lt;&gt; '1':
+     DELETE server row WHERE same keys
+
+  // (c) BUILD THE ROW (new build: typed parameters, NOT string concatenation)
+  FOR each field IN row:
+     value = field.value
+     IF field needs tokenizing (see §8 matrix):
+        value = Tokenize(value)        // may RETURN (false, 557) on failure
+     // legacy formats by prefix (FT quote/escape, FC/FN numeric, FD date) — you use params
+
+  // (d) INSERT INTO server.[table] (...) VALUES (...)
+
+  // (e) POST-CHECK (headers): verify the header now exists on the server.
+  //     If not → reset this header + all its children back to '0' and RETURN (false, 556)
+  RETURN (true, 0)</pre>
+<div class="callout must"><span class="lbl">Preserve exactly</span>
+The <b>HD-first rule</b>, <b>delete-before-insert</b>, and <b>header post-check reset</b> are core data-integrity
+guarantees. They ensure HQ never holds a header without its children. Keep these as DB transactions in the new build.</div>
+</section>
+
+<!-- 8 TOKEN -->
+<section id="token">
+<h2>8 · Tokenization</h2>
+<p>Sensitive card/member numbers must be tokenized before leaving the branch. The legacy call is
+<code>SP_PRCbToken()</code> against the SafeNet SOAP service; format <code>FIRST_SIX_TOKEN</code> keeps the first 6
+digits and randomizes the rest.</p>
+<pre>FUNCTION Tokenize(cardNo) -> (token, ok):
+  IF NOT tokenEnabled OR len(cardNo) &lt; 7:   RETURN (cardNo, true)   // guard: pass through
+  IF len(cardNo) &lt; 14 OR cardNo is empty:   RETURN (cardNo, true)   // only tokenize len &gt;= 14
+  IF online AND not skipDbSearch:
+     existing = SELECT TOP 1 FTToken FROM TPSTTokenLst
+                WHERE FTValue = cardNo AND FTValue &lt;&gt; FTToken
+                ORDER BY FDDateIns DESC
+     IF existing found: RETURN (existing, true)        // reuse — avoids a web-service call
+  IF InitSoap() ok:
+     token = soap.InsertToken(naeUser, naePwd, dbUser, dbPwd, db, cardNo, FORMAT=4, luhn=0)
+     IF error OR token empty: RETURN (cardNo, false)   // → caller raises Error 557, skips row
+     INSERT INTO TPSTTokenLst (date, who, table, field, keys..., FTValue, FTToken, status=1, srv)
+     RETURN (token, true)
+  RETURN (cardNo, false)</pre>
+<h3>8.1 When to tokenize (conditions matrix)</h3>
+<table>
+<tr><th>Table</th><th>Field</th><th>Condition</th></tr>
+<tr><td><code>TPSTSalHD</code> / <code>TPSTDepositHD</code></td><td><code>FTCstCardCode</code></td><td>Always</td></tr>
+<tr><td><code>TPSTSalRC</code> / <code>TPSTDepositRC</code></td><td><code>FTSrcCardNo</code></td><td><code>FTTdmCode</code> ∈ {T002 Credit, T003 Hire-Purchase, T017 TC-Card}</td></tr>
+<tr><td><code>TPSTSalCD</code> / <code>TPSTDepositCD</code></td><td><code>FTScdCardID</code></td><td><code>FNDctNo</code> ∈ {11, 12, 15, 28}</td></tr>
+<tr><td><code>TPSTSalePoint</code></td><td><code>FTSpoMemID</code></td><td>Always</td></tr>
+</table>
+</section>
+
+<!-- 9 POINTS -->
+<section id="points">
+<h2>9 · Member points</h2>
+<pre>FUNCTION UpdateMemberPoints():
+  REQUIRE online AND connect(Member) AND connect(Local)
+  pending = SELECT DISTINCT keys FROM TPSTSalePoint WHERE FTRemark='0' AND FTSpoMemID &lt;&gt; ''
+  FOR each transaction IN pending:
+     groups = SELECT SUM(FCSpoPoint) AS pts, FTSpoMemID
+              FROM TPSTSalePoint WHERE same trans AND FTRemark='0'
+              GROUP BY FTSpoMemID, FDDateUpd, FTWhoUpd
+     FOR each g IN groups:
+        memberToken = Tokenize(g.FTSpoMemID)            // §8; also write token map to Member DB
+        pts = g.pts
+        IF transType IN {Return, IPV, DepositCancel, CancelVoucher, ...}: pts = -pts   // sign
+        member = SELECT TOP 1 FROM TCNMMallCard WHERE FTMcdCode = memberToken
+        IF member exists:
+           UPDATE TCNMMallCard SET FCEarned += pts,
+                  FCBalance = FCMcdTotalPoint + FCEarned + pts
+        ELSE:
+           INSERT TCNMMallCard (FTMcdStaAct='A', FTMcdName='New Member', FCEarned=pts, FCBalance=pts, expDate)
+        INSERT INTO TPSTBPHis (...history row...)
+        UPDATE TPSTSalePoint SET FTRemark='1' WHERE same keys      // mark processed
+  ON ERROR: re-check web service + connections, then continue with next record</pre>
+<h3>9.1 Transaction types &amp; point sign</h3>
+<table>
+<tr><th>Effect</th><th>Transaction types</th></tr>
+<tr><td><b class="role-central">+ Point</b></td><td>Sale (03), VIPSale (10), Deposit (06), DutyFreeSale (13), Voucher (15), AddDeposit (19)</td></tr>
+<tr><td><b class="role-safenet">− Point</b></td><td>Return (04), IPV (05), DepositCancel (16), AddDepositCancel (20), CancelVoucher (21)</td></tr>
+</table>
+</section>
+
+<!-- 10 ERRORS -->
+<section id="errors">
+<h2>10 · Error handling</h2>
+<table>
+<tr><th>Code</th><th>Meaning</th><th>Required response</th></tr>
+<tr><td><code>555</code></td><td>Child rows of a header not all sent yet</td><td>Skip the header this cycle; retry next cycle.</td></tr>
+<tr><td><code>556</code></td><td>Header missing on server after insert</td><td>Reset header + all children to <code>'0'</code>; re-sync from scratch.</td></tr>
+<tr><td><code>557</code></td><td>Tokenization failed</td><td>Skip the record, log it; do not send raw data.</td></tr>
+<tr><td><code>-2147217873</code></td><td>Duplicate key on INSERT</td><td>Switch to UPDATE (only when flag = <code>'3'</code>); else treat as already-synced.</td></tr>
+<tr><td><code>-2147467259</code></td><td>Connection / provider lost</td><td>Abort the current cycle immediately; reconnect next cycle.</td></tr>
+<tr><td><code>-2147217871</code></td><td>Command timeout</td><td>Legacy reindexes the table (<code>DBCC DBREINDEX</code>) and retries — in the new build, just retry with backoff.</td></tr>
+</table>
+</section>
+
+<!-- 11 CONFIG -->
+<section id="config">
+<h2>11 · Configuration &amp; environment</h2>
+<h3>11.1 Connection config — <code>AdaIni.Ada</code> (MS Access, table <code>TConfig</code>)</h3>
+<table>
+<tr><th>Config code</th><th>Maps to</th></tr>
+<tr><td><code>SF_SQLDB1</code></td><td>Central / Online DB (user=FTCfgOn, pwd=FTCfgOff, server=FTCfgValue, db=FTCfgDescTha)</td></tr>
+<tr><td><code>SF_SQLDB2</code></td><td>Local / Offline DB</td></tr>
+<tr><td><code>SM_SQLDB1</code></td><td>Member DB</td></tr>
+</table>
+<h3>11.2 Runtime state — Windows Registry (<code>AdaPosMall\POSFront</code>)</h3>
+<p><code>SentSale</code>, <code>Online</code> (gate the cycle) · <code>SentStartDate/Time</code>, <code>SentStaOn</code> (run state).
+In the new build, replace with config + a small state store; do not depend on the Windows Registry.</p>
+<h3>11.3 Tokenizer config — <code>TSysConfig</code> code <code>TKToken</code></h3>
+<table>
+<tr><th>Seq</th><th>Value</th><th>Seq</th><th>Value</th></tr>
+<tr><td>001</td><td>Web-service URL</td><td>005</td><td>Token DB user</td></tr>
+<tr><td>002</td><td>NAE user</td><td>006</td><td>Token DB password</td></tr>
+<tr><td>003</td><td>NAE password</td><td>007</td><td>Format = <code>FIRST_SIX_TOKEN</code> (→ 4)</td></tr>
+<tr><td>004</td><td>Token DB name</td><td>008</td><td>Luhn check (0)</td></tr>
+</table>
+<p>Token on/off comes from <code>TCNMStorePara</code> where <code>FTStpCode='29'</code> (<code>FTStpStaAlw</code>='Y').</p>
+</section>
+
+<!-- 12 NFR -->
+<section id="nfr">
+<h2>12 · Non-functional requirements (carry forward)</h2>
+<table>
+<tr><th>Aspect</th><th>Legacy value</th><th>New-build target</th></tr>
+<tr><td>Sync latency</td><td>≤ 500ms poll</td><td>Near-real-time via events; ≤ a few seconds end-to-end.</td></tr>
+<tr><td>Connect timeout</td><td>15–30s</td><td>Configurable; fail fast + retry with backoff.</td></tr>
+<tr><td>Command timeout</td><td>60–90s</td><td>Configurable per operation.</td></tr>
+<tr><td>Tokenizer timeout</td><td>10,000ms</td><td>Configurable; circuit-breaker on repeated failure.</td></tr>
+<tr><td>Reliability</td><td>NOLOCK reads, retry on dup, reindex on timeout</td><td>Idempotent writes, transactions, at-least-once delivery, dead-letter on poison rows.</td></tr>
+<tr><td>Concurrency</td><td>Single-threaded, single instance</td><td>May parallelize per table/partition; still exactly-once effect per row.</td></tr>
+</table>
+</section>
+
+<!-- 13 SECURITY -->
+<section id="security">
+<h2>13 · Security mandate (must-fix)</h2>
+<div class="callout must"><span class="lbl">Non-negotiable</span>These legacy weaknesses must <b>not</b> be reproduced in the new build.</div>
+<table>
+<tr><th>Legacy weakness</th><th>Required fix</th></tr>
+<tr><td>Plain-text DB &amp; tokenizer credentials (TSysConfig, AdaIni.Ada)</td><td>Secrets in a vault / KMS / env with rotation. Never in a table or file.</td></tr>
+<tr><td>SQL built by string concatenation + manual escaping</td><td><b>Parameterized queries / ORM everywhere.</b> No string-built SQL.</td></tr>
+<tr><td>Direct cross-WAN DB connections, no encryption</td><td>No direct DB over the WAN. Branch → HQ over HTTPS (API) or TLS-secured queue only.</td></tr>
+<tr><td>No DB transactions (partial writes possible)</td><td>Wrap each transaction's writes in a DB transaction (BEGIN…COMMIT/ROLLBACK).</td></tr>
+<tr><td>Raw card data could leak on token failure</td><td>On token failure, <b>never</b> fall back to sending raw data — skip &amp; dead-letter (legacy Error 557).</td></tr>
+<tr><td>VB6 (end-of-life), Windows-only</td><td>Modern, supported, cross-platform runtime.</td></tr>
+</table>
+</section>
+
+<!-- 14 TARGET -->
+<section id="target">
+<h2>14 · Target architecture (the "to-be")</h2>
+<p>Shift from "agent opens databases across the network and polls" to "agent emits events; HQ services own the data".</p>
+<svg viewBox="0 0 900 200" role="img" aria-label="Target architecture">
+  <defs><style>.tb{fill:var(--panel);stroke-width:2}.tt{font:600 12px Inter,sans-serif;fill:var(--ink)}.ts{font:10px Inter,sans-serif;fill:var(--muted)}.tl{stroke:var(--config);stroke-width:1.8;fill:none;marker-end:url(#a)}</style>
+  <marker id="a" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="var(--config)"/></marker></defs>
+  <rect class="tb" x="20" y="60" width="180" height="80" rx="10" style="stroke:var(--branch)"/><text class="tt" x="38" y="92">Branch Agent</text><text class="ts" x="38" y="112">CDC / log-tail</text><text class="ts" x="38" y="128">store-and-forward</text>
+  <rect class="tb" x="260" y="60" width="170" height="80" rx="10" style="stroke:var(--purple)"/><text class="tt" x="278" y="92">Message Broker</text><text class="ts" x="278" y="112">Kafka / RabbitMQ</text><text class="ts" x="278" y="128">durable · replayable</text>
+  <rect class="tb" x="490" y="60" width="170" height="80" rx="10" style="stroke:var(--central)"/><text class="tt" x="508" y="92">HQ API / Service</text><text class="ts" x="508" y="112">REST / gRPC</text><text class="ts" x="508" y="128">owns transactions</text>
+  <rect class="tb" x="720" y="60" width="160" height="80" rx="10" style="stroke:var(--member)"/><text class="tt" x="738" y="92">Data + KMS</text><text class="ts" x="738" y="112">Central · Member</text><text class="ts" x="738" y="128">HSM / Cloud KMS</text>
+  <line class="tl" x1="200" y1="100" x2="258" y2="100"/><line class="tl" x1="430" y1="100" x2="488" y2="100"/><line class="tl" x1="660" y1="100" x2="718" y2="100"/>
+</svg>
+<div class="grid2">
+  <div class="card"><h4 class="role-branch">Branch agent</h4><p>Detect new/changed rows via change-data-capture or log-tailing instead of polling. Buffer locally (store-and-forward) and publish over TLS. Stays simple, stateless beyond its outbox.</p></div>
+  <div class="card"><h4 class="role-purple">Transport</h4><p>A durable, replayable message broker (Kafka/RabbitMQ) decouples branches from HQ so a brief HQ outage loses nothing. At-least-once delivery + idempotent consumers.</p></div>
+  <div class="card"><h4 class="role-central">HQ services</h4><p>One API/consumer owns all writes inside DB transactions, with parameterized SQL/ORM, validation, and the same business rules (HD-first, dedupe, points). Central auth &amp; audit.</p></div>
+  <div class="card"><h4 class="role-member">Data &amp; security</h4><p>Tokenization via HSM/Cloud KMS (replace the legacy SOAP service); secrets in a vault; encryption in transit and at rest.</p></div>
+</div>
+</section>
+
+<!-- 15 DIRECTIVE -->
+<section id="directive">
+<h2>15 · Build directive (language-agnostic)</h2>
+<div class="callout keep"><span class="lbl">Keep — business rules</span>
+Sync state machine (0/1/3) · HD-first ordering · delete-before-insert · header post-check reset (556) ·
+tokenization rules &amp; reuse · point sign-by-transaction-type · idempotent per-row sync · child-before-parent integrity.</div>
+<div class="callout must"><span class="lbl">Replace — architecture</span>
+500ms polling → event/CDC · direct DB-over-WAN → API/queue + TLS · string SQL → parameterized/ORM ·
+Registry/Access config → config service + secret vault · no transactions → transactional writes · SOAP tokenizer → KMS/HSM.</div>
+<h3>15.1 Suggested module breakdown (any language)</h3>
+<table>
+<tr><th>Module</th><th>Responsibility</th></tr>
+<tr><td><code>config</code></td><td>Load connection/runtime config from env/secret store; validate at boot.</td></tr>
+<tr><td><code>source</code></td><td>Detect &amp; read pending rows from the Local DB (CDC/outbox); respect the sale-date bound.</td></tr>
+<tr><td><code>model</code></td><td>Typed entities for each table; the sync-table registry (was <code>TSysSync</code>).</td></tr>
+<tr><td><code>tokenizer</code></td><td>Token client + cache (was <code>TPSTTokenLst</code>); enforce the §8 conditions; fail-closed.</td></tr>
+<tr><td><code>sync</code></td><td>The cycle/consumer: ordering, HD-first, dedupe, transactional insert/update, flag updates.</td></tr>
+<tr><td><code>points</code></td><td>Aggregate, sign, upsert <code>TCNMMallCard</code>, write <code>TPSTBPHis</code>, mark processed.</td></tr>
+<tr><td><code>transport</code></td><td>Publish/consume over the broker or call the HQ API; retries, backoff, dead-letter.</td></tr>
+<tr><td><code>observability</code></td><td>Structured logs, metrics, health checks (replaces the flat log file).</td></tr>
+</table>
+</section>
+
+<!-- 16 MILESTONES -->
+<section id="milestones">
+<h2>16 · Milestones</h2>
+<ol>
+  <li><b>Schema &amp; contracts</b> — model all tables (§4) + the event/payload schema. Stand up Local/Central/Member DBs (or test doubles).</li>
+  <li><b>Config &amp; secrets</b> — boot from env/vault; connect to all three DBs; health checks (§11).</li>
+  <li><b>Read path</b> — detect pending rows (CDC/outbox) bounded by sale date (§6 step 3–4).</li>
+  <li><b>Tokenizer</b> — client + cache + §8 conditions + fail-closed (Error 557 behaviour).</li>
+  <li><b>Sync write path</b> — transactional insert/update with HD-first, dedupe, post-check reset (§7); flag updates.</li>
+  <li><b>Points</b> — aggregation, sign, upsert + history + mark processed (§9).</li>
+  <li><b>Transport</b> — move HQ writes behind the API/queue; add retries/backoff/dead-letter.</li>
+  <li><b>Hardening</b> — TLS, secrets rotation, metrics/alerts, load &amp; failure testing; cut over branch-by-branch.</li>
+</ol>
+</section>
+
+<!-- 17 ACCEPTANCE -->
+<section id="acceptance">
+<h2>17 · Acceptance criteria (definition of done)</h2>
+<ul>
+  <li>A sale recorded at a branch appears <b>complete</b> (header + all children) at HQ, or not at all — never a partial header.</li>
+  <li>No raw card/member number is ever stored or transmitted centrally; tokenization failure skips the row (never falls back to raw).</li>
+  <li>Re-running a cycle on already-synced data is a <b>no-op</b> (idempotent) — duplicates are handled, not duplicated.</li>
+  <li>Member point totals reconcile exactly with the source <code>TPSTSalePoint</code> rows (sign rules honoured), with a history entry per change.</li>
+  <li>A branch can be offline for hours and fully catch up on reconnect, in order, with nothing lost.</li>
+  <li>No string-built SQL, no plain-text secrets, no un-encrypted cross-WAN DB traffic anywhere.</li>
+  <li>All five legacy error conditions (555/556/557/dup/conn-lost) have explicit, tested handling.</li>
+</ul>
+</section>
+
+<!-- 18 GLOSSARY -->
+<section id="glossary">
+<h2>18 · Glossary</h2>
+<table>
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td><code>FTStaSentOnOff</code></td><td>Per-row sync flag: 0 pending · 1 synced · 3 needs-update.</td></tr>
+<tr><td>HD / DT / RC / CD</td><td>Header / Detail / Receipt / Card sub-tables of a transaction.</td></tr>
+<tr><td>HD-first rule</td><td>A header is sent only after all its child rows are confirmed sent.</td></tr>
+<tr><td>Tokenize</td><td>Replace a raw card/member number with an irreversible token (FIRST_SIX_TOKEN).</td></tr>
+<tr><td>Tender code (<code>FTTdmCode</code>)</td><td>Payment method; T002/T003/T017 require tokenization.</td></tr>
+<tr><td>Terminal number (<code>FTTmnNum</code>)</td><td>Identifies the POS; resolved from the computer name via <code>TCNMTerminalMtn</code>.</td></tr>
+</table>
+</section>
+
+<footer>
+ServiceTransfer — Build Brief &amp; Re-implementation Directive · reverse-engineered from <code>legacy_source/</code> (VB6).
+Hand this file together with the repository folder; build in any language. · Adasoft Co., Ltd · 2026
+</footer>
+</main>
+</div>
+
+<script>
+function tg(){var h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');try{localStorage.setItem('bb-theme',h.getAttribute('data-theme'))}catch(e){}}
+(function(){try{var t=localStorage.getItem('bb-theme');if(t)document.documentElement.setAttribute('data-theme',t);else if(matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.setAttribute('data-theme','dark')}catch(e){}})();
+// smooth-scroll + active TOC
+document.querySelectorAll('.toc a').forEach(function(a){a.addEventListener('click',function(e){var el=document.querySelector(a.getAttribute('href'));if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'})}})});
+</script>
+</body>
+</html>

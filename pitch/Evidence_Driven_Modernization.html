@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evidence-Driven Modernization — Capability Map</title>
+<style>
+:root{
+  --bg:#0b1120; --panel:#111c33; --panel2:#16243d; --ink:#f1f5f9; --ink2:#aebbcf; --muted:#6f7e96;
+  --line:#22304a; --accent:#60a5fa; --accent2:#c084fc;
+  --branch:#60a5fa; --central:#34d399; --member:#fbbf24; --safenet:#f87171; --purple:#c084fc; --done:#34d399;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#05080f;color:var(--ink);font-family:'Inter','Segoe UI',system-ui,sans-serif;
+  display:flex;align-items:center;justify-content:center;min-height:100vh;padding:16px}
+.slide{width:1320px;height:792px;position:relative;overflow:hidden;border:1px solid #1d2a42;border-radius:18px;
+  padding:22px 28px 18px;box-shadow:0 30px 90px rgba(0,0,0,.6);transform-origin:center;
+  background:radial-gradient(900px 480px at 90% -10%,rgba(96,165,250,.15),transparent 60%),
+             radial-gradient(700px 480px at -6% 112%,rgba(192,132,252,.13),transparent 60%),var(--bg)}
+@media (max-width:1380px){.slide{transform:scale(calc((100vw - 36px)/1320))}}
+@media (max-height:830px){.slide{transform:scale(calc((100vh - 36px)/792))}}
+
+/* header */
+.hd{display:flex;align-items:flex-start;gap:1rem;border-bottom:1px solid #1d2a42;padding-bottom:10px;margin-bottom:10px}
+.kick{font-size:10px;font-weight:800;letter-spacing:.16em;color:var(--accent);text-transform:uppercase}
+h1{font-size:30px;line-height:1.02;margin:2px 0 3px;
+  background:linear-gradient(100deg,#fff 8%,var(--accent) 55%,var(--accent2) 95%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{font-size:12px;color:var(--ink2);max-width:840px;line-height:1.4}
+.badge{margin-left:auto;text-align:right;flex:0 0 auto}
+.badge .b1{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.08em;color:#0b1120;
+  background:linear-gradient(120deg,var(--accent),var(--accent2));padding:5px 11px;border-radius:999px}
+.badge .b2{font-size:9.5px;color:var(--muted);margin-top:5px}
+
+/* matrix */
+.mx{display:grid;grid-template-columns:124px repeat(6,1fr);gap:5px}
+.rowlab{display:flex;flex-direction:column;justify-content:center;padding:3px 6px;font-size:10px;font-weight:800;color:var(--ink2)}
+.rowlab small{font-size:8px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+.cell{background:var(--panel);border:1px solid #1d2a42;border-radius:8px;padding:6px 7px}
+
+/* phase header */
+.phh{border-radius:8px;padding:6px 8px;color:#0b1120;font-weight:800;position:relative;text-align:center}
+.phh .n{font-size:8px;opacity:.7;font-weight:800;letter-spacing:.05em}
+.phh .t{font-size:13px;line-height:1.05}
+.phh .map{font-size:7.5px;opacity:.75;font-weight:700}
+
+/* band (full width) */
+.band{grid-column:2 / -1;border-radius:8px;padding:6px 11px;display:flex;align-items:center;gap:9px;
+  background:linear-gradient(90deg,var(--panel2),var(--panel));border:1px solid #1d2a42}
+.band.spine{border-color:rgba(96,165,250,.4);background:linear-gradient(90deg,rgba(96,165,250,.12),var(--panel))}
+.band .ic{font-size:16px}
+.band b{font-size:11px;color:var(--ink)}
+.band span{font-size:9.5px;color:var(--ink2)}
+
+/* agent cell */
+.ag{display:flex;align-items:center;gap:6px}
+.ag .i{font-size:15px}
+.ag .nm{font-size:10px;font-weight:800;color:var(--ink);line-height:1.1}
+
+/* feature chips */
+.feat{display:flex;flex-direction:column;gap:3px}
+.fc{display:flex;align-items:center;gap:5px;font-size:8.7px;color:var(--ink2);line-height:1.25}
+.st{flex:0 0 auto;width:8px;height:8px;border-radius:50%}
+.st.p{background:var(--done)} .st.a{background:var(--member)} .st.r{background:#56657e}
+
+.tool{font-size:8.6px;color:var(--ink2);line-height:1.35;font-family:'SFMono-Regular',Consolas,monospace}
+.llm{display:flex;flex-direction:column;gap:3px}
+.llm .pri{font-size:9px;font-weight:800;color:#0b1120;background:linear-gradient(120deg,var(--accent),var(--accent2));
+  border-radius:6px;padding:2px 6px;text-align:center}
+.llm .opt{font-size:8px;color:var(--muted);text-align:center}
+
+/* bottom strip */
+.bottom{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;margin-top:11px;
+  border-top:1px solid #1d2a42;padding-top:9px}
+.legend{display:flex;gap:12px;align-items:center}
+.legend .l{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--ink2)}
+.wins{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.win{font-size:9px;font-weight:800;color:#0b1120;border-radius:999px;padding:3px 9px}
+.proof{display:flex;gap:9px}
+.kpi{text-align:center}.kpi b{display:block;font-size:15px;line-height:1;
+  background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.kpi span{font-size:7.5px;color:var(--muted)}
+.tagline{font-size:11px;font-weight:800;color:var(--ink);text-align:center;margin-top:7px}
+.tagline span{background:linear-gradient(100deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.wm{position:absolute;right:-40px;bottom:-60px;font-size:230px;font-weight:900;color:rgba(96,165,250,.03);pointer-events:none}
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="wm">ED</div>
+
+  <!-- HEADER -->
+  <div class="hd">
+    <div>
+      <div class="kick">Modernization Methodology · Capability Map</div>
+      <h1>Evidence-Driven Modernization</h1>
+      <div class="sub">Same end-to-end lifecycle as an AI modernization platform — but with a <b style="color:#fff">verification spine</b>: every step's output is traced back to the <b style="color:#fff">real source code</b>, and the result is a build-ready directive any team can implement in <b style="color:#fff">any language</b>.</div>
+    </div>
+    <div class="badge"><span class="b1">WE DON'T GUESS — WE VERIFY</span><div class="b2">Proven end-to-end on a live legacy system</div></div>
+  </div>
+
+  <!-- MATRIX -->
+  <div class="mx">
+    <!-- phase header row -->
+    <div class="rowlab" style="font-size:9px;color:var(--muted)">PHASE →<small>(vs platform lifecycle)</small></div>
+    <div class="phh" style="background:var(--branch)"><div class="n">PLAN</div><div class="t">Discover</div><div class="map">＝ Planning</div></div>
+    <div class="phh" style="background:var(--central)"><div class="n">ASSET</div><div class="t">Verify</div><div class="map">＝ Asset Visualization</div></div>
+    <div class="phh" style="background:var(--member)"><div class="n">DESIGN</div><div class="t">Visualize</div><div class="map">＝ Requirements / Design</div></div>
+    <div class="phh" style="background:var(--safenet)"><div class="n">SPEC</div><div class="t">Specify</div><div class="map">＝ Design hand-off</div></div>
+    <div class="phh" style="background:var(--purple)"><div class="n">BUILD</div><div class="t">Modernize</div><div class="map">＝ Implementation</div></div>
+    <div class="phh" style="background:var(--accent)"><div class="n">VERIFY</div><div class="t">Handoff</div><div class="map">＝ Test / Operate</div></div>
+
+    <!-- orchestration band -->
+    <div class="rowlab">AI Orchestration<small>coordinator</small></div>
+    <div class="band spine"><span class="ic">🧠</span><div><b>Claude Code agent</b> &nbsp;<span>— one orchestrator drives all six steps end-to-end, keeping a single chain of traceability (no multi-agent hand-off gaps).</span></div></div>
+
+    <!-- AI agent row -->
+    <div class="rowlab">AI Agent<small>specialized role</small></div>
+    <div class="cell ag"><span class="i">🔎</span><span class="nm">Code Archaeologist</span></div>
+    <div class="cell ag"><span class="i">✔️</span><span class="nm">Verification Agent</span></div>
+    <div class="cell ag"><span class="i">📊</span><span class="nm">Docs / Frontend Agent</span></div>
+    <div class="cell ag"><span class="i">📐</span><span class="nm">System Analyst</span></div>
+    <div class="cell ag"><span class="i">🏗️</span><span class="nm">Solution Architect</span></div>
+    <div class="cell ag"><span class="i">🧪</span><span class="nm">QA / Test Agent</span></div>
+
+    <!-- features row -->
+    <div class="rowlab">Features<small>capabilities</small></div>
+    <div class="cell feat"><div class="fc"><span class="st p"></span>Source reading</div><div class="fc"><span class="st p"></span>Dependency map</div><div class="fc"><span class="st p"></span>Structure extract</div></div>
+    <div class="cell feat"><div class="fc"><span class="st p"></span>Fact-tracing</div><div class="fc"><span class="st p"></span>Error detection</div><div class="fc"><span class="st p"></span>No-hallucination</div></div>
+    <div class="cell feat"><div class="fc"><span class="st p"></span>Interactive portal</div><div class="fc"><span class="st p"></span>Live ER / flow</div><div class="fc"><span class="st p"></span>Theme / UX</div></div>
+    <div class="cell feat"><div class="fc"><span class="st p"></span>Any-language brief</div><div class="fc"><span class="st p"></span>Pseudocode + rules</div><div class="fc"><span class="st p"></span>Bilingual docs</div></div>
+    <div class="cell feat"><div class="fc"><span class="st p"></span>Keep-rules / new-arch</div><div class="fc"><span class="st p"></span>Target architecture</div><div class="fc"><span class="st a"></span>Code generation</div></div>
+    <div class="cell feat"><div class="fc"><span class="st p"></span>Acceptance criteria</div><div class="fc"><span class="st p"></span>CI/CD + deploy</div><div class="fc"><span class="st a"></span>Auto-test suite</div></div>
+
+    <!-- tools row -->
+    <div class="rowlab">Tools / Stack<small>what runs it</small></div>
+    <div class="cell"><div class="tool">Grep · Glob · Read · Git</div></div>
+    <div class="cell"><div class="tool">cross-ref · diff · trace</div></div>
+    <div class="cell"><div class="tool">React/Vite · SVG · matplotlib</div></div>
+    <div class="cell"><div class="tool">Markdown/HTML · python-docx/pptx</div></div>
+    <div class="cell"><div class="tool">any: Go · .NET · Java · Node</div></div>
+    <div class="cell"><div class="tool">GitHub Actions · tests</div></div>
+
+    <!-- LLM / model row -->
+    <div class="rowlab">AI Model / LLM<small>brand</small></div>
+    <div class="cell llm"><div class="pri">Claude Opus 4.x</div></div>
+    <div class="cell llm"><div class="pri">Claude Opus 4.x</div></div>
+    <div class="cell llm"><div class="pri">Claude Opus 4.x</div></div>
+    <div class="cell llm"><div class="pri">Claude Opus 4.x</div></div>
+    <div class="cell llm"><div class="pri">Claude Opus 4.x</div><div class="opt">＋ pluggable: Copilot · GPT</div></div>
+    <div class="cell llm"><div class="pri">Claude Opus 4.x</div></div>
+
+    <!-- knowledge band -->
+    <div class="rowlab">Knowledge<small>ground truth</small></div>
+    <div class="band"><span class="ic">📚</span><div><b>The source repository itself</b> &nbsp;<span>— legacy code + verified facts are the knowledge base. No external RAG / knowledge graph that can drift away from reality.</span></div></div>
+
+    <!-- human band -->
+    <div class="rowlab">Human-in-loop<small>control</small></div>
+    <div class="band"><span class="ic">🧑‍💻</span><div><b>You stay in control</b> &nbsp;<span>— scope, steer and approve at each gate; the agent does the heavy lifting. Review is targeted, never the bottleneck.</span></div></div>
+  </div>
+
+  <!-- BOTTOM STRIP -->
+  <div class="bottom">
+    <div class="legend">
+      <div class="l"><span class="st p" style="width:9px;height:9px;border-radius:50%"></span>Proven (ServiceTransfer)</div>
+      <div class="l"><span class="st a" style="width:9px;height:9px;border-radius:50%"></span>Available</div>
+      <div class="l"><span class="st r" style="width:9px;height:9px;border-radius:50%"></span>Roadmap</div>
+    </div>
+    <div class="wins">
+      <span class="win" style="background:var(--accent)">EVIDENCE, not AI-guessing</span>
+      <span class="win" style="background:var(--central)">PORTABLE — no vendor lock-in</span>
+      <span class="win" style="background:var(--member)">INTERACTIVE deliverables</span>
+      <span class="win" style="background:var(--purple)">LEAN — one agent, open tools</span>
+    </div>
+    <div class="proof">
+      <div class="kpi"><b>2,860</b><span>VB6 lines verified</span></div>
+      <div class="kpi"><b>100%</b><span>traced to source</span></div>
+      <div class="kpi"><b>15+</b><span>docs delivered</span></div>
+      <div class="kpi"><b>1</b><span>any-lang brief</span></div>
+    </div>
+  </div>
+  <div class="tagline">★ Proven on <b style="color:#fff">ServiceTransfer</b> (legacy VB6 POS agent) &nbsp;·&nbsp; Documentation is <span>step&nbsp;1</span> — we make the foundation unbreakable.</div>
+</div>
+</body>
+</html>
