@@ -1,0 +1,13 @@
+*How to Run*
+This is a command line java program and can be run like below
+
+For encryption of card number 4111111111111111
+  java Encdec -e 164111111111111111
+Please note 16 in front, which is lenght of card number
+
+For decryption 
+  java Encdec -d base64-encoded-strig
+
+*Requirement*
+JRE 1.8
+key.bin (this file is needed and it is AES key. Ascan will provide AES Key and AZ Digital will prepare key.bin file for program)

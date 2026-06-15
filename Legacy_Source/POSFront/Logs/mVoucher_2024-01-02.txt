@@ -1,0 +1,192 @@
+﻿18:02:31 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+18:02:31 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+18:02:31 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Para Request
+client_id=E4B8FE64B36F4124B486C96A03878CDD&client_secret=D0F523B88BF34CFD9EFF90A69A614E50&grant_type=client_credentials& Scope=TakaApi.Alll&Content-Type=x-www-form-urlencoded
+18:03:00 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTMzNzgsImV4cCI6MTcwNDI3OTc3OCwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiQkREQjBFRDU4MDJFOEUyOEU0MzQ1MTNCM0ZERDdERDUiLCJpYXQiOjE3MDQxOTMzNzgsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.TucTXNv_ACVWzVsIegr5gwcCql2X9861HkBlCR8BIwWebRgb_Ix-Mbg9rQE64YpoJeN0mW4ca868k3-wJbdWLD99FhPwBkQbjEulmI1HXTkICo3x-nFk1uazIJhB49QBFclAwbpFwNJBoNISdd_QsRUhqQVPrs3-N60kuAAIfpElVauZYPPZOFizwspUkypY_CFqCucwllIdMGPbMHYllPCLMCRf-txxmXwDr3Vz-nUR14GAR3Lc6PVGOgoWeUbtpjP7IchUFHdyMy_BsA3Xrg0ecdsNqasQVAq0Zjgg71wuG5eZbMBllPjbVPNCsxP_tD1DC2_nCTgC8IytO7Nsxw","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+18:03:00 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+18:03:00 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone
+{"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTMzNzgsImV4cCI6MTcwNDI3OTc3OCwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiQkREQjBFRDU4MDJFOEUyOEU0MzQ1MTNCM0ZERDdERDUiLCJpYXQiOjE3MDQxOTMzNzgsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.TucTXNv_ACVWzVsIegr5gwcCql2X9861HkBlCR8BIwWebRgb_Ix-Mbg9rQE64YpoJeN0mW4ca868k3-wJbdWLD99FhPwBkQbjEulmI1HXTkICo3x-nFk1uazIJhB49QBFclAwbpFwNJBoNISdd_QsRUhqQVPrs3-N60kuAAIfpElVauZYPPZOFizwspUkypY_CFqCucwllIdMGPbMHYllPCLMCRf-txxmXwDr3Vz-nUR14GAR3Lc6PVGOgoWeUbtpjP7IchUFHdyMy_BsA3Xrg0ecdsNqasQVAq0Zjgg71wuG5eZbMBllPjbVPNCsxP_tD1DC2_nCTgC8IytO7Nsxw","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+18:03:00 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+18:07:48 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+18:07:48 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+18:07:48 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Para Request
+client_id=E4B8FE64B36F4124B486C96A03878CDD&client_secret=D0F523B88BF34CFD9EFF90A69A614E50&grant_type=client_credentials& Scope=TakaApi.Alll&Content-Type=x-www-form-urlencoded
+18:07:49 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTM2NjgsImV4cCI6MTcwNDI4MDA2OCwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiNTdFREJCQTUzMzQyMjM0Qjc0MDU5MDI0QjNCRURGQTIiLCJpYXQiOjE3MDQxOTM2NjgsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.Fmdex_5MZC14eiemuSMN8uOX81MTEjosAU-QSrR4uhAooiJFYHDe6JExr1Wh-XV35CZzE0TonOzBThlmOu_VKXnkMSkKd802t-Rvbd5gbArzQrT2_SKuREXIXgv3L4Hm-KsQpQTE67ZATSzZcxb5bphX8TeiZZthzWZKf8V33gR7B-F7dIAry9LSsbFlstt719vTFlzKOqANfV185yQlrsemplY7aGwwr5OrEwC7p9L19GHBV6nXlWh-vqAzpeKaWmRMmLi6hk6Zi2Xd0iu1Ue6sGHtHugO_pSiKpdsf2d754nEfK-hhmbfHag-V-0VXJcegydkzDAfPBx8_Ofgsmg","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+18:07:49 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+18:07:49 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone
+{"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTM2NjgsImV4cCI6MTcwNDI4MDA2OCwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiNTdFREJCQTUzMzQyMjM0Qjc0MDU5MDI0QjNCRURGQTIiLCJpYXQiOjE3MDQxOTM2NjgsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.Fmdex_5MZC14eiemuSMN8uOX81MTEjosAU-QSrR4uhAooiJFYHDe6JExr1Wh-XV35CZzE0TonOzBThlmOu_VKXnkMSkKd802t-Rvbd5gbArzQrT2_SKuREXIXgv3L4Hm-KsQpQTE67ZATSzZcxb5bphX8TeiZZthzWZKf8V33gR7B-F7dIAry9LSsbFlstt719vTFlzKOqANfV185yQlrsemplY7aGwwr5OrEwC7p9L19GHBV6nXlWh-vqAzpeKaWmRMmLi6hk6Zi2Xd0iu1Ue6sGHtHugO_pSiKpdsf2d754nEfK-hhmbfHag-V-0VXJcegydkzDAfPBx8_Ofgsmg","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+18:07:49 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+18:11:05 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+18:11:05 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+18:11:05 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Para Request
+client_id=E4B8FE64B36F4124B486C96A03878CDD&client_secret=D0F523B88BF34CFD9EFF90A69A614E50&grant_type=client_credentials& Scope=TakaApi.Alll&Content-Type=x-www-form-urlencoded
+18:11:27 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > [Err WebException] = Unable to connect to the remote server
+18:11:27 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > [Err WebException] = Unable to connect to the remote server
+18:11:27 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone(4)
+{
+  "error_code": -1,
+  "error_message": "Unable to connect to the remote server"
+}
+18:11:27 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+18:11:46 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+18:11:46 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+18:11:46 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Para Request
+client_id=E4B8FE64B36F4124B486C96A03878CDD&client_secret=D0F523B88BF34CFD9EFF90A69A614E50&grant_type=client_credentials& Scope=TakaApi.Alll&Content-Type=x-www-form-urlencoded
+18:11:47 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTM5MDYsImV4cCI6MTcwNDI4MDMwNiwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiRkMzNDMyNzIzQ0VEQTkzMjZEN0MxNzkzQzFCRTg2QjgiLCJpYXQiOjE3MDQxOTM5MDYsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.iejIemqLNUJPs84KPB89eNJZ3fp0xN-7yyFfHwPc6uJFcpSOrGawg0Cy_-idY83_vBbsPDD11fppYfxP27Kqr7yLGAAWhnLEtZjrRRdeWoU35KsWbfGawpVreijsM8aykQHAunbI6TkPzB_z_86wq974QpWPw7sSmcykVQql19z4g_n7Y3aUw8Ur1hULebq5QOgbSfr4ic3JKCW2YrbyJUeyhj3bMA8OXklBK8_scqlGFagAn065hLdk7ka4PAkDjPSmwJMU3pck-hohypRYN1gcc0N_KOMENTDIDUTNuc2YsrDS_8OOFjzaHiqYOkDG82w74NDtAoNZ5WhsmnYUnw","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+18:11:47 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+18:11:47 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone
+{"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTM5MDYsImV4cCI6MTcwNDI4MDMwNiwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiRkMzNDMyNzIzQ0VEQTkzMjZEN0MxNzkzQzFCRTg2QjgiLCJpYXQiOjE3MDQxOTM5MDYsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.iejIemqLNUJPs84KPB89eNJZ3fp0xN-7yyFfHwPc6uJFcpSOrGawg0Cy_-idY83_vBbsPDD11fppYfxP27Kqr7yLGAAWhnLEtZjrRRdeWoU35KsWbfGawpVreijsM8aykQHAunbI6TkPzB_z_86wq974QpWPw7sSmcykVQql19z4g_n7Y3aUw8Ur1hULebq5QOgbSfr4ic3JKCW2YrbyJUeyhj3bMA8OXklBK8_scqlGFagAn065hLdk7ka4PAkDjPSmwJMU3pck-hohypRYN1gcc0N_KOMENTDIDUTNuc2YsrDS_8OOFjzaHiqYOkDG82w74NDtAoNZ5WhsmnYUnw","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+18:11:47 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+18:12:01 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------Start Pay----------------------------
+18:12:01 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url=https://uat-api.takashimaya.com.sg/api/crm/voucher/verify
+18:12:01 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url Request
+https://uat-api.takashimaya.com.sg/api/crm/voucher/verify/826680
+18:12:01 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Key Header : Authorization = Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTM5MDYsImV4cCI6MTcwNDI4MDMwNiwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiRkMzNDMyNzIzQ0VEQTkzMjZEN0MxNzkzQzFCRTg2QjgiLCJpYXQiOjE3MDQxOTM5MDYsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.iejIemqLNUJPs84KPB89eNJZ3fp0xN-7yyFfHwPc6uJFcpSOrGawg0Cy_-idY83_vBbsPDD11fppYfxP27Kqr7yLGAAWhnLEtZjrRRdeWoU35KsWbfGawpVreijsM8aykQHAunbI6TkPzB_z_86wq974QpWPw7sSmcykVQql19z4g_n7Y3aUw8Ur1hULebq5QOgbSfr4ic3JKCW2YrbyJUeyhj3bMA8OXklBK8_scqlGFagAn065hLdk7ka4PAkDjPSmwJMU3pck-hohypRYN1gcc0N_KOMENTDIDUTNuc2YsrDS_8OOFjzaHiqYOkDG82w74NDtAoNZ5WhsmnYUnw
+18:12:29 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"success":true,"code":200,"error":[],"data":{"voucher_status":0,"voucher_no":"826680","voucher_expDate":"2024-03-28","voucher_amt":10}}
+18:12:29 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+18:12:29 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Json Resspone
+{"success":true,"code":200,"error":[],"data":{"voucher_status":0,"voucher_no":"826680","voucher_expDate":"2024-03-28","voucher_amt":10}}
+18:12:29 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------End Pay----------------------------
+18:14:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------Start Pay----------------------------
+18:14:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url=https://uat-api.takashimaya.com.sg/api/crm/voucher/verify
+18:14:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url Request
+https://uat-api.takashimaya.com.sg/api/crm/voucher/verify/826680
+18:14:41 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Key Header : Authorization = Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTM5MDYsImV4cCI6MTcwNDI4MDMwNiwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiRkMzNDMyNzIzQ0VEQTkzMjZEN0MxNzkzQzFCRTg2QjgiLCJpYXQiOjE3MDQxOTM5MDYsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.iejIemqLNUJPs84KPB89eNJZ3fp0xN-7yyFfHwPc6uJFcpSOrGawg0Cy_-idY83_vBbsPDD11fppYfxP27Kqr7yLGAAWhnLEtZjrRRdeWoU35KsWbfGawpVreijsM8aykQHAunbI6TkPzB_z_86wq974QpWPw7sSmcykVQql19z4g_n7Y3aUw8Ur1hULebq5QOgbSfr4ic3JKCW2YrbyJUeyhj3bMA8OXklBK8_scqlGFagAn065hLdk7ka4PAkDjPSmwJMU3pck-hohypRYN1gcc0N_KOMENTDIDUTNuc2YsrDS_8OOFjzaHiqYOkDG82w74NDtAoNZ5WhsmnYUnw
+18:14:41 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"success":true,"code":200,"error":[],"data":{"voucher_status":0,"voucher_no":"826680","voucher_expDate":"2024-03-28","voucher_amt":10}}
+18:14:41 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+18:14:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Json Resspone
+{"success":true,"code":200,"error":[],"data":{"voucher_status":0,"voucher_no":"826680","voucher_expDate":"2024-03-28","voucher_amt":10}}
+18:14:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------End Pay----------------------------
+18:21:21 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+18:21:21 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+18:21:21 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Para Request
+client_id=E4B8FE64B36F4124B486C96A03878CDD&client_secret=D0F523B88BF34CFD9EFF90A69A614E50&grant_type=client_credentials& Scope=TakaApi.Alll&Content-Type=x-www-form-urlencoded
+18:21:30 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTQ0OTAsImV4cCI6MTcwNDI4MDg5MCwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiQzhFMEREMUJCRDVBNEYxODA5QjdDMzFGQzIwREJFOEUiLCJpYXQiOjE3MDQxOTQ0OTAsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.P2FTxH6uuFZAiJk4v8oArJ_NxgNMgliVwnhFOdoBq2grRV2ZXM1z9ZT10t9noJ8u0v-hqCLDW_FqMNjKuSR-ifs-FzdQ7hRtZKs3LQBLfHEO50gVpjrhBsZt8mqnIPsbkG1xx--jpgusFsBxodRIblWUT7R3aICoYG4qNOfc2c7xDtWB4TMPsIxwB9X_OwKmWieLMC3UpfY57WCeqgxr11wy5-WilppioYbrVs07Lo3hTYXf6NG5ROFXrFrVxiMcQnDoSzIF1wU13zKmK9Mq2ESwThAmjBddFkJll94jjnjmeI87RC-BFz4sC_rBH-Eh5YT79i9CBcLCNUqRkIwXMQ","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+18:21:30 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+18:21:30 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone
+{"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTQ0OTAsImV4cCI6MTcwNDI4MDg5MCwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiQzhFMEREMUJCRDVBNEYxODA5QjdDMzFGQzIwREJFOEUiLCJpYXQiOjE3MDQxOTQ0OTAsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.P2FTxH6uuFZAiJk4v8oArJ_NxgNMgliVwnhFOdoBq2grRV2ZXM1z9ZT10t9noJ8u0v-hqCLDW_FqMNjKuSR-ifs-FzdQ7hRtZKs3LQBLfHEO50gVpjrhBsZt8mqnIPsbkG1xx--jpgusFsBxodRIblWUT7R3aICoYG4qNOfc2c7xDtWB4TMPsIxwB9X_OwKmWieLMC3UpfY57WCeqgxr11wy5-WilppioYbrVs07Lo3hTYXf6NG5ROFXrFrVxiMcQnDoSzIF1wU13zKmK9Mq2ESwThAmjBddFkJll94jjnjmeI87RC-BFz4sC_rBH-Eh5YT79i9CBcLCNUqRkIwXMQ","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+18:21:30 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+18:21:43 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------Start Pay----------------------------
+18:21:43 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url=https://uat-api.takashimaya.com.sg/api/crm/voucher/verify
+18:21:43 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url Request
+https://uat-api.takashimaya.com.sg/api/crm/voucher/verify/826680
+18:21:43 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Key Header : Authorization = Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTQ0OTAsImV4cCI6MTcwNDI4MDg5MCwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiQzhFMEREMUJCRDVBNEYxODA5QjdDMzFGQzIwREJFOEUiLCJpYXQiOjE3MDQxOTQ0OTAsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.P2FTxH6uuFZAiJk4v8oArJ_NxgNMgliVwnhFOdoBq2grRV2ZXM1z9ZT10t9noJ8u0v-hqCLDW_FqMNjKuSR-ifs-FzdQ7hRtZKs3LQBLfHEO50gVpjrhBsZt8mqnIPsbkG1xx--jpgusFsBxodRIblWUT7R3aICoYG4qNOfc2c7xDtWB4TMPsIxwB9X_OwKmWieLMC3UpfY57WCeqgxr11wy5-WilppioYbrVs07Lo3hTYXf6NG5ROFXrFrVxiMcQnDoSzIF1wU13zKmK9Mq2ESwThAmjBddFkJll94jjnjmeI87RC-BFz4sC_rBH-Eh5YT79i9CBcLCNUqRkIwXMQ
+18:21:43 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"success":true,"code":200,"error":[],"data":{"voucher_status":0,"voucher_no":"826680","voucher_expDate":"2024-03-28","voucher_amt":10}}
+18:21:43 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+18:21:43 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Json Resspone
+{"success":true,"code":200,"error":[],"data":{"voucher_status":0,"voucher_no":"826680","voucher_expDate":"2024-03-28","voucher_amt":10}}
+18:21:43 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------End Pay----------------------------
+18:58:32 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+18:58:32 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+18:58:32 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Para Request
+client_id=E4B8FE64B36F4124B486C96A03878CDD&client_secret=D0F523B88BF34CFD9EFF90A69A614E50&grant_type=client_credentials& Scope=TakaApi.Alll&Content-Type=x-www-form-urlencoded
+18:58:53 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > [Err WebException] = Unable to connect to the remote server
+18:58:53 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > [Err WebException] = Unable to connect to the remote server
+18:58:53 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone(4)
+{
+  "error_code": -1,
+  "error_message": "Unable to connect to the remote server"
+}
+18:58:53 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+18:59:05 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+18:59:05 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+18:59:05 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Para Request
+client_id=E4B8FE64B36F4124B486C96A03878CDD&client_secret=D0F523B88BF34CFD9EFF90A69A614E50&grant_type=client_credentials& Scope=TakaApi.Alll&Content-Type=x-www-form-urlencoded
+18:59:31 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTY3NjksImV4cCI6MTcwNDI4MzE2OSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMDg5MjVBMjQ3MTJDQzBCNTE5NkJBNDg1OUVGNDM0OTkiLCJpYXQiOjE3MDQxOTY3NjksInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.SHFECGuaBCm1ZVumZLvLhD3jUDeTKSeniTZfdG4ooO2Tz1Hvhnnm9VnC_8unFa1kH_EhAMBGHxaUdk4wC3iNfR5_gdf1VR_5ugrtZlVz9RAOz-16azoF9u9_nA4zTkT8WSC6axMTBrX1e1rCANeT2VU7--WIQpsrlW1inqoT3q4w2yTp08cgQOENau200rblcfW3IBQ-3dejTRWiTqGH52eJQmUEvcQgg4e8YYAjCTDiwaF1_8IceTxX4XlQNdpch4lE_4ER3gpk-d68ukaSw23tVo15jO_ZtBZ9wEMmjG7GlRizUwVYDvo2JDUqS8HqAt67tYG1wDrUR2bt0Xs5Rg","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+18:59:31 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+18:59:31 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone
+{"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTY3NjksImV4cCI6MTcwNDI4MzE2OSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMDg5MjVBMjQ3MTJDQzBCNTE5NkJBNDg1OUVGNDM0OTkiLCJpYXQiOjE3MDQxOTY3NjksInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.SHFECGuaBCm1ZVumZLvLhD3jUDeTKSeniTZfdG4ooO2Tz1Hvhnnm9VnC_8unFa1kH_EhAMBGHxaUdk4wC3iNfR5_gdf1VR_5ugrtZlVz9RAOz-16azoF9u9_nA4zTkT8WSC6axMTBrX1e1rCANeT2VU7--WIQpsrlW1inqoT3q4w2yTp08cgQOENau200rblcfW3IBQ-3dejTRWiTqGH52eJQmUEvcQgg4e8YYAjCTDiwaF1_8IceTxX4XlQNdpch4lE_4ER3gpk-d68ukaSw23tVo15jO_ZtBZ9wEMmjG7GlRizUwVYDvo2JDUqS8HqAt67tYG1wDrUR2bt0Xs5Rg","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+18:59:31 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+18:59:49 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------Start Pay----------------------------
+18:59:49 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url=https://uat-api.takashimaya.com.sg/api/crm/voucher/verify
+18:59:49 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url Request
+https://uat-api.takashimaya.com.sg/api/crm/voucher/verify/826680
+18:59:49 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Key Header : Authorization = Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTY3NjksImV4cCI6MTcwNDI4MzE2OSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMDg5MjVBMjQ3MTJDQzBCNTE5NkJBNDg1OUVGNDM0OTkiLCJpYXQiOjE3MDQxOTY3NjksInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.SHFECGuaBCm1ZVumZLvLhD3jUDeTKSeniTZfdG4ooO2Tz1Hvhnnm9VnC_8unFa1kH_EhAMBGHxaUdk4wC3iNfR5_gdf1VR_5ugrtZlVz9RAOz-16azoF9u9_nA4zTkT8WSC6axMTBrX1e1rCANeT2VU7--WIQpsrlW1inqoT3q4w2yTp08cgQOENau200rblcfW3IBQ-3dejTRWiTqGH52eJQmUEvcQgg4e8YYAjCTDiwaF1_8IceTxX4XlQNdpch4lE_4ER3gpk-d68ukaSw23tVo15jO_ZtBZ9wEMmjG7GlRizUwVYDvo2JDUqS8HqAt67tYG1wDrUR2bt0Xs5Rg
+18:59:59 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"success":true,"code":200,"error":[],"data":{"voucher_status":0,"voucher_no":"826680","voucher_expDate":"2024-03-28","voucher_amt":10}}
+18:59:59 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+18:59:59 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Json Resspone
+{"success":true,"code":200,"error":[],"data":{"voucher_status":0,"voucher_no":"826680","voucher_expDate":"2024-03-28","voucher_amt":10}}
+18:59:59 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------End Pay----------------------------
+19:01:28 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------Start Pay----------------------------
+19:01:28 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url=https://uat-api.takashimaya.com.sg/api/crm/voucher/verify
+19:01:28 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url Request
+https://uat-api.takashimaya.com.sg/api/crm/voucher/verify/826680
+19:01:28 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Key Header : Authorization = Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTY3NjksImV4cCI6MTcwNDI4MzE2OSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMDg5MjVBMjQ3MTJDQzBCNTE5NkJBNDg1OUVGNDM0OTkiLCJpYXQiOjE3MDQxOTY3NjksInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.SHFECGuaBCm1ZVumZLvLhD3jUDeTKSeniTZfdG4ooO2Tz1Hvhnnm9VnC_8unFa1kH_EhAMBGHxaUdk4wC3iNfR5_gdf1VR_5ugrtZlVz9RAOz-16azoF9u9_nA4zTkT8WSC6axMTBrX1e1rCANeT2VU7--WIQpsrlW1inqoT3q4w2yTp08cgQOENau200rblcfW3IBQ-3dejTRWiTqGH52eJQmUEvcQgg4e8YYAjCTDiwaF1_8IceTxX4XlQNdpch4lE_4ER3gpk-d68ukaSw23tVo15jO_ZtBZ9wEMmjG7GlRizUwVYDvo2JDUqS8HqAt67tYG1wDrUR2bt0Xs5Rg
+19:01:38 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"success":true,"code":200,"error":[],"data":{"voucher_status":0,"voucher_no":"826680","voucher_expDate":"2024-03-28","voucher_amt":10}}
+19:01:38 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+19:01:38 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Json Resspone
+{"success":true,"code":200,"error":[],"data":{"voucher_status":0,"voucher_no":"826680","voucher_expDate":"2024-03-28","voucher_amt":10}}
+19:01:38 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------End Pay----------------------------
+19:15:57 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > ------------------------------Start Pay----------------------------
+19:15:57 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > Url=https://uat-api.takashimaya.com.sg/api/crm/voucher/updatestatus
+19:15:57 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > Json Request
+{
+  "voucher_no": "826680",
+  "POSID": "99997",
+  "updateTransID": "00326",
+  "update_datetime": "2024-01-02 19:15:57"
+}
+19:15:57 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > Url Request
+https://uat-api.takashimaya.com.sg/api/crm/voucher/updatestatus
+19:15:57 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Key Header : Authorization = Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTY3NjksImV4cCI6MTcwNDI4MzE2OSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMDg5MjVBMjQ3MTJDQzBCNTE5NkJBNDg1OUVGNDM0OTkiLCJpYXQiOjE3MDQxOTY3NjksInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.SHFECGuaBCm1ZVumZLvLhD3jUDeTKSeniTZfdG4ooO2Tz1Hvhnnm9VnC_8unFa1kH_EhAMBGHxaUdk4wC3iNfR5_gdf1VR_5ugrtZlVz9RAOz-16azoF9u9_nA4zTkT8WSC6axMTBrX1e1rCANeT2VU7--WIQpsrlW1inqoT3q4w2yTp08cgQOENau200rblcfW3IBQ-3dejTRWiTqGH52eJQmUEvcQgg4e8YYAjCTDiwaF1_8IceTxX4XlQNdpch4lE_4ER3gpk-d68ukaSw23tVo15jO_ZtBZ9wEMmjG7GlRizUwVYDvo2JDUqS8HqAt67tYG1wDrUR2bt0Xs5Rg
+19:16:02 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"success":true,"code":200,"error":[],"data":"Voucher status updated Successfully"}
+19:16:02 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+19:16:02 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > Json Resspone
+{"success":true,"code":200,"error":[],"data":"Voucher status updated Successfully"}
+19:16:02 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > ------------------------------End Pay----------------------------
+19:18:34 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------Start Pay----------------------------
+19:18:34 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url=https://uat-api.takashimaya.com.sg/api/crm/voucher/verify
+19:18:34 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url Request
+https://uat-api.takashimaya.com.sg/api/crm/voucher/verify/826680
+19:18:34 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Key Header : Authorization = Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTY3NjksImV4cCI6MTcwNDI4MzE2OSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMDg5MjVBMjQ3MTJDQzBCNTE5NkJBNDg1OUVGNDM0OTkiLCJpYXQiOjE3MDQxOTY3NjksInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.SHFECGuaBCm1ZVumZLvLhD3jUDeTKSeniTZfdG4ooO2Tz1Hvhnnm9VnC_8unFa1kH_EhAMBGHxaUdk4wC3iNfR5_gdf1VR_5ugrtZlVz9RAOz-16azoF9u9_nA4zTkT8WSC6axMTBrX1e1rCANeT2VU7--WIQpsrlW1inqoT3q4w2yTp08cgQOENau200rblcfW3IBQ-3dejTRWiTqGH52eJQmUEvcQgg4e8YYAjCTDiwaF1_8IceTxX4XlQNdpch4lE_4ER3gpk-d68ukaSw23tVo15jO_ZtBZ9wEMmjG7GlRizUwVYDvo2JDUqS8HqAt67tYG1wDrUR2bt0Xs5Rg
+19:18:41 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"success":false,"code":200,"error":["The Voucher status is not allowed to do redemption"],"data":null}
+19:18:41 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+19:18:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Json Resspone
+{"success":false,"code":200,"error":["The Voucher status is not allowed to do redemption"],"data":null}
+19:18:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------End Pay----------------------------
+19:20:33 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------Start Pay----------------------------
+19:20:33 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url=https://uat-api.takashimaya.com.sg/api/crm/voucher/verify
+19:20:33 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url Request
+https://uat-api.takashimaya.com.sg/api/crm/voucher/verify/826680
+19:20:33 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Key Header : Authorization = Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxOTY3NjksImV4cCI6MTcwNDI4MzE2OSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMDg5MjVBMjQ3MTJDQzBCNTE5NkJBNDg1OUVGNDM0OTkiLCJpYXQiOjE3MDQxOTY3NjksInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.SHFECGuaBCm1ZVumZLvLhD3jUDeTKSeniTZfdG4ooO2Tz1Hvhnnm9VnC_8unFa1kH_EhAMBGHxaUdk4wC3iNfR5_gdf1VR_5ugrtZlVz9RAOz-16azoF9u9_nA4zTkT8WSC6axMTBrX1e1rCANeT2VU7--WIQpsrlW1inqoT3q4w2yTp08cgQOENau200rblcfW3IBQ-3dejTRWiTqGH52eJQmUEvcQgg4e8YYAjCTDiwaF1_8IceTxX4XlQNdpch4lE_4ER3gpk-d68ukaSw23tVo15jO_ZtBZ9wEMmjG7GlRizUwVYDvo2JDUqS8HqAt67tYG1wDrUR2bt0Xs5Rg
+19:20:35 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"success":false,"code":200,"error":["The Voucher status is not allowed to do redemption"],"data":null}
+19:20:35 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+19:20:35 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Json Resspone
+{"success":false,"code":200,"error":["The Voucher status is not allowed to do redemption"],"data":null}
+19:20:35 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------End Pay----------------------------
+20:06:50 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+20:06:50 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+20:06:50 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Para Request
+client_id=E4B8FE64B36F4124B486C96A03878CDD&client_secret=D0F523B88BF34CFD9EFF90A69A614E50&grant_type=client_credentials& Scope=TakaApi.Alll&Content-Type=x-www-form-urlencoded
+20:06:59 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQyMDA4NDUsImV4cCI6MTcwNDI4NzI0NSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMTU0ODEwOENBODdFMDc4Qzk1NEEyRkFFMzdGRkZBNkQiLCJpYXQiOjE3MDQyMDA4NDUsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.m9rKfSyZdxmWsKslMjc62EiPv_UgkPJvNnF5Qzs4-2Cn2ManKAndO2kpPkZZsIJ2l9uj9AjLLWfWHjEOUKEHiwEQw4vZ8O_kKQOobG9VltEMX4Wd_ztFLwNvJD7TOaU4L7F2Lzfo_AsQxt-9fft5Np6Itv5Y0OWQ44rPDMvAbw_GcyjH3BgjQjca4LSV8TZgfm3gS91QXEScCMS1_v_1wTc8aPoKcuq-KuvGyNbFHXDvg9N4gjs7DKPM2TU1tYrePQrn19ii6MTj5BPdpPHCBAlCJPtFI9CMGcg-ZRBjmK3IUPl_rfgPeGZ7-l8XLppC64yJhqWCk9WBzHAnw_hjVw","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+20:06:59 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+20:06:59 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone
+{"access_token":"eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQyMDA4NDUsImV4cCI6MTcwNDI4NzI0NSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMTU0ODEwOENBODdFMDc4Qzk1NEEyRkFFMzdGRkZBNkQiLCJpYXQiOjE3MDQyMDA4NDUsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.m9rKfSyZdxmWsKslMjc62EiPv_UgkPJvNnF5Qzs4-2Cn2ManKAndO2kpPkZZsIJ2l9uj9AjLLWfWHjEOUKEHiwEQw4vZ8O_kKQOobG9VltEMX4Wd_ztFLwNvJD7TOaU4L7F2Lzfo_AsQxt-9fft5Np6Itv5Y0OWQ44rPDMvAbw_GcyjH3BgjQjca4LSV8TZgfm3gS91QXEScCMS1_v_1wTc8aPoKcuq-KuvGyNbFHXDvg9N4gjs7DKPM2TU1tYrePQrn19ii6MTj5BPdpPHCBAlCJPtFI9CMGcg-ZRBjmK3IUPl_rfgPeGZ7-l8XLppC64yJhqWCk9WBzHAnw_hjVw","expires_in":86400,"token_type":"Bearer","scope":"TakaApi.All"}
+20:06:59 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+20:07:21 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------Start Pay----------------------------
+20:07:21 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url=https://uat-api.takashimaya.com.sg/api/crm/voucher/verify
+20:07:21 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Url Request
+https://uat-api.takashimaya.com.sg/api/crm/voucher/verify/809686
+20:07:21 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Key Header : Authorization = Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQyMDA4NDUsImV4cCI6MTcwNDI4NzI0NSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMTU0ODEwOENBODdFMDc4Qzk1NEEyRkFFMzdGRkZBNkQiLCJpYXQiOjE3MDQyMDA4NDUsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.m9rKfSyZdxmWsKslMjc62EiPv_UgkPJvNnF5Qzs4-2Cn2ManKAndO2kpPkZZsIJ2l9uj9AjLLWfWHjEOUKEHiwEQw4vZ8O_kKQOobG9VltEMX4Wd_ztFLwNvJD7TOaU4L7F2Lzfo_AsQxt-9fft5Np6Itv5Y0OWQ44rPDMvAbw_GcyjH3BgjQjca4LSV8TZgfm3gS91QXEScCMS1_v_1wTc8aPoKcuq-KuvGyNbFHXDvg9N4gjs7DKPM2TU1tYrePQrn19ii6MTj5BPdpPHCBAlCJPtFI9CMGcg-ZRBjmK3IUPl_rfgPeGZ7-l8XLppC64yJhqWCk9WBzHAnw_hjVw
+20:07:41 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"success":true,"code":200,"error":[],"data":{"voucher_status":5,"voucher_no":"809686","voucher_expDate":"2024-03-17","voucher_amt":10}}
+20:07:41 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+20:07:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > Json Resspone
+{"success":true,"code":200,"error":[],"data":{"voucher_status":5,"voucher_no":"809686","voucher_expDate":"2024-03-17","voucher_amt":10}}
+20:07:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoVerifAPI) > ------------------------------End Pay----------------------------
+20:07:55 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > ------------------------------Start Pay----------------------------
+20:07:55 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > Url=https://uat-api.takashimaya.com.sg/api/crm/voucher/updatestatus
+20:07:55 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > Json Request
+{
+  "voucher_no": "809686",
+  "POSID": "99997",
+  "updateTransID": "00326",
+  "update_datetime": "2024-01-02 20:07:55"
+}
+20:07:55 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > Url Request
+https://uat-api.takashimaya.com.sg/api/crm/voucher/updatestatus
+20:07:55 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Key Header : Authorization = Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQyMDA4NDUsImV4cCI6MTcwNDI4NzI0NSwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiMTU0ODEwOENBODdFMDc4Qzk1NEEyRkFFMzdGRkZBNkQiLCJpYXQiOjE3MDQyMDA4NDUsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.m9rKfSyZdxmWsKslMjc62EiPv_UgkPJvNnF5Qzs4-2Cn2ManKAndO2kpPkZZsIJ2l9uj9AjLLWfWHjEOUKEHiwEQw4vZ8O_kKQOobG9VltEMX4Wd_ztFLwNvJD7TOaU4L7F2Lzfo_AsQxt-9fft5Np6Itv5Y0OWQ44rPDMvAbw_GcyjH3BgjQjca4LSV8TZgfm3gS91QXEScCMS1_v_1wTc8aPoKcuq-KuvGyNbFHXDvg9N4gjs7DKPM2TU1tYrePQrn19ii6MTj5BPdpPHCBAlCJPtFI9CMGcg-ZRBjmK3IUPl_rfgPeGZ7-l8XLppC64yJhqWCk9WBzHAnw_hjVw
+20:08:02 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Respone = {"success":true,"code":200,"error":[],"data":"Voucher status updated Successfully"}
+20:08:02 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > Http Response Code:  OK
+20:08:02 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > Json Resspone
+{"success":true,"code":200,"error":[],"data":"Voucher status updated Successfully"}
+20:08:02 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoUpdateAPI) > ------------------------------End Pay----------------------------

@@ -1,0 +1,24 @@
+﻿14:01:15 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+14:01:15 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+14:01:15 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > Para Request
+client_id=E4B8FE64B36F4124B486C96A03878CDD&client_secret=D0F523B88BF34CFD9EFF90A69A614E50&grant_type=client_credentials& Scope=TakaApi.Alll&Content-Type=x-www-form-urlencoded
+14:01:36 Dll V.: 1.0.0.4 : Form (cAPI:C_CALLxAPI) > [Err WebException] = Unable to connect to the remote server
+14:01:36 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > [Err WebException] = Unable to connect to the remote server
+14:01:36 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > Json Resspone(4)
+{
+  "error_code": -1,
+  "error_message": "Unable to connect to the remote server"
+}
+14:01:36 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+14:08:56 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+14:08:56 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+14:08:56 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > Para Request
+client_id=E4B8FE64B36F4124B486C96A03878CDD&client_secret=D0F523B88BF34CFD9EFF90A69A614E50&grant_type=client_credentials& Scope=TakaApi.Alll&Content-Type=x-www-form-urlencoded
+14:09:17 Dll V.: 1.0.0.4 : Form (cAPI:C_CALLxAPI) > [Err WebException] = Unable to connect to the remote server
+14:09:17 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > [Err WebException] = Unable to connect to the remote server
+14:09:17 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > Json Resspone(4)
+{
+  "error_code": -1,
+  "error_message": "Unable to connect to the remote server"
+}
+14:09:17 Dll V.: 1.0.0.4 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------

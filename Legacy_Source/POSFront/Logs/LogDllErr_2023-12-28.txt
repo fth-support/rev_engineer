@@ -1,0 +1,54 @@
+﻿19:09:59 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+19:09:59 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-api.takashimaya.com.sg/connect/token
+19:09:59 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Request
+{
+  "client_id": "E4B8FE64B36F4124B486C96A03878CDD",
+  "client_secret": "D0F523B88BF34CFD9EFF90A69A614E50",
+  "grant_type": "client_credentials",
+  "Scope": "TakaApi.All",
+  "Content-Type": "x-www-form-urlencoded"
+}
+19:10:09 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > [Err WebException] = The remote server returned an error: (404) Not Found.
+19:10:09 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone
+
+19:10:09 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > [Err Exception] = Object reference not set to an instance of an object.
+19:10:09 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone(5)
+{
+  "error_code": -1,
+  "error_message": "Object reference not set to an instance of an object."
+}
+19:10:09 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+19:42:50 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+19:42:50 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-api.takashimaya.com.sg/connect/token
+19:42:50 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Request
+{
+  "client_id": "E4B8FE64B36F4124B486C96A03878CDD",
+  "client_secret": "D0F523B88BF34CFD9EFF90A69A614E50",
+  "grant_type": "client_credentials",
+  "Scope": "TakaApi.All",
+  "Content-Type": "x-www-form-urlencoded"
+}
+19:42:50 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > [Err WebException] = The remote server returned an error: (404) Not Found.
+19:42:50 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone
+
+19:42:50 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > [Err Exception] = Object reference not set to an instance of an object.
+19:42:50 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone(5)
+{
+  "error_code": -1,
+  "error_message": "Object reference not set to an instance of an object."
+}
+19:42:50 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------
+20:40:39 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------Start Pay----------------------------
+20:40:39 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Url=https://uat-auth.takashimaya.com.sg/connect/token
+20:40:39 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Request
+{
+  "client_id": "E4B8FE64B36F4124B486C96A03878CDD",
+  "client_secret": "D0F523B88BF34CFD9EFF90A69A614E50",
+  "grant_type": "client_credentials",
+  "Scope": "TakaApi.All",
+  "Content-Type": "x-www-form-urlencoded"
+}
+20:40:41 Dll V.: 1.0.0.1 : Form (cAPI:C_CALLxAPI) > [Err WebException] = The remote server returned an error: (400) Bad Request.
+20:40:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > Json Resspone
+{"error":"invalid_client"}
+20:40:41 Dll V.: 1.0.0.1 : Form (cVoucher:SENDoAuthAPI) > ------------------------------End Pay----------------------------

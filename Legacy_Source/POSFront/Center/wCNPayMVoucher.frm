@@ -559,7 +559,7 @@ On Error GoTo ErrHandle
             Exit Sub
         End If
         'for test case token expire res code 401
-       ' tVB_CNMVoucherToken = "<REDACTED_TEST_JWT_removed_before_publishing>"   'for test token expire
+       ' tVB_CNMVoucherToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxNjkwMzAsImV4cCI6MTcwNDI1NTQzMCwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiNjMxODVDMjQ4QzExRDk4NzdBRTlFMUZCRUEyRjMyQkMiLCJpYXQiOjE3MDQxNjkwMzAsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.uq4RbpTE0RgCEbLLP84XXrPtN1MGykT8ChXj4lrUfjuCiAF0YdSPn5kFDPMdLlbp4-4O-MbBdu0zi_wmmKGgoRl5lJYTFrkW5bo-oPCLkRlgL3yQi1BpsquKa0RiQKRWBuo3kLif0zoD6ZHAfi5zJO2X9BYYA4uFnpKNIY-LWuKbR5ZWfE4pe3RjA4cFuvr1xawzaH53Msgd809uUQZWBw_TNVbx2xamt2bDPgMmV5Bf0fguLjnfpWMNa2uhJpjUmArHHX7VtAT_vxGx-aZdab_KBbygbVoQVQGuczuaiB6Heu18n3z6tLf0y92zYKqQsfAh3JmkAIHnozxNty6WiA"   'for test token expire
 
         tW_POSID = tVB_CNTerminalNum
         tW_updateTransID = tVB_Running
@@ -790,7 +790,7 @@ On Error GoTo ErrHandle
      Screen.MousePointer = 11
     otmAuth.Enabled = False
     'for test case token expire res code 401
-   ' tVB_CNMVoucherToken = "<REDACTED_TEST_JWT_removed_before_publishing>"
+   ' tVB_CNMVoucherToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6Ijc3QUFBNkMzMTk2NUEyRUI0NzBBQkYwODE1OTA0OEI0MzZCNDc3RDdSUzI1NiIsInR5cCI6ImF0K2p3dCIsIng1dCI6ImQ2cW13eGxsb3V0SENyOElGWkJJdERhMGQ5YyJ9.eyJuYmYiOjE3MDQxNjkwMzAsImV4cCI6MTcwNDI1NTQzMCwiaXNzIjoiaHR0cHM6Ly91YXQtYXV0aC50YWthc2hpbWF5YS5jb20uc2ciLCJhdWQiOiJSZXNvdXJjZUFwaSIsImNsaWVudF9pZCI6IkU0QjhGRTY0QjM2RjQxMjRCNDg2Qzk2QTAzODc4Q0REIiwianRpIjoiNjMxODVDMjQ4QzExRDk4NzdBRTlFMUZCRUEyRjMyQkMiLCJpYXQiOjE3MDQxNjkwMzAsInNjb3BlIjpbIlRha2FBcGkuQWxsIl19.uq4RbpTE0RgCEbLLP84XXrPtN1MGykT8ChXj4lrUfjuCiAF0YdSPn5kFDPMdLlbp4-4O-MbBdu0zi_wmmKGgoRl5lJYTFrkW5bo-oPCLkRlgL3yQi1BpsquKa0RiQKRWBuo3kLif0zoD6ZHAfi5zJO2X9BYYA4uFnpKNIY-LWuKbR5ZWfE4pe3RjA4cFuvr1xawzaH53Msgd809uUQZWBw_TNVbx2xamt2bDPgMmV5Bf0fguLjnfpWMNa2uhJpjUmArHHX7VtAT_vxGx-aZdab_KBbygbVoQVQGuczuaiB6Heu18n3z6tLf0y92zYKqQsfAh3JmkAIHnozxNty6WiA"
     If tVB_CNMVoucherToken = "" Then
          bGetToken = True
     ElseIf nVB_CNMVoucherExpireIn <= 0 Then
