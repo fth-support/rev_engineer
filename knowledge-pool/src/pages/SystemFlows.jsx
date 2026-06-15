@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Network, Database, RefreshCw, ShieldCheck, CreditCard, Rocket, ArrowRight } from 'lucide-react'
+import { Network, Database, RefreshCw, ShieldCheck, CreditCard, Rocket, ArrowRight, GitBranch } from 'lucide-react'
 import ArchitectureGraph from '../components/diagrams/ArchitectureGraph'
+import TxLifecycleStepper from '../components/diagrams/TxLifecycleStepper'
 import SyncFlowStepper from '../components/diagrams/SyncFlowStepper'
 import ERGraph from '../components/diagrams/ERGraph'
 import TokenizationStepper from '../components/diagrams/TokenizationStepper'
@@ -11,6 +12,7 @@ import './pages.css'
 
 const flows = [
   { id: 'architecture', title: 'System Architecture', icon: RefreshCw, Comp: ArchitectureGraph, doc: '/docs/architecture-srs', docLabel: 'Architecture & SRS' },
+  { id: 'lifecycle', title: 'End-to-End Transaction', icon: GitBranch, Comp: TxLifecycleStepper, doc: '/docs/architecture-srs', docLabel: 'Architecture & SRS' },
   { id: 'sync', title: 'Data Sync Flow', icon: RefreshCw, Comp: SyncFlowStepper, doc: '/docs/program-spec', docLabel: 'Program Spec' },
   { id: 'er', title: 'ER Diagram', icon: Database, Comp: ERGraph, doc: '/docs/data-dictionary', docLabel: 'Data Dictionary' },
   { id: 'token', title: 'Tokenization Flow', icon: ShieldCheck, Comp: TokenizationStepper, doc: '/docs/security', docLabel: 'Security & Tokens' },

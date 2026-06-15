@@ -1,8 +1,33 @@
 # ServiceTransfer: Program Specification
 
-> 🔗 **Interactive diagrams:** step through the live [Data Sync Flow](../doc-claude-ver/Diagrams/03_Sync_Flow.html) and [Member Points Flow](../doc-claude-ver/Diagrams/05_Member_Points_Flow.html) (full [index](../doc-claude-ver/Diagrams/00_Index.html)). The Mermaid flow below renders natively on GitHub / GitLab / VS Code.
+> 🔗 **Interactive diagrams:** step through the live [Transaction Lifecycle](../doc-claude-ver/Diagrams/06_Transaction_Lifecycle.html) (POSFront → ServiceTransfer), [Data Sync Flow](../doc-claude-ver/Diagrams/03_Sync_Flow.html) and [Member Points Flow](../doc-claude-ver/Diagrams/05_Member_Points_Flow.html) (full [index](../doc-claude-ver/Diagrams/00_Index.html)). The Mermaid flow below renders natively on GitHub / GitLab / VS Code.
 
 เอกสารฉบับนี้ถอดตรรกะการทำงาน (Logic) ของ ServiceTransfer เดิมที่เขียนด้วย VB6 ออกมาเป็นรูปแบบ **Pseudocode** เพื่อให้ทีมพัฒนาเข้าใจ Flow การทำงานและสามารถนำไปสร้างระบบใหม่ (Re-implement) ในภาษาใดก็ได้โดยไม่ต้องไล่ดูโค้ด VB6
+
+## 0. Upstream Producer — POSFront (บริบทต้นทาง)
+
+ServiceTransfer รับช่วงต่อจาก **POSFront** (โปรแกรมขายหน้าร้าน) ผ่าน Local DB:
+
+```mermaid
+flowchart LR
+    A[POSFront: เปิดบิล\nTPSHD-Tmn StaDoc=2] --> B[จ่ายเงิน + พิมพ์ใบเสร็จ\nUPDATE StaDoc=1]
+    B --> C{{TRG_Tmp2Sale\nSTP_PRCxTmp2Sale}}
+    C --> D[(TPSTSal*\nFlag=0 รอซิงค์)]
+    D --> E[ServiceTransfer\npoll Flag=0 → push HQ]
+    E --> F[(Central DB\nFlag=1 synced)]
+```
+
+```vb
+// POSFront Save Sale (Center/mCNSP.bas, wTender.frm)
+INSERT INTO TPSHD<Tmn> (...keys..., FTShdStaDoc) VALUES (..., '2')   // เปิดบิล
+... TakePayment() + PrintReceipt() + OpenCashDrawer() ...
+UPDATE TPSHD<Tmn> SET FTShdStaDoc = '1'  WHERE keys_match            // ปิดบิล
+// → Trigger TRG_Tmp2Sale<Tmn> ย้ายเข้า TPSTSal* และตั้ง FTStaSentOnOff='0'
+```
+
+หลังจุดนี้ แถวพร้อมใน `TPSTSalHD ... WHERE FTShdStaDoc='1' AND FTStaSentOnOff='0'` ซึ่งเป็น Input ของ ServiceTransfer ด้านล่าง
+
+---
 
 ## 1. High-Level Call Graph
 ระบบมีจุดเริ่มต้นทำงานหลักๆ อยู่ 2 ส่วนคือ ตอนเปิดโปรแกรม (Form_Load) และลูปประมวลผลหลัก (otmForm_Timer)

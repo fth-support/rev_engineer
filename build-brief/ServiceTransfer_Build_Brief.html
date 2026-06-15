@@ -170,6 +170,7 @@ This is <b>not a line-by-line port</b>. Preserve the <i>business rules</i> exact
 <tr><td><code>legacy_source/Forms/wMain.frm</code></td><td>Main form — the 500ms timer loop &amp; sync/insert/points functions (~1,763 lines)</td><td>§6 §7 §9 §10</td></tr>
 <tr><td><code>legacy_source/Modules/mMain.bas</code></td><td>Shared module — config read, tokenization, SOAP, helpers (~1,099 lines)</td><td>§5 §8 §11</td></tr>
 <tr><td><code>legacy_source/Modules/Module4.bas</code></td><td>Win32 <code>SleepEx</code> declaration (object-clear delay)</td><td>§5</td></tr>
+<tr><td><code>legacy_source/POSFront/</code></td><td>Upstream POS sales app (producer). <code>mDB.bas</code> = <code>Sub Main</code> launcher; <code>Center/mCNSP.bas</code> = sale save + <code>TRG_Tmp2Sale</code> trigger</td><td>§1 (input contract)</td></tr>
 <tr><td><code>doc-agy-ver/*.md</code></td><td>Markdown docs (Mermaid diagrams, GitHub-renderable)</td><td>Quick reference</td></tr>
 <tr><td><code>doc-claude-ver/</code></td><td>Word specs, slide deck, standalone interactive HTML diagrams</td><td>Stakeholder-facing</td></tr>
 <tr><td><code>knowledge-pool/</code></td><td>Interactive documentation portal (React) + verified diagram data (<code>src/data/diagramData.js</code>)</td><td>Visual exploration</td></tr>
@@ -196,6 +197,18 @@ local DB, write them to the central DB (tokenizing card fields en route), then p
   <li><b>Member points</b> — aggregate loyalty points per member and post them (with history) to the Member DB.</li>
   <li><b>Resilience</b> — survive offline periods, duplicate keys, timeouts; never send a header before its child rows.</li>
 </ul>
+<h3>Upstream producer — POSFront (the input contract)</h3>
+<p>ServiceTransfer does not create sales; it is the <b>consumer</b> half of a two-program pipeline. The <b>producer</b> is
+<b>POSFront</b>, the cashier-facing VB6 POS application (Adasoft, "TAKASHIMAYA project", v6.2412.1). The two never call each
+other — they hand off through the Local DB via two status flags. Note that <b>POSFront's <code>Sub Main</code> is what launches this
+agent</b> (alongside <code>ServiceOnOff</code> / <code>ServiceAutoReplicate</code> / <code>ServiceAutoClear</code>); a modern rebuild
+should instead run the sync service as an <b>independent</b> process.</p>
+<table>
+<tr><th>Flag</th><th>Owner</th><th>Meaning &amp; handoff</th></tr>
+<tr><td><code>FTShdStaDoc</code></td><td>POSFront</td><td><code>'2'</code> in-progress → <code>'1'</code> complete (paid + receipt printed). An <code>AFTER UPDATE</code> trigger <code>TRG_Tmp2Sale&lt;Tmn&gt;</code> → <code>STP_PRCxTmp2Sale</code> then promotes the bill from the per-terminal working table <code>TPSHD&lt;Tmn&gt;</code> into <code>TPSTSal*</code> with <code>FTStaSentOnOff='0'</code>.</td></tr>
+<tr><td><code>FTStaSentOnOff</code></td><td>ServiceTransfer</td><td><code>'0'</code> pending → <code>'1'</code> synced to HQ (this agent owns this flag).</td></tr>
+</table>
+<div class="callout"><span class="lbl">Input contract</span> The sync service consumes rows where <code>FTShdStaDoc='1' AND FTStaSentOnOff='0'</code>. A row still at <code>'2'</code> is an open bill and must be ignored. Master data (products, prices, members, tender) flows the other way — Server → branch — via the separate replication service.</div>
 </section>
 
 <!-- 2 BUSINESS -->
@@ -212,8 +225,8 @@ local DB, write them to the central DB (tokenizing card fields en route), then p
 </table>
 <h3>2.2 End-to-end business flow</h3>
 <div class="grid2">
-  <div class="step"><div class="n">1</div><div class="b"><b class="role-branch">Customer transaction</b><div>POS records a sale (header + detail + receipt + card + points) to the Local DB.</div></div></div>
-  <div class="step"><div class="n">2</div><div class="b"><b class="role-central">Local recording</b><div>Rows are stored offline-capable, flagged <code>FTStaSentOnOff='0'</code> (pending).</div></div></div>
+  <div class="step"><div class="n">1</div><div class="b"><b class="role-branch">POSFront sale</b><div>POSFront records a sale (header + detail + receipt + card + points) to the Local DB, then on payment marks it complete (<code>FTShdStaDoc='1'</code>) and prints the receipt.</div></div></div>
+  <div class="step"><div class="n">2</div><div class="b"><b class="role-central">Promote &amp; queue</b><div>Trigger <code>TRG_Tmp2Sale</code> moves the bill into <code>TPSTSal*</code>, flagged <code>FTStaSentOnOff='0'</code> (pending) — offline-capable.</div></div></div>
   <div class="step"><div class="n">3</div><div class="b"><b class="role-member">Background sync</b><div>The agent's timer picks up pending rows.</div></div></div>
   <div class="step"><div class="n">4</div><div class="b"><b class="role-safenet">Data protection</b><div>Card/member fields are tokenized via SafeNet.</div></div></div>
   <div class="step"><div class="n">5</div><div class="b"><b class="role-purple">HQ consolidation</b><div>Rows are inserted into the Central DB.</div></div></div>

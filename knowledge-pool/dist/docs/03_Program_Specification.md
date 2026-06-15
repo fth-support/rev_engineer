@@ -2,6 +2,49 @@
 
 เอกสารฉบับนี้ถอดตรรกะการทำงาน (Logic) ของ ServiceTransfer เดิมที่เขียนด้วย VB6 ออกมาเป็นรูปแบบ **Pseudocode** เพื่อให้ทีมพัฒนาเข้าใจ Flow การทำงานและสามารถนำไปสร้างระบบใหม่ (Re-implement) ในภาษาใดก็ได้โดยไม่ต้องไล่ดูโค้ด VB6
 
+## 0. Upstream Producer — POSFront (บริบทต้นทาง)
+
+ServiceTransfer ไม่ได้สร้างยอดขายเอง — มันรับช่วงต่อจาก **POSFront** ซึ่งเป็นโปรแกรมขายหน้าร้าน ภาพรวมการส่งต่อทั้งสาย (cashier → HQ) ดูได้จาก Flow นี้:
+
+```diagram
+tx_lifecycle
+```
+
+### 0.1 POSFront — Save Sale (Pseudocode)
+```vb
+// POSFront: เมื่อเริ่มบิลและตอนจ่ายเงิน (Center/mCNSP.bas, wTender.frm)
+FUNCTION POSFront_SaveSale(cart, payment)
+    // 1. เปิดบิล: เขียนลงตารางทำงานต่อเครื่อง ด้วยสถานะ "กำลังทำ"
+    INSERT INTO TPSHD<Tmn> (...keys..., FTShdStaDoc)  VALUES (..., '2')
+    INSERT INTO TPSDT<Tmn> / TPSRC<Tmn> / TPSCD<Tmn> (...line items, tenders, cards...)
+
+    // 2. รับชำระเงิน + พิมพ์ใบเสร็จ (OPOS)
+    IF NOT TakePayment(payment) THEN RETURN False
+    PrintReceipt()         // OPOS printer
+    OpenCashDrawer()
+
+    // 3. ปิดบิล: เปลี่ยนสถานะเป็น "เสร็จสมบูรณ์" → จุดนี้คือสัญญาณ commit
+    UPDATE TPSHD<Tmn> SET FTShdStaDoc = '1' WHERE keys_match
+    // → SQL Trigger TRG_Tmp2Sale<Tmn> ทำงานต่อให้อัตโนมัติ (ดู 0.2)
+    RETURN True
+END FUNCTION
+```
+
+### 0.2 Promotion Trigger (Local DB)
+```sql
+CREATE TRIGGER TRG_Tmp2Sale<Tmn> ON TPSHD<Tmn> AFTER UPDATE AS
+IF UPDATE(FTShdStaDoc)
+BEGIN
+    -- ย้ายบิลที่เสร็จแล้ว (StaDoc='1') จากตารางทำงาน → ตารางขายรวม
+    EXEC STP_PRCxTmp2Sale 'TPSHD<Tmn>'
+    -- แถวใหม่ใน TPSTSalHD/DT/RC/CD ถูกตั้ง FTStaSentOnOff = '0' (รอซิงค์)
+END
+```
+
+หลังจุดนี้ แถวพร้อมแล้วใน `TPSTSalHD ... WHERE FTShdStaDoc='1' AND FTStaSentOnOff='0'` ซึ่งเป็น Input ของ ServiceTransfer ในหัวข้อถัดไป
+
+---
+
 ## 1. High-Level Call Graph
 ระบบมีจุดเริ่มต้นทำงานหลักๆ อยู่ 2 ส่วนคือ ตอนเปิดโปรแกรม (Form_Load) และลูปประมวลผลหลัก (otmForm_Timer)
 

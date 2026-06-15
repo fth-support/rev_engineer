@@ -26,6 +26,25 @@ er_diagram
 
 ทุกตารางในกลุ่มนี้จะมี Primary Key 3 ตัวแรกร่วมกัน (Composite Key) คือ `FTTmnNum` (รหัสเครื่องจุดขาย), `FTShdTransNo` (เลขที่บิล), `FDShdTransDate` (วันที่ทำรายการ) และมี `FTStaSentOnOff` เป็นสถานะการซิงค์: `0`=Pending, `1`=Synced, `3`=Needs Update
 
+### 3.0 POSFront Working Tables & Promotion Trigger (ฝั่งผู้ผลิตข้อมูล)
+ก่อนแถวจะมาอยู่ในตารางขายรวม `TPSTSal*` ข้างล่างนี้ โปรแกรม **POSFront** จะเขียนบิลที่กำลังทำลง **ตารางทำงานต่อเครื่อง (per-terminal working tables)** ซึ่งตั้งชื่อด้วย Terminal Number ต่อท้าย:
+
+| ตารางทำงาน (Working) | ตารางขายรวมปลายทาง (Sale) | คำอธิบาย |
+| --- | --- | --- |
+| `TPSHD<Tmn>` | `TPSTSalHD` | หัวบิล (เช่น `TPSHD01`) |
+| `TPSDT<Tmn>` | `TPSTSalDT` | รายการสินค้า |
+| `TPSRC<Tmn>` | `TPSTSalRC` | การรับชำระ |
+| `TPSCD<Tmn>` | `TPSTSalCD` | บัตรส่วนลด |
+
+ลำดับการเปลี่ยนสถานะของฟิลด์ `FTShdStaDoc` บน `TPSHD<Tmn>`:
+- `'2'` = บิลกำลังทำ (POSFront เพิ่งสร้าง — ยังไม่ใช่ยอดขายจริง)
+- `'1'` = บิลเสร็จสมบูรณ์ (จ่ายเงิน + พิมพ์ใบเสร็จแล้ว)
+
+เมื่อค่าถูก UPDATE จาก `'2'` → `'1'` **SQL Trigger `TRG_Tmp2Sale<Tmn>`** (`AFTER UPDATE` เมื่อ `IF UPDATE(FTShdStaDoc)`) จะเรียก Stored Procedure **`STP_PRCxTmp2Sale`** ย้ายบิลที่เสร็จแล้วจากตารางทำงานเข้าตารางขายรวม `TPSTSalHD/DT/RC/CD` โดยตั้ง `FTStaSentOnOff = '0'` (รอ ServiceTransfer ซิงค์ขึ้น HQ)
+
+> [!IMPORTANT]
+> **สองธง สองเจ้าของ:** `FTShdStaDoc` (`'2'`→`'1'`) เป็นของ **POSFront** (บิลเสร็จ), `FTStaSentOnOff` (`'0'`→`'1'`) เป็นของ **ServiceTransfer** (ส่งขึ้น HQ แล้ว) — สองธงนี้คือ "สัญญา" ที่เชื่อมสองโปรแกรมเข้าด้วยกัน
+
 ### 3.1 TPSTSalHD — ส่วนหัวธุรกรรมการขาย (Sales Header)
 | # | คอลัมน์ (Column) | ประเภท | Key | คำอธิบาย (Description) |
 |---|---|---|---|---|
@@ -33,7 +52,7 @@ er_diagram
 | 2 | FTShdTransNo | VARCHAR | PK | เลขที่ธุรกรรม (Running Number ต่อวัน) |
 | 3 | FDShdTransDate | DATE | PK | วันที่ทำรายการ (Format YYYY/MM/DD) |
 | 4 | FTShdTransType | VARCHAR | | ประเภทธุรกรรม (ดูตารางรหัส) |
-| 5 | FTShdStaDoc | VARCHAR | | สถานะเอกสาร — '1' = เสร็จสมบูรณ์ |
+| 5 | FTShdStaDoc | VARCHAR | | สถานะเอกสาร (POSFront เป็นผู้ตั้ง) — '2' = กำลังทำ, '1' = เสร็จสมบูรณ์ |
 | 6 | FTStaSentOnOff | VARCHAR | | สถานะการซิงค์ — 0 = รอ, 1 = ส่งแล้ว, 3 = ต้อง Update |
 | 7 | FTCstCardCode | VARCHAR | **TKN** | รหัสบัตรลูกค้า — **ถูก Tokenize ก่อนส่งขึ้น Server** |
 | 8 | FTSendUp | VARCHAR | | สถานะส่งขึ้น — ถูก Force เป็น '0' เมื่อ INSERT ขึ้น Server |

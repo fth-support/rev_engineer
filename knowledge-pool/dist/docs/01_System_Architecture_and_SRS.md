@@ -1,12 +1,15 @@
-# ServiceTransfer: Software Requirements Specification & Architecture
+# ServiceTransfer & POSFront: Software Requirements Specification & Architecture
 
 ## 1. Executive Summary
-**ServiceTransfer** is a background data-synchronization agent originally written in Visual Basic 6.0. It runs on every POS terminal at branch stores, operating via a 500ms timer loop. Its primary duties are:
-1. **Sales Synchronization:** Transfers pending sales transactions (header, detail, receipt, card, deposit, hold, voucher, and points) flagged with `FTStaSentOnOff = '0'` from the local SQL Server Express database to the central SQL Server at the Head Office.
-2. **Data Tokenization:** Tokenizes sensitive card data through the SafeNet SOAP web service before any sensitive value leaves the branch.
-3. **Member Points:** Posts accumulated member points to a separate Member database (`TCNMMallCard` / `TPSTBPHis`).
+The POS terminal at each branch runs **two cooperating VB6 programs** that together move a sale from the cashier to Head Office. They never call each other directly — they hand off through the **Local DB** using two status flags.
 
-While resilient (handling duplicate updates, timeouts, and ensuring header records are only sent after child tables), it carries significant legacy risks: VB6 is EOL, SQL statements are dynamically concatenated (SQL Injection risk), lack of DB transactions, plain-text credentials, and inefficient 500ms polling. This document outlines the legacy behavior and the targeted revamp architecture.
+- **POSFront** *(the producer)* — the cashier-facing sales application (Adasoft, "TAKASHIMAYA project", v6.2412.1). It reads master data from the server, records each sale into the local database, takes payment, prints the receipt, and marks the bill **complete** (`FTShdStaDoc = '1'`). Its `Sub Main` is also the launcher that starts the four background services, **including ServiceTransfer itself**.
+- **ServiceTransfer** *(the consumer)* — a background data-synchronization agent. It runs on every POS terminal via a 500ms timer loop and:
+  1. **Sales Synchronization:** Transfers completed sales (header, detail, receipt, card, deposit, hold, voucher, and points) flagged with `FTStaSentOnOff = '0'` from the local SQL Server Express database to the central SQL Server at the Head Office.
+  2. **Data Tokenization:** Tokenizes sensitive card data through the SafeNet SOAP web service before any sensitive value leaves the branch.
+  3. **Member Points:** Posts accumulated member points to a separate Member database (`TCNMMallCard` / `TPSTBPHis`).
+
+This split makes the terminal fully **offline-capable**: POSFront keeps selling even when the WAN is down, and ServiceTransfer drains the backlog once connectivity returns. While resilient (handling duplicate updates, timeouts, and ensuring header records are only sent after child tables), the design carries significant legacy risks: VB6 is EOL, SQL statements are dynamically concatenated (SQL Injection risk), lack of DB transactions, plain-text credentials, and inefficient 500ms polling. This document outlines the legacy behavior and the targeted revamp architecture.
 
 ---
 
@@ -28,16 +31,46 @@ sync_flow
 
 ---
 
-## 3. System Architecture (Legacy)
+## 3. End-to-End Transaction Lifecycle (POSFront → ServiceTransfer)
 
-### 3.1 Legacy Component Architecture
+โปรแกรมสองตัวบนเครื่อง POS ทำงานแบบ **Producer / Consumer** โดยส่งต่องานกันผ่าน Local DB และ **ธงสถานะ 2 ตัว** — ไม่มีการเรียกฟังก์ชันข้ามโปรแกรมกันโดยตรง ทำให้เครื่อง POS ทำงาน Offline ได้เต็มรูปแบบ
+
+```diagram
+tx_lifecycle
+```
+
+### 3.1 Orchestration (ใครเปิดใคร)
+`POSFront` คือ Process หลักบนเครื่อง — `Sub Main` (`mDB.bas`) เป็นผู้ Launch บริการเบื้องหลังทั้ง 4 ตัว:
+| ลำดับ | โปรแกรมที่ถูกเปิด | หน้าที่ |
+| --- | --- | --- |
+| 1 | **ServiceOnOff.exe** | ตรวจ/สลับสถานะ Online–Offline ของเครื่อง |
+| 2 | **ServiceAutoReplicate.exe** | Replicate **Master** จาก Central Server ลง Local (ทำให้ขายแบบ Offline ได้) |
+| 3 | **ServiceAutoClear.exe** | เคลียร์ไฟล์/ข้อมูลค้าง |
+| 4 | **ServiceTranfer.exe** | คือ **ServiceTransfer** — เอเจนต์ซิงค์ยอดขายขึ้น HQ |
+
+### 3.2 The Two-Flag Handshake (สัญญาระหว่างสองโปรแกรม)
+| ธง (Flag) | เจ้าของ | ความหมาย | เหตุการณ์ที่เปลี่ยนค่า |
+| --- | --- | --- | --- |
+| `FTShdStaDoc` | **POSFront** | `'2'` = บิลกำลังทำ → `'1'` = บิลเสร็จสมบูรณ์ | จ่ายเงิน + พิมพ์ใบเสร็จเรียบร้อย |
+| `FTStaSentOnOff` | **ServiceTransfer** | `'0'` = รอส่ง → `'1'` = ส่งขึ้น HQ แล้ว (`'3'` = ต้อง Update) | INSERT/UPDATE ขึ้น Central DB สำเร็จ |
+
+เมื่อ POSFront อัปเดต `FTShdStaDoc` จาก `'2'` เป็น `'1'` บนตารางทำงานต่อเครื่อง (`TPSHD<Tmn>`) **SQL Trigger `TRG_Tmp2Sale<Tmn>`** จะทำงาน (`AFTER UPDATE`) เรียก Stored Procedure `STP_PRCxTmp2Sale` เพื่อย้ายบิลที่เสร็จแล้วเข้าตารางขายรวม `TPSTSalHD/DT/RC/CD` (ตั้ง `FTStaSentOnOff='0'` รอซิงค์) จากนั้น ServiceTransfer จึงมารับช่วงต่อ
+
+> [!NOTE]
+> POSFront เป็นโปรแกรมขนาดใหญ่ (VB6, OPOS/Fujitsu, Codejock, MSSOAP, ADO 2.8) — เอกสารชุดนี้โฟกัสเฉพาะ **ส่วนที่เชื่อมต่อกับ ServiceTransfer** (อ่าน Master, เขียนบิล, ธง Completion, Trigger ย้ายข้อมูล) ไม่ได้ลงรายละเอียด UI การขายทั้งหมด
+
+---
+
+## 4. System Architecture (Legacy)
+
+### 4.1 Legacy Component Architecture
 สถาปัตยกรรมเดิมใช้การรันโปรแกรม Background บนเครื่อง POS โดยเชื่อมต่อฐานข้อมูลโดยตรงผ่าน ADODB OLEDB Provider ຂ้ามระบบเครือข่าย
 
 ```diagram
 architecture
 ```
 
-### 3.2 Key Features & Constraints
+### 4.2 Key Features & Constraints
 - **Automated Background Sync:** ทำงานด้วย Timer Polling ทุก 500 ms ซึ่งกินทรัพยากร CPU/IO สูงเกินความจำเป็น
 - **Resilient Offline Support:** ระบบรองรับ Offline Mode เต็มรูปแบบโดยอาศัย Flag `FTStaSentOnOff` 
 - **Dynamic SQL Generation:** โค้ดใช้วิธีการต่อ String (Concatenation) เพื่อสร้าง SQL Query ซึ่งเป็นจุดอ่อนด้าน Security
@@ -46,18 +79,18 @@ architecture
 
 ---
 
-## 4. Revamp Recommendations (Target Architecture)
+## 5. Revamp Recommendations (Target Architecture)
 
 การปรับปรุงระบบ (Revamp) ไม่ควรเป็นการแปลงโค้ดจาก VB6 เป็นภาษาใหม่โดยตรง แต่ควรปรับแก้ปัญหาในเชิงสถาปัตยกรรม (Architectural Shift) ให้เป็นระบบที่มีความปลอดภัย ลดภาระระบบ และขยายขนาด (Scale) ได้ง่ายขึ้น
 
-### 4.1 Recommended Target Architecture
+### 5.1 Recommended Target Architecture
 แทนที่การเปิด Connection ฐานข้อมูลข้าม WAN ด้วยการใช้สถาปัตยกรรมแบบ **Event-Driven** และ **API Gateway**
 
 ```diagram
 target_architecture
 ```
 
-### 4.2 Prioritized Improvement List
+### 5.2 Prioritized Improvement List
 1. **CRITICAL - Event-Driven Architecture:** เปลี่ยนจาก Timer Polling (500ms) เป็นการดักจับ Event เมื่อมีบิลใหม่ (เช่น File System Watcher หรือ CDC จาก Local DB) ส่งเข้า Message Queue
 2. **CRITICAL - API Gateway & Transactions:** ห้ามต่อ DB ข้ามเครือข่าย ให้ยิงข้อมูลเข้า API ที่ฝั่ง HQ แทน เพื่อให้ API เป็นคนควบคุม Database Transaction (BEGIN TRAN...COMMIT) ป้องกันข้อมูลขาดหาย
 3. **CRITICAL - Parameterized Queries:** เลิกวิธีการต่อ String (Concatenation) เพื่อสร้าง SQL และใช้ ORM หรือ Parameterized SQL อย่างเคร่งครัด

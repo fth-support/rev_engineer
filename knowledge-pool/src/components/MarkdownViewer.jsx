@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 
 import ArchitectureGraph from './diagrams/ArchitectureGraph'
 import TargetArchitectureGraph from './diagrams/TargetArchitectureGraph'
+import TxLifecycleStepper from './diagrams/TxLifecycleStepper'
 import SyncFlowStepper from './diagrams/SyncFlowStepper'
 import ERGraph from './diagrams/ERGraph'
 import TokenizationStepper from './diagrams/TokenizationStepper'
@@ -13,6 +14,7 @@ import MemberPointsStepper from './diagrams/MemberPointsStepper'
 const DIAGRAMS = {
   architecture: ArchitectureGraph,
   target_architecture: TargetArchitectureGraph,
+  tx_lifecycle: TxLifecycleStepper,
   sync_flow: SyncFlowStepper,
   er_diagram: ERGraph,
   tokenization: TokenizationStepper,

@@ -12,31 +12,54 @@
 // ---------------------------------------------------------------------------
 // 1. SYSTEM ARCHITECTURE (node graph)
 // x/y are percentages of the canvas; w/h in px.
+// Two cooperating VB6 programs on each POS terminal:
+//   POSFront (sales producer) → Local DB (handoff) → ServiceTransfer (sync consumer) → HQ.
+// Verified against legacy_source/POSFront (mDB.bas Sub Main, Center/mCNSP.bas, cCNDB.cls).
 // ---------------------------------------------------------------------------
 export const architecture = {
   nodes: [
     {
-      id: 'pos', role: 'branch', x: 22, y: 28, w: 230,
-      title: 'POS Terminal (Branch)', subtitle: 'ServiceTransfer.exe · Timer 500ms',
-      items: ['wMain.frm (1,763 lines)', 'mMain.bas (1,099 lines)', 'Local DB — SQL Express'],
+      id: 'posfront', role: 'branch', x: 15, y: 12, w: 232,
+      title: 'POSFront (Sales App)', subtitle: 'VB6 POS · v6.2412.1',
+      items: ['Reads master from Server', 'Writes sale → Local DB', 'Tender + print receipt'],
       detail: {
-        tag: 'VB6 Background Agent',
-        desc: 'Runs on every branch POS terminal. A 500ms timer loop (otmForm_Timer) polls the local SQL Express DB for rows flagged FTStaSentOnOff=\'0\' and pushes them to HQ.',
-        facts: ['Timer Interval = 500ms', 'ADODB 2.7 over SQLOLEDB.1', 'Config: AdaIni.Ada (Access), Registry AdaPosMall\\POSFront', 'Logs: LOG\\TransferOffline*.Log'],
+        tag: 'Sales Producer',
+        desc: 'The cashier-facing POS application (Adasoft, TAKASHIMAYA project). It reads product / price / member / tender master, records each sale into per-terminal working tables, and on successful payment marks the bill complete (FTShdStaDoc=\'1\') and prints the receipt. Its Sub Main is also the launcher for the 4 background services — including ServiceTransfer.',
+        facts: ['Entry point: Sub Main (mDB.bas)', 'Launches ServiceOnOff / AutoReplicate / AutoClear / ServiceTranfer', 'Working tables TPSHD<Tmn> / DT / RC / CD', 'OPOS (Fujitsu) printer + cash drawer'],
       },
     },
     {
-      id: 'central', role: 'central', x: 72, y: 22, w: 220,
+      id: 'localdb', role: 'config', x: 15, y: 46, w: 232,
+      title: 'Local DB (SQL Express)', subtitle: 'On the POS terminal',
+      items: ['TPSHD<Tmn> working tables', 'TRG_Tmp2Sale → STP_PRCxTmp2Sale', 'TPSTSalHD/DT/RC/CD · FTStaSentOnOff'],
+      detail: {
+        tag: 'Handoff Buffer',
+        desc: 'The store-and-forward database that decouples the two programs and makes the terminal offline-capable. A completed bill is promoted from the per-terminal working table into the consolidated TPSTSal* tables by an AFTER-UPDATE trigger, then waits there (FTStaSentOnOff=\'0\') for ServiceTransfer to pick it up.',
+        facts: ['Trigger TRG_Tmp2Sale<Tmn> AFTER UPDATE(FTShdStaDoc)', 'STP_PRCxTmp2Sale promotes Tmp → Sale', 'New rows default FTStaSentOnOff=\'0\'', 'Kept in sync with Server by ServiceAutoReplicate.exe'],
+      },
+    },
+    {
+      id: 'transfer', role: 'purple', x: 45, y: 84, w: 232,
+      title: 'ServiceTransfer (Agent)', subtitle: 'VB6 · Timer 500ms',
+      items: ['wMain.frm / mMain.bas', "Polls FTStaSentOnOff='0'", 'Tokenize → push → confirm'],
+      detail: {
+        tag: 'Sync Consumer',
+        desc: 'Background agent (launched by POSFront) that pushes completed sales to HQ. Its 500ms timer loop reads rows flagged FTStaSentOnOff=\'0\' from the Local DB, tokenizes card data, INSERT/UPDATEs the Central DB, posts member points, then flags the local row \'1\'.',
+        facts: ['Timer Interval = 500ms (otmForm_Timer)', 'HD-first rule + dup-key → UPDATE', 'Error codes 555 / 556 / 557', 'Logs: LOG\\TransferOffline*.Log'],
+      },
+    },
+    {
+      id: 'central', role: 'central', x: 74, y: 14, w: 216,
       title: 'Central Server (HQ)', subtitle: 'SQL Server — Central DB',
-      items: ['TPSTSalHD / DT / RC / CD', 'TSysSync (sync config)', 'TCNMTerminalMtn · TSysConfig'],
+      items: ['Master data source', 'TPSTSalHD / DT / RC / CD', 'TSysSync · TCNMTerminalMtn'],
       detail: {
-        tag: 'Consolidated Sales DB',
-        desc: 'Receives sales transactions from every branch. The agent reads sync configuration (TSysSync) and the operation date (TSysChgDateTime) from here, then INSERT/UPDATEs sales tables.',
-        facts: ['Health check: SELECT FTTmnCode FROM TCNMTerminalMtn', 'Sale date: TSysChgDateTime.FDCdtDate', 'Sync list: TSysSync WHERE FTSscStaActive=\'1\''],
+        tag: 'Master + Consolidated Sales',
+        desc: 'Single source of master data (products, prices, members, tender, discounts) replicated down to each branch, and the destination that receives every branch\'s consolidated sales.',
+        facts: ['Master → branch via ServiceAutoReplicate', 'Sync list: TSysSync WHERE FTSscStaActive=\'1\'', 'Health: SELECT FTTmnCode FROM TCNMTerminalMtn'],
       },
     },
     {
-      id: 'member', role: 'member', x: 78, y: 70, w: 200,
+      id: 'member', role: 'member', x: 80, y: 66, w: 200,
       title: 'Member DB', subtitle: 'SQL Server — Loyalty',
       items: ['TCNMMallCard (member cards)', 'TPSTBPHis (point history)', 'TPSTTokenLst (token map)'],
       detail: {
@@ -46,21 +69,24 @@ export const architecture = {
       },
     },
     {
-      id: 'safenet', role: 'safenet', x: 28, y: 74, w: 210,
+      id: 'safenet', role: 'safenet', x: 48, y: 49, w: 200,
       title: 'SafeNet Tokenizer', subtitle: 'SOAP Web Service',
-      items: ['MSSOAP.SoapClient30', 'InsertToken() · GetValue()', 'FIRST_SIX_TOKEN · Timeout 10,000ms'],
+      items: ['MSSOAP.SoapClient30', 'InsertToken() · GetValue()', 'FIRST_SIX_TOKEN'],
       detail: {
         tag: 'External Tokenization',
         desc: 'Card numbers are tokenized here before any sensitive value leaves the branch. Format FIRST_SIX_TOKEN keeps the first 6 digits and randomizes the rest.',
-        facts: ['SP_CHKbWebservice → MSSoapInit(URL)', 'InsertToken(CardNo, format=4, luhn=0)', 'Failure raises Error 557'],
+        facts: ['SP_CHKbWebservice → MSSoapInit(URL), timeout 10,000ms', 'InsertToken(CardNo, format=4, luhn=0)', 'Failure raises Error 557'],
       },
     },
   ],
   edges: [
-    { from: 'pos', to: 'central', label: 'SQLOLEDB.1 — INSERT/UPDATE' },
-    { from: 'central', to: 'pos', label: 'SELECT config / sale date' },
-    { from: 'pos', to: 'safenet', label: 'SOAP — InsertToken()' },
-    { from: 'pos', to: 'member', label: 'W_UPDxUpdatePoint()' },
+    { from: 'central', to: 'posfront', label: '① replicate master' },
+    { from: 'posfront', to: 'localdb', label: '② write sale · StaDoc 2→1' },
+    { from: 'localdb', to: 'transfer', label: "③ poll Flag='0'" },
+    { from: 'transfer', to: 'safenet', label: '④ InsertToken()' },
+    { from: 'transfer', to: 'central', label: '⑤ INSERT/UPDATE sales' },
+    { from: 'transfer', to: 'member', label: '⑥ update points' },
+    { from: 'transfer', to: 'localdb', label: "⑦ set Flag='1'" },
   ],
 }
 
@@ -194,6 +220,73 @@ export const erDiagram = {
 // Each step: { title, role, code?, lines:[], branch?:{label,tone} }
 // tone: 'exit' | 'error' | 'ok'
 // ---------------------------------------------------------------------------
+
+// 4.0 END-TO-END TRANSACTION LIFECYCLE — POSFront (producer) → ServiceTransfer (consumer)
+// The two programs never call each other; they hand off through the Local DB via two flags:
+//   FTShdStaDoc  '2'→'1'  (owned by POSFront — bill complete)
+//   FTStaSentOnOff '0'→'1' (owned by ServiceTransfer — synced to HQ)
+export const txLifecycleSteps = [
+  {
+    title: 'POSFront — Read master', role: 'config', code: 'Sub Main (mDB.bas)',
+    lines: [
+      'POSFront starts, connects ocnOnLine (Server) + ocnOffLine (Local)',
+      'Reads product / price / member / tender / discount master',
+      'Online → from Central Server; Offline → from replicated Local copy',
+    ],
+    branch: { label: 'Sub Main also launches ServiceOnOff / AutoReplicate / AutoClear / ServiceTranfer', tone: 'ok' },
+  },
+  {
+    title: 'POSFront — Open the bill', role: 'branch',
+    lines: [
+      'Cashier scans items / takes the order',
+      "Rows written to per-terminal working tables TPSHD<Tmn> / DT / RC / CD",
+      "Header flag FTShdStaDoc = '2' (in-progress, not yet a real sale)",
+    ],
+  },
+  {
+    title: 'POSFront — Payment & receipt', role: 'branch', code: 'wTender.frm',
+    lines: [
+      'Tender complete (cash / card / voucher / points)',
+      'Print receipt via OPOS printer + open cash drawer',
+      "UPDATE working table SET FTShdStaDoc = '1' (bill complete)",
+    ],
+    branch: { label: "FTShdStaDoc '2' → '1' is the commit signal", tone: 'ok' },
+  },
+  {
+    title: 'Local DB — Promote to sale', role: 'central', code: 'TRG_Tmp2Sale<Tmn>',
+    lines: [
+      'Trigger fires AFTER UPDATE(FTShdStaDoc) on TPSHD<Tmn>',
+      'EXEC STP_PRCxTmp2Sale — copy completed bill into TPSTSalHD / DT / RC / CD',
+      "New consolidated rows default FTStaSentOnOff = '0' (pending sync)",
+    ],
+  },
+  {
+    title: 'ServiceTransfer — Detect & tokenize', role: 'safenet', code: 'otmForm_Timer (500ms)',
+    lines: [
+      "Poll TPSTSal* WHERE FTShdStaDoc='1' AND FTStaSentOnOff='0'",
+      'Tokenize card fields via SafeNet (FIRST_SIX_TOKEN)',
+      'HD-first rule: send children (DT/RC/CD) before the header',
+    ],
+    branch: { label: '555 children not ready → skip · 557 token fail → skip+reset', tone: 'error' },
+  },
+  {
+    title: 'ServiceTransfer — Push to HQ', role: 'purple',
+    lines: [
+      'INSERT / UPDATE into Central DB (dup key → UPDATE)',
+      'W_UPDxUpdatePoint() posts accumulated points to Member DB',
+    ],
+  },
+  {
+    title: 'ServiceTransfer — Confirm', role: 'member', code: 'W_DATxUpdateByScript()',
+    lines: [
+      "UPDATE Local SET FTStaSentOnOff = '1' (synced)",
+      'Bill is now consolidated at Head Office',
+      'Next 500ms cycle picks up the following pending bill',
+    ],
+    branch: { label: 'Two-flag handshake complete: StaDoc 1 + SentOnOff 1', tone: 'ok' },
+  },
+]
+
 export const syncFlowSteps = [
   {
     title: 'Pre-check', role: 'config', code: 'otmForm_Timer()',

@@ -19,3 +19,17 @@
 # ไฟล์อื่นๆ
 *.scc
 *.user
+
+# Database backups (ใหญ่เกิน + มีข้อมูลจริง — ห้าม commit ขึ้น GitHub)
+*.bak
+legacy_source/POSSDB.bak
+
+# Python
+__pycache__/
+*.pyc
+
+# Runtime logs — มี client_secret / token จริง ห้าม commit เด็ดขาด
+legacy_source/POSFront/Logs/
+
+# Card-encryption utility — key.bin คือ AES key จริงสำหรับเข้ารหัสเลขบัตร ห้าม commit
+legacy_source/POSFront/encdec/

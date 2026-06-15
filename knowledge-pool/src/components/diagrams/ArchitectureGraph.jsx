@@ -9,13 +9,13 @@ function ArchitectureGraph() {
     <DiagramFrame
       icon={<Network size={20} color="var(--accent)" />}
       title="System Architecture"
-      subtitle="ServiceTransfer v5.1810.1 — 3-database topology + SafeNet tokenizer"
+      subtitle="POSFront (producer) + ServiceTransfer (sync) — 3-database topology + SafeNet tokenizer"
       hint="Click a node to highlight its connections and see details"
     >
       <NodeGraph
         nodes={architecture.nodes}
         edges={architecture.edges}
-        aspect={1.7}
+        aspect={1.5}
         ariaLabel="System architecture graph"
         renderNode={(p) => <GraphNode {...p} />}
         getDetail={(node) => node.detail}

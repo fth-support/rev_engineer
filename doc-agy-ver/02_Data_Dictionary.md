@@ -20,6 +20,7 @@
 
 ```mermaid
 erDiagram
+    TPSHD_Tmn ||--|| TPSTSalHD : "TRG_Tmp2Sale promote (StaDoc 1)"
     TPSTSalHD ||--o{ TPSTSalDT : "1:N (TmnNum,TransNo,Date)"
     TPSTSalHD ||--o{ TPSTSalRC : "1:N"
     TPSTSalHD ||--o{ TPSTSalCD : "1:N"
@@ -32,11 +33,27 @@ erDiagram
     TPSTTokenLst ||--o{ TPSTSalePoint : "Tokenize (MemID)"
 ```
 
+> `TPSHD_Tmn` (= `TPSHD<Tmn>`) คือตารางทำงานต่อเครื่องที่ **POSFront** เขียนบิล เมื่อบิลเสร็จ (`FTShdStaDoc='1'`) Trigger จะ promote เข้า `TPSTSalHD` — ดูหัวข้อ 3.0
+
 ---
 
 ## 3. กลุ่มตารางธุรกรรมการขาย (Sales Transaction Tables)
 
 ทุกตารางในกลุ่มนี้จะมี Primary Key 3 ตัวแรกร่วมกัน (Composite Key) คือ `FTTmnNum` (รหัสเครื่องจุดขาย), `FTShdTransNo` (เลขที่บิล), `FDShdTransDate` (วันที่ทำรายการ) และมี `FTStaSentOnOff` เป็นสถานะการซิงค์: `0`=Pending, `1`=Synced, `3`=Needs Update
+
+### 3.0 POSFront Working Tables & Promotion Trigger (ฝั่งผู้ผลิตข้อมูล)
+ก่อนแถวจะเข้าตารางขายรวม `TPSTSal*` โปรแกรม **POSFront** เขียนบิลที่กำลังทำลง **ตารางทำงานต่อเครื่อง** ที่ตั้งชื่อด้วย Terminal Number ต่อท้าย:
+
+| Working table | → Sale table | คำอธิบาย |
+| --- | --- | --- |
+| `TPSHD<Tmn>` | `TPSTSalHD` | หัวบิล (เช่น `TPSHD01`) |
+| `TPSDT<Tmn>` | `TPSTSalDT` | รายการสินค้า |
+| `TPSRC<Tmn>` | `TPSTSalRC` | การรับชำระ |
+| `TPSCD<Tmn>` | `TPSTSalCD` | บัตรส่วนลด |
+
+`FTShdStaDoc` บน `TPSHD<Tmn>`: `'2'` = กำลังทำ → `'1'` = เสร็จสมบูรณ์ (จ่ายเงิน+พิมพ์ใบเสร็จแล้ว) เมื่อ UPDATE เป็น `'1'` → **Trigger `TRG_Tmp2Sale<Tmn>`** (`AFTER UPDATE`) เรียก `STP_PRCxTmp2Sale` ย้ายบิลเข้า `TPSTSalHD/DT/RC/CD` ตั้ง `FTStaSentOnOff='0'` รอ ServiceTransfer ซิงค์
+
+> **สองธง สองเจ้าของ:** `FTShdStaDoc` (`'2'`→`'1'`) = POSFront (บิลเสร็จ), `FTStaSentOnOff` (`'0'`→`'1'`) = ServiceTransfer (ส่ง HQ แล้ว) — สองธงนี้คือสัญญาที่เชื่อมสองโปรแกรม
 
 ### 3.1 TPSTSalHD — ส่วนหัวธุรกรรมการขาย (Sales Header)
 | # | คอลัมน์ (Column) | ประเภท | Key | คำอธิบาย (Description) |
