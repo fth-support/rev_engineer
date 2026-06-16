@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import Home from './pages/Home'
+import Methodology from './pages/Methodology'
 import SystemFlows from './pages/SystemFlows'
 import Downloads from './pages/Downloads'
 import MarkdownViewer from './components/MarkdownViewer'
@@ -10,6 +11,7 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/methodology" element={<Methodology />} />
         <Route path="/flows" element={<SystemFlows />} />
         <Route path="/downloads" element={<Downloads />} />
         <Route path="/docs/architecture-srs" element={<MarkdownViewer file="01_System_Architecture_and_SRS.md" />} />

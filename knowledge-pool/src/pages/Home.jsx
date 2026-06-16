@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Server, DatabaseZap, Code, ShieldCheck, Activity, Database, Layers, ArrowRight, Network } from 'lucide-react'
+import { Server, DatabaseZap, Code, ShieldCheck, Activity, Database, Layers, ArrowRight, Network, Sparkles } from 'lucide-react'
 import StatCounter from '../components/primitives/StatCounter'
 import ArchitectureGraph from '../components/diagrams/ArchitectureGraph'
 import './pages.css'
@@ -26,6 +26,7 @@ function Home() {
           </div>
           <div className="hero-cta">
             <Link to="/flows" className="btn primary"><Network size={16} /> Explore Flows</Link>
+            <Link to="/methodology" className="btn ghost"><Sparkles size={15} /> How we did it</Link>
             <Link to="/docs/architecture-srs" className="btn ghost">Read the SRS <ArrowRight size={15} /></Link>
           </div>
         </section>

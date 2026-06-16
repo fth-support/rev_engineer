@@ -4,6 +4,7 @@ import ThemeToggle from './ThemeToggle'
 
 const TITLES = {
   '': 'Introduction',
+  methodology: 'Evidence-Driven Modernization',
   flows: 'System Flows & Diagrams',
   downloads: 'Download Deliverables',
   'docs/architecture-srs': 'Architecture & SRS',
