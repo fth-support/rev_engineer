@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Home, FileText, Database, ShieldCheck, Download, Code, X, Network, Layers, Sparkles } from 'lucide-react'
+import { Home, FileText, Database, ShieldCheck, Download, Code, X, Network, Layers, Presentation } from 'lucide-react'
 
 const docLinks = [
   { to: '/docs/architecture-srs', icon: FileText, label: 'Architecture & SRS' },
@@ -39,7 +39,7 @@ function Sidebar({ isOpen, onClose }) {
             <Network size={18} /> System Flows & Diagrams
           </NavLink>
           <NavLink to="/methodology" className={navClass} onClick={closeOnMobile}>
-            <Sparkles size={18} /> Modernization Method
+            <Presentation size={18} /> Pitch Presentation
           </NavLink>
 
           <div className="nav-group">Documents</div>
