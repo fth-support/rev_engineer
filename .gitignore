@@ -24,6 +24,12 @@
 *.bak
 legacy_source/POSSDB.bak
 
+# DB data exports (real transaction data + PII) — keep LOCAL, never push to public repo
+db_export/
+legacy_source/pos_export/
+# Crystal report files (may embed saved customer data) — keep LOCAL until verified
+legacy_source/Reports/
+
 # Python
 __pycache__/
 *.pyc
