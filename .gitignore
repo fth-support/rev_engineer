@@ -29,6 +29,8 @@ db_export/
 legacy_source/pos_export/
 # Crystal report files (may embed saved customer data) — keep LOCAL until verified
 legacy_source/Reports/
+# Internal user manual (large binary; knowledge captured in POS_Transaction_Model.md)
+legacy_source/*.docx
 
 # Python
 __pycache__/

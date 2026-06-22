@@ -3,7 +3,8 @@ import { useLocation } from 'react-router-dom'
 import ThemeToggle from './ThemeToggle'
 
 const TITLES = {
-  '': 'Introduction',
+  '': 'Overview',
+  sco: 'SCO Kiosk',
   methodology: 'Evidence-Driven Modernization',
   flows: 'System Flows & Diagrams',
   downloads: 'Download Deliverables',
@@ -25,7 +26,7 @@ function Topbar({ onToggleSidebar }) {
         <Menu size={22} />
       </button>
       <nav className="topbar__crumbs" aria-label="Breadcrumb">
-        <span>ServiceTransfer</span>
+        <span>Project SCO</span>
         <span className="sep">/</span>
         <span className="current">{current}</span>
       </nav>

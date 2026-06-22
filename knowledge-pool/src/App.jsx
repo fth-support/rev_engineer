@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import Home from './pages/Home'
+import SCO from './pages/SCO'
 import Methodology from './pages/Methodology'
 import SystemFlows from './pages/SystemFlows'
 import Downloads from './pages/Downloads'
@@ -11,6 +12,7 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/sco" element={<SCO />} />
         <Route path="/methodology" element={<Methodology />} />
         <Route path="/flows" element={<SystemFlows />} />
         <Route path="/downloads" element={<Downloads />} />

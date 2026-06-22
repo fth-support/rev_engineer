@@ -1,0 +1,147 @@
+/* Project SCO landing — Foodland Self-Checkout summary + embedded demo. Theme-token driven. */
+
+.sco { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.sco h2 { margin: 0; font-size: clamp(1.4rem, 3vw, 1.9rem); border: none; padding: 0; }
+.sco-section-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.sco-section-head h2 { display: flex; align-items: center; gap: 0.55rem; }
+
+.sco-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em;
+  color: var(--accent-contrast); background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  padding: 0.38rem 0.85rem; border-radius: 999px; box-shadow: 0 10px 26px -14px var(--accent);
+}
+.sco-badge--ghost { color: var(--accent); background: var(--accent-soft); box-shadow: none; border: 1px solid var(--border); }
+
+/* ---------------- hero ---------------- */
+.sco-hero {
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column; gap: 1.4rem;
+  padding: clamp(1.6rem, 4vw, 2.6rem);
+  background:
+    radial-gradient(680px 320px at 100% -30%, var(--accent-soft), transparent 70%),
+    radial-gradient(520px 320px at -10% 130%, var(--accent-2-soft), transparent 70%),
+    var(--surface);
+}
+.sco-hero__main { max-width: 60ch; }
+.sco-hero h1 {
+  font-size: clamp(2.1rem, 5.5vw, 3.4rem); line-height: 1.04; margin: 0.7rem 0 0.7rem;
+  background: linear-gradient(105deg, var(--text-primary) 10%, var(--accent) 70%, var(--accent-2) 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sco-hero p { font-size: clamp(0.98rem, 2vw, 1.12rem); color: var(--text-secondary); margin: 0 0 1.2rem; line-height: 1.6; }
+.sco-hero p strong { color: var(--text-primary); }
+.sco-hero__cta { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+.sco-hero__chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* ---------------- live demo ---------------- */
+.sco-demo { padding: clamp(1.2rem, 3vw, 1.8rem); }
+.sco-demo__hint { margin: 0 0 1rem; color: var(--text-secondary); font-size: 0.9rem; }
+.sco-open { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; font-weight: 700; color: var(--accent); }
+.sco-open:hover { color: var(--accent-strong); }
+
+.sco-frame {
+  position: relative; width: 100%; height: clamp(560px, 78vh, 880px);
+  border-radius: var(--radius-md); overflow: hidden;
+  border: 1px solid var(--border-strong); background: #15100d;
+}
+.sco-frame iframe { width: 100%; height: 100%; border: 0; opacity: 0; transition: opacity 0.4s ease; }
+.sco-frame iframe.is-loaded { opacity: 1; }
+.sco-frame__loading {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); font-size: 0.9rem; font-weight: 600;
+}
+
+/* ---------------- blocks ---------------- */
+.sco-block { padding: 0.25rem 0; }
+
+/* shopper flow */
+.sco-flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8rem; }
+.sco-step {
+  position: relative; padding: 1.3rem 1.1rem 1.2rem; border-radius: var(--radius-md);
+  background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--accent);
+}
+.sco-step__icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+  border-radius: 12px; color: var(--accent); background: var(--accent-soft); margin-bottom: 0.6rem;
+}
+.sco-step__n { position: absolute; top: 0.8rem; right: 1rem; font-family: var(--font-display); font-weight: 800; font-size: 1.5rem; color: var(--accent); opacity: 0.18; }
+.sco-step h3 { margin: 0 0 0.4rem; font-size: 1.02rem; display: flex; flex-direction: column; gap: 0.1rem; }
+.sco-step h3 small { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; }
+.sco-step p { margin: 0; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
+.sco-step__arrow { position: absolute; top: 50%; right: -0.65rem; transform: translateY(-50%); z-index: 2; color: var(--accent); background: var(--page-bg); border-radius: 50%; display: flex; }
+
+/* capabilities */
+.sco-caps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.sco-cap { padding: 1.4rem; border-radius: var(--radius-md); border-left: 3px solid var(--c); }
+.sco-cap__icon { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); margin-bottom: 0.7rem; }
+.sco-cap h3 { margin: 0 0 0.4rem; font-size: 1.05rem; }
+.sco-cap p { margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.55; }
+
+/* integration architecture */
+.sco-arch { padding: clamp(1.4rem, 3vw, 2rem); }
+.sco-arch__chain { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.5rem; }
+.sco-arch__node { position: relative; flex: 1 1 150px; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; padding: 1rem 0.6rem; border-radius: var(--radius-sm); background: var(--surface-sunken); border: 1px solid var(--border); text-align: center; }
+.sco-arch__icon { display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 50%; color: var(--accent); background: var(--accent-soft); }
+.sco-arch__label { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); }
+.sco-arch__link { position: absolute; right: -0.5rem; top: 50%; width: 0.5rem; height: 3px; transform: translateY(-50%); background: var(--accent); opacity: 0.5; z-index: 1; }
+.sco-arch__note { margin: 1.2rem 0 0; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+.sco-arch__note strong { color: var(--text-primary); }
+
+/* foundation band */
+.sco-foundation {
+  padding: clamp(1.6rem, 4vw, 2.4rem);
+  background: radial-gradient(600px 260px at 0% -20%, var(--accent-soft), transparent 70%), var(--surface);
+  border: 1px solid var(--border-strong);
+}
+.sco-foundation h2 { margin: 0.7rem 0 0.6rem; }
+.sco-foundation p { margin: 0 0 1.2rem; max-width: 70ch; color: var(--text-secondary); line-height: 1.65; }
+.sco-foundation code { font-family: var(--font-mono); font-size: 0.85em; background: var(--code-bg); color: var(--code-text); padding: 0.1rem 0.4rem; border-radius: 5px; }
+.sco-foundation__links { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+/* two-column lists (screens/overlays, promotions, scope) */
+.sco-twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.sco-list { padding: 1.3rem 1.4rem; border-radius: var(--radius-md); }
+.sco-list h3 { display: flex; align-items: center; gap: 0.4rem; margin: 0 0 0.9rem; font-size: 1rem; }
+.sco-list h3 span { margin-left: auto; font-size: 0.78rem; font-weight: 800; color: var(--accent); background: var(--accent-soft); padding: 0.1rem 0.55rem; border-radius: 999px; }
+.sco-list__good { color: var(--success); }
+.sco-list__muted { color: var(--text-secondary); }
+
+.sco-tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.sco-tag {
+  font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);
+  background: var(--surface-sunken); border: 1px solid var(--border);
+  padding: 0.34rem 0.7rem; border-radius: 999px;
+}
+.sco-tag--gold { color: color-mix(in srgb, var(--accent-2) 70%, var(--text-primary)); background: var(--accent-2-soft); border-color: color-mix(in srgb, var(--accent-2) 30%, transparent); }
+.sco-tag--good { color: var(--success); background: var(--success-bg); border-color: color-mix(in srgb, var(--success) 30%, transparent); }
+
+.sco-fineprint { margin: 0.8rem 0 0; font-size: 0.78rem; color: var(--text-muted); font-style: italic; }
+
+/* api chips */
+.sco-apis { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 1.2rem; padding-top: 1.1rem; border-top: 1px solid var(--border); }
+.sco-apis__label { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-right: 0.3rem; }
+.sco-api { font-size: 0.78rem; color: var(--text-secondary); background: var(--surface-sunken); border: 1px solid var(--border); padding: 0.3rem 0.6rem; border-radius: 8px; }
+.sco-api b { color: var(--accent); font-family: var(--font-mono); font-size: 0.74rem; }
+
+/* checklists */
+.sco-checks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+.sco-checks li { position: relative; padding-left: 1.4rem; font-size: 0.86rem; color: var(--text-secondary); line-height: 1.45; }
+.sco-checks li::before { content: '○'; position: absolute; left: 0; top: -1px; color: var(--text-muted); font-weight: 700; }
+.sco-checks--good li::before { content: '→'; color: var(--success); }
+
+/* ---------------- responsive ---------------- */
+@media (max-width: 1024px) {
+  .sco-flow { grid-template-columns: repeat(2, 1fr); }
+  .sco-step__arrow { display: none; }
+  .sco-caps { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  .sco-twocol { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  .sco-flow { grid-template-columns: 1fr; }
+  .sco-caps { grid-template-columns: 1fr; }
+  .sco-frame { height: 70vh; }
+}

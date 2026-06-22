@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Nunito+Sans:wght@400;600;700;800;900&family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;-webkit-font-smoothing:antialiased;}
+  @keyframes scoSpin{to{transform:rotate(360deg);}}
+  @keyframes scoBlink{0%,100%{opacity:1;}50%{opacity:.25;}}
+  @keyframes scoDots{0%,80%,100%{opacity:.25;transform:translateY(0);}40%{opacity:1;transform:translateY(-7px);}}
+  @keyframes scoRise{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes scoPop{0%{opacity:0;transform:scale(.92);}55%{transform:scale(1.02);}100%{opacity:1;transform:scale(1);}}
+  @keyframes scoScanLine{0%{transform:translateY(-120px);}100%{transform:translateY(120px);}}
+  @keyframes scoBeam{0%,100%{opacity:.3;}50%{opacity:.9;}}
+  @keyframes scoPulseR{0%,100%{transform:scale(1);box-shadow:0 20px 50px rgba(0,0,0,.28),0 0 0 0 rgba(255,255,255,.55);}50%{transform:scale(1.03);box-shadow:0 28px 70px rgba(0,0,0,.34),0 0 0 28px rgba(255,255,255,0);}}
+  @keyframes scoFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  @keyframes scoCheck{0%{stroke-dashoffset:60;}100%{stroke-dashoffset:0;}}
+</style>
+</helmet>
+
+<div style="min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;gap:28px;background:radial-gradient(circle at 50% 24%,#33271f,#15100d 72%);padding:24px;">
+
+  <!-- ===================== PROTOTYPE CONTROL PANEL ===================== -->
+  <div style="flex:none;width:264px;align-self:stretch;max-height:96vh;overflow:auto;background:#1c1512;border:1px solid #34271f;border-radius:18px;padding:18px;color:#e7d9d0;font-family:'Nunito Sans',sans-serif;font-size:13px;">
+    <div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:15px;color:#fff;letter-spacing:.3px;">Prototype controls</div>
+    <div style="color:#9c857a;font-size:11.5px;margin-top:2px;line-height:1.4;">Tap through the real kiosk, or jump to any state to review.</div>
+
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#7a655b;margin:18px 0 8px;">Screens</div>
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      <button onClick="{{ goIdle }}" style="text-align:left;padding:10px 12px;border-radius:9px;border:1px solid #3a2c24;background:{{ idleBtnBg }};color:#f1e6df;font-size:13px;font-weight:700;cursor:pointer;">1 · Idle / Attract</button>
+      <button onClick="{{ goScan }}" style="text-align:left;padding:10px 12px;border-radius:9px;border:1px solid #3a2c24;background:{{ scanBtnBg }};color:#f1e6df;font-size:13px;font-weight:700;cursor:pointer;">2 · Scan &amp; Cart</button>
+      <button onClick="{{ goMember }}" style="text-align:left;padding:10px 12px;border-radius:9px;border:1px solid #3a2c24;background:{{ memberBtnBg }};color:#f1e6df;font-size:13px;font-weight:700;cursor:pointer;">4 · Member &amp; Discounts</button>
+      <button onClick="{{ goPayment }}" style="text-align:left;padding:10px 12px;border-radius:9px;border:1px solid #3a2c24;background:{{ payBtnBg }};color:#f1e6df;font-size:13px;font-weight:700;cursor:pointer;">5 · Payment method</button>
+      <button onClick="{{ goReceipt }}" style="text-align:left;padding:10px 12px;border-radius:9px;border:1px solid #3a2c24;background:{{ receiptBtnBg }};color:#f1e6df;font-size:13px;font-weight:700;cursor:pointer;">7 · Receipt</button>
+      <button onClick="{{ beginTxn }}" style="text-align:left;padding:10px 12px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:13px;font-weight:700;cursor:pointer;">Member step (pre-scan)</button>
+      <button onClick="{{ openStaff }}" style="text-align:left;padding:10px 12px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:13px;font-weight:700;cursor:pointer;">Staff settings</button>
+    </div>
+
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#7a655b;margin:18px 0 8px;">Overlays</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+      <button onClick="{{ ovWeightBtn }}" style="padding:9px 8px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:12px;font-weight:700;cursor:pointer;">Weight</button>
+      <button onClick="{{ ovPriceBtn }}" style="padding:9px 8px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:12px;font-weight:700;cursor:pointer;">Price entry</button>
+      <button onClick="{{ ovAttendantBtn }}" style="padding:9px 8px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:12px;font-weight:700;cursor:pointer;">Attendant</button>
+      <button onClick="{{ ovUnknownBtn }}" style="padding:9px 8px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:12px;font-weight:700;cursor:pointer;">Unknown</button>
+      <button onClick="{{ ovHelpBtn }}" style="padding:9px 8px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:12px;font-weight:700;cursor:pointer;">Call staff</button>
+      <button onClick="{{ ovTimeoutBtn }}" style="padding:9px 8px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:12px;font-weight:700;cursor:pointer;">Timeout</button>
+    </div>
+
+    <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#7a655b;margin:18px 0 8px;">Simulate</div>
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      <button onClick="{{ toggleOnline }}" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:13px;font-weight:700;cursor:pointer;"><span>Connectivity</span><span style="color:{{ onlineColor }};font-weight:800;">{{ onlineLabel }}</span></button>
+      <button onClick="{{ togglePayFail }}" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:13px;font-weight:700;cursor:pointer;"><span>Next payment</span><span style="color:{{ payFailColor }};font-weight:800;">{{ payFailLabel }}</span></button>
+      <button onClick="{{ toggleReach }}" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:9px;border:1px solid #3a2c24;background:#241a15;color:#f1e6df;font-size:13px;font-weight:700;cursor:pointer;"><span>Reach mode (a11y)</span><span style="color:{{ reachColor }};font-weight:800;">{{ reachLabel }}</span></button>
+      <button onClick="{{ reset }}" style="padding:11px 12px;border-radius:9px;border:1px solid #7f1d1d;background:#3b1414;color:#fca5a5;font-size:13px;font-weight:800;cursor:pointer;margin-top:2px;">Reset everything</button>
+    </div>
+  </div>
+
+  <!-- ===================== KIOSK DEVICE ===================== -->
+  <div style="{{ deviceOuterStyle }}">
+   <div style="{{ deviceInnerStyle }}">
+
+    <!-- ============ PERSISTENT HEADER (all customer screens) ============ -->
+    <sc-if value="{{ showHeader }}" hint-placeholder-val="{{ true }}">
+    <div style="flex:none;height:158px;background:#fff;border-bottom:1px solid #ECE3DE;display:flex;align-items:center;gap:16px;padding:0 34px;box-shadow:0 3px 14px rgba(33,27,26,.07);position:relative;z-index:6;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;">
+      <sc-if value="{{ canBack }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ goScan }}" style="flex:none;width:62px;height:62px;border-radius:14px;background:#F1ECE9;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#5C4F49" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg></button>
+      </sc-if>
+      <img src="assets/foodland_logo.png" alt="Foodland" style="height:62px;display:block;flex:none;">
+      <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+        <div style="display:flex;align-items:center;gap:10px;"><div style="width:52px;height:52px;border-radius:50%;background:{{ s1Bg }};display:flex;align-items:center;justify-content:center;font-family:'Rubik',sans-serif;font-weight:800;font-size:25px;color:{{ s1Col }};"><sc-if value="{{ s1Done }}" hint-placeholder-val="{{ false }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></sc-if><sc-if value="{{ s1Num }}" hint-placeholder-val="{{ true }}">1</sc-if></div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:21px;line-height:1.1;color:{{ s1Lab }};">สแกน<br><span style="font-size:16px;opacity:.82;">Scan</span></div></div>
+        <div style="width:42px;height:3px;background:{{ conn1Bg }};margin:0 14px;border-radius:2px;"></div>
+        <div style="display:flex;align-items:center;gap:10px;"><div style="width:52px;height:52px;border-radius:50%;background:{{ s2Bg }};display:flex;align-items:center;justify-content:center;font-family:'Rubik',sans-serif;font-weight:800;font-size:25px;color:{{ s2Col }};"><sc-if value="{{ s2Done }}" hint-placeholder-val="{{ false }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></sc-if><sc-if value="{{ s2Num }}" hint-placeholder-val="{{ true }}">2</sc-if></div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:21px;line-height:1.1;color:{{ s2Lab }};">ชำระเงิน<br><span style="font-size:16px;opacity:.82;">Pay</span></div></div>
+        <div style="width:42px;height:3px;background:{{ conn2Bg }};margin:0 14px;border-radius:2px;"></div>
+        <div style="display:flex;align-items:center;gap:10px;"><div style="width:52px;height:52px;border-radius:50%;background:{{ s3Bg }};display:flex;align-items:center;justify-content:center;font-family:'Rubik',sans-serif;font-weight:800;font-size:25px;color:{{ s3Col }};"><sc-if value="{{ s3Done }}" hint-placeholder-val="{{ false }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></sc-if><sc-if value="{{ s3Num }}" hint-placeholder-val="{{ true }}">3</sc-if></div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:21px;line-height:1.1;color:{{ s3Lab }};">เสร็จ<br><span style="font-size:16px;opacity:.82;">Done</span></div></div>
+      </div>
+      <div style="flex:none;display:flex;align-items:center;gap:11px;">
+        <div style="display:flex;align-items:center;gap:8px;background:{{ statusBg }};border-radius:30px;padding:11px 16px;"><span style="width:12px;height:12px;border-radius:50%;background:{{ statusDot }};"></span><span style="font-weight:800;font-size:17px;color:{{ statusText }};">{{ statusLabel }}</span></div>
+        <div style="display:flex;background:#F1ECE9;border-radius:12px;padding:5px;gap:3px;">
+          <button onClick="{{ setTH }}" style="border:none;cursor:pointer;padding:10px 15px;border-radius:9px;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:18px;background:{{ thPillBg2 }};color:{{ thPillColor2 }};">ไทย</button>
+          <button onClick="{{ setEN }}" style="border:none;cursor:pointer;padding:10px 15px;border-radius:9px;font-family:'Rubik',sans-serif;font-weight:800;font-size:18px;background:{{ enPillBg2 }};color:{{ enPillColor2 }};">EN</button>
+        </div>
+        <button onClick="{{ callHelp }}" title="Help" style="flex:none;width:56px;height:56px;border-radius:13px;background:#F1ECE9;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5C4F49" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>
+        <button onClick="{{ openStaff }}" title="Staff" style="flex:none;width:56px;height:56px;border-radius:13px;background:#F1ECE9;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5C4F49" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ============ CONTENT REGION ============ -->
+    <div style="flex:1;position:relative;overflow:hidden;">
+
+    <!-- ================= SCREEN 1 — IDLE / ATTRACT ================= -->
+    <sc-if value="{{ idleNormal }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Idle" style="position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,#E2231A,#C2161A 58%,#9E1014);display:flex;flex-direction:column;color:#fff;overflow:hidden;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;">
+      <!-- food line-icon pattern -->
+      <div style="position:absolute;inset:0;pointer-events:none;color:#fff;">
+        <svg style="position:absolute;top:150px;left:60px;opacity:.5;" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>
+        <svg style="position:absolute;top:330px;left:180px;opacity:.42;" width="104" height="104" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 5V2l-5.89 5.89"/><circle cx="16.6" cy="15.89" r="3"/><circle cx="8.11" cy="7.4" r="3"/><circle cx="12.35" cy="11.65" r="3"/><circle cx="13.91" cy="5.85" r="3"/><circle cx="18.15" cy="10.09" r="3"/><circle cx="6.56" cy="13.2" r="3"/><circle cx="10.8" cy="17.44" r="3"/><circle cx="5" cy="19" r="3"/></svg>
+        <svg style="position:absolute;top:560px;left:70px;opacity:.45;" width="92" height="92" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.27 21.7s9.87-3.5 12.73-6.36a4.5 4.5 0 0 0-6.36-6.37C5.77 11.84 2.27 21.7 2.27 21.7zM8.64 14l-2.05-2.04M15.34 15l-2.46-2.46"/><path d="M22 9s-1.33-2-3.5-2C16.86 7 15 9 15 9s1.33 2 3.5 2S22 9 22 9z"/><path d="M15 2s-2 1.33-2 3.5S15 9 15 9s2-1.84 2-4-2-3-2-3z"/></svg>
+        <svg style="position:absolute;top:820px;left:150px;opacity:.4;" width="110" height="110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3Z"/><path d="M12 17a5 5 0 0 0 10 0c0-2.76-2.5-5-5-3-2.5-2-5 .24-5 3Z"/><path d="M7 14c3.22-2.91 4.29-8.75 5-12 1.66 2.38 4.94 9 5 12"/><path d="M22 9c-4.29 0-7.14-2.33-10-7 5.71 0 10 4.67 10 7Z"/></svg>
+        <svg style="position:absolute;top:230px;right:80px;opacity:.45;" width="104" height="104" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M2.27 21.7s9.87-3.5 12.73-6.36a4.5 4.5 0 0 0-6.36-6.37C5.77 11.84 2.27 21.7 2.27 21.7z"/><path d="M8.64 14l-2.05-2.04"/></svg>
+        <svg style="position:absolute;top:430px;right:60px;opacity:.4;" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v2"/><path d="M14 2v2"/><path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1"/><path d="M6 2v2"/></svg>
+        <svg style="position:absolute;top:660px;right:120px;opacity:.45;" width="92" height="92" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c6.23-.05 7.87-5.57 7.5-10-.36-4.34-3.95-9.96-7.5-10-3.55.04-7.14 5.66-7.5 10-.37 4.43 1.27 9.95 7.5 10z"/></svg>
+        <svg style="position:absolute;top:1180px;left:90px;opacity:.4;" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5"/><path d="M8.5 8.5v.01"/><path d="M16 15.5v.01"/><path d="M12 12v.01"/><path d="M11 17v.01"/><path d="M7 14v.01"/></svg>
+        <svg style="position:absolute;top:1320px;right:90px;opacity:.42;" width="104" height="104" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="m7 11 4.08 10.35a1 1 0 0 0 1.84 0L17 11"/><path d="M17 7A5 5 0 0 0 7 7"/><path d="M17 7a2 2 0 0 1 0 4H7a2 2 0 0 1 0-4"/></svg>
+        <svg style="position:absolute;top:1150px;right:200px;opacity:.4;" width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21.66 17.67a1.08 1.08 0 0 1-.04 1.6A12 12 0 0 1 4.73 2.38a1.1 1.1 0 0 1 1.61-.04z"/><path d="M19.65 15.66A8 8 0 0 1 8.35 4.34"/><path d="m14 10-5.5 5.5"/><path d="M14 17.85V10H6.15"/></svg>
+        <svg style="position:absolute;top:1480px;left:240px;opacity:.4;" width="110" height="110" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5.15 17.89c5.52-1.52 8.65-6.89 7-12C11.55 4 11.5 2 13 2c3.22 0 5 5.5 5 8 0 6.5-4.2 12-10.49 12C5.11 22 2 22 2 20c0-1.5 1.14-1.55 3.15-2.11Z"/></svg>
+        <svg style="position:absolute;top:1520px;right:120px;opacity:.45;" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>
+      </div>
+
+      <!-- top bar: staff/help + logo + lang -->
+      <div style="position:relative;z-index:2;display:flex;align-items:flex-start;justify-content:space-between;padding:44px 48px 0;">
+        <div style="display:flex;gap:12px;">
+          <button onClick="{{ openStaff }}" title="Staff" style="width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.16);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></button>
+          <button onClick="{{ callHelp }}" title="Help" style="width:60px;height:60px;border-radius:14px;background:rgba(255,255,255,.16);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg></button>
+        </div>
+        <div style="position:absolute;left:50%;top:32px;transform:translateX(-50%);background:#fff;border-radius:24px;padding:16px 32px;box-shadow:0 16px 44px rgba(0,0,0,.28);"><img src="assets/foodland_open24.png" alt="Foodland Supermarket · Open 24 Hours" style="height:138px;display:block;"></div>
+        <div style="display:flex;align-items:center;gap:14px;font-family:'Rubik',sans-serif;font-weight:800;font-size:30px;">
+          <button onClick="{{ setTH }}" style="background:none;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:30px;color:{{ idleTHcol }};">TH</button>
+          <span style="opacity:.4;">|</span>
+          <button onClick="{{ setEN }}" style="background:none;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:30px;color:{{ idleENcol }};">EN</button>
+          <span style="opacity:.4;">|</span>
+          <button onClick="{{ setCN }}" style="background:none;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:30px;color:{{ idleCNcol }};">CN</button>
+        </div>
+      </div>
+
+      <div style="position:relative;z-index:2;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 64px;">
+        <div style="position:relative;width:300px;height:300px;margin-bottom:46px;display:flex;align-items:center;justify-content:center;">
+          <div style="position:absolute;inset:0;border-radius:50%;background:rgba(255,255,255,.10);"></div>
+          <div style="position:absolute;inset:30px;border-radius:50%;background:rgba(255,255,255,.13);"></div>
+          <div style="position:absolute;inset:60px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 50px rgba(0,0,0,.28);">
+            <svg width="104" height="104" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          </div>
+          <span style="position:absolute;top:4px;right:8px;background:#F5B800;color:#7A0F0C;font-family:'Rubik',sans-serif;font-weight:800;font-size:24px;padding:8px 18px;border-radius:30px;transform:rotate(8deg);box-shadow:0 6px 16px rgba(0,0,0,.22);">SELF CHECKOUT</span>
+        </div>
+        <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:48px;color:#fff;margin-bottom:8px;">ยินดีต้อนรับสู่ฟู้ดแลนด์</div>
+        <div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:26px;color:rgba(255,255,255,.78);letter-spacing:1px;margin-bottom:46px;">WELCOME · ชำระเงินด้วยตนเอง</div>
+        <button onClick="{{ beginTxn }}" style="background:#fff;border:none;cursor:pointer;border-radius:90px;padding:42px 100px;box-shadow:0 22px 60px rgba(0,0,0,.32);display:flex;flex-direction:column;align-items:center;gap:2px;animation:scoPulseR 2.6s ease-in-out infinite;">
+          <span style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:40px;color:#9E1014;">แตะเพื่อเริ่ม</span>
+          <span style="font-family:'Rubik',sans-serif;font-weight:800;font-size:70px;line-height:1.05;color:#E2231A;letter-spacing:1px;">TOUCH TO START</span>
+        </button>
+
+        <div style="margin-top:48px;display:flex;align-items:center;gap:18px;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:30px;color:#fff;">
+          <span>หรือสแกนสินค้าเพื่อเริ่ม · or Scan an Item to Begin</span>
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:74px;height:56px;background:#fff;border-radius:10px;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9E1014" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5v14"/><path d="M8 5v14"/><path d="M12 5v14"/><path d="M17 5v14"/><path d="M21 5v14"/></svg></span>
+        </div>
+      </div>
+
+      <!-- WELCOME AD BAND · left Promotion artwork + right 2-row promo products carousel -->
+      <div style="position:relative;z-index:2;background:#fff;box-shadow:0 -10px 30px rgba(0,0,0,.2);padding:16px 28px 6px;">
+        <div style="display:flex;gap:16px;height:340px;">
+          <!-- left: composed Promotion artwork -->
+          <div style="flex:none;width:300px;border-radius:18px;overflow:hidden;position:relative;background:linear-gradient(150deg,#E2231A,#A21210);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px;color:#fff;">
+            <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(0,0,0,.16) 3px, transparent 3.4px);background-size:24px 24px;opacity:.5;"></div>
+            <span style="position:relative;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:32px;letter-spacing:1px;">โปรโมชั่น</span>
+            <span style="position:relative;font-family:'Rubik',sans-serif;font-weight:800;font-size:18px;opacity:.82;letter-spacing:4px;margin-top:2px;">PROMOTION</span>
+            <div style="position:relative;font-family:'Rubik',sans-serif;font-weight:800;font-size:96px;line-height:.88;-webkit-text-stroke:6px #7A0F0C;paint-order:stroke fill;margin:12px 0 10px;">1+1</div>
+            <div style="position:relative;background:linear-gradient(180deg,#FFE24D,#F5B800);color:#C2161A;font-family:'Rubik',sans-serif;font-weight:800;font-size:34px;padding:5px 30px;border-radius:13px;transform:rotate(-3deg);box-shadow:0 5px 0 rgba(122,15,12,.3);">FREE</div>
+            <div style="position:relative;margin-top:16px;background:#fff;color:#B71C16;font-weight:800;font-size:15px;padding:7px 16px;border-radius:20px;">ดีลประจำสัปดาห์ · This week</div>
+          </div>
+          <!-- right: sliding promo products, 2 rows -->
+          <div style="flex:1;min-width:0;border-radius:14px;overflow:hidden;position:relative;">
+            <div style="display:flex;height:100%;transition:transform .7s cubic-bezier(.4,0,.2,1);transform:{{ adTrackTransform }};">
+              <div style="flex:none;width:100%;height:100%;display:flex;flex-direction:column;gap:8px;">
+                <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;"><img src="assets/ads1_snack.png" alt="promo" style="max-width:100%;max-height:100%;object-fit:contain;"></div>
+                <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;"><img src="assets/ads2_milk.png" alt="promo" style="max-width:100%;max-height:100%;object-fit:contain;"></div>
+              </div>
+              <div style="flex:none;width:100%;height:100%;display:flex;flex-direction:column;gap:8px;">
+                <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;"><img src="assets/ads3_sauce.png" alt="promo" style="max-width:100%;max-height:100%;object-fit:contain;"></div>
+                <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;"><img src="assets/ads1_snack.png" alt="promo" style="max-width:100%;max-height:100%;object-fit:contain;"></div>
+              </div>
+              <div style="flex:none;width:100%;height:100%;display:flex;flex-direction:column;gap:8px;">
+                <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;"><img src="assets/ads2_milk.png" alt="promo" style="max-width:100%;max-height:100%;object-fit:contain;"></div>
+                <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;"><img src="assets/ads3_sauce.png" alt="promo" style="max-width:100%;max-height:100%;object-fit:contain;"></div>
+              </div>
+              <div style="flex:none;width:100%;height:100%;display:flex;flex-direction:column;gap:8px;">
+                <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;"><img src="assets/ads1_snack.png" alt="promo" style="max-width:100%;max-height:100%;object-fit:contain;"></div>
+                <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;"><img src="assets/ads3_sauce.png" alt="promo" style="max-width:100%;max-height:100%;object-fit:contain;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0 6px;">
+          <button onClick="{{ goSlide0 }}" style="width:{{ adDotW0 }};height:12px;border-radius:6px;border:none;cursor:pointer;background:{{ adDotBg0 }};transition:all .4s ease;"></button>
+          <button onClick="{{ goSlide1 }}" style="width:{{ adDotW1 }};height:12px;border-radius:6px;border:none;cursor:pointer;background:{{ adDotBg1 }};transition:all .4s ease;"></button>
+          <button onClick="{{ goSlide2 }}" style="width:{{ adDotW2 }};height:12px;border-radius:6px;border:none;cursor:pointer;background:{{ adDotBg2 }};transition:all .4s ease;"></button>
+          <button onClick="{{ goSlide3 }}" style="width:{{ adDotW3 }};height:12px;border-radius:6px;border:none;cursor:pointer;background:{{ adDotBg3 }};transition:all .4s ease;"></button>
+        </div>
+      </div>
+
+      <!-- bottom footer / status strip -->
+      <div style="position:relative;z-index:2;background:#9E1014;display:flex;align-items:center;justify-content:center;gap:14px;padding:16px 0 18px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <span style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:26px;letter-spacing:2px;color:#fff;">OPEN 24 HOURS · บริการ 24 ชั่วโมง</span>
+      </div>
+
+    </div>
+    </sc-if>
+
+    <!-- ================= IDLE — OUT OF SERVICE ================= -->
+    <sc-if value="{{ idleDown }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Out of service" style="position:absolute;inset:0;background:linear-gradient(168deg,#3A2922,#1c100d);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#fff;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;padding:0 80px;">
+      <div style="background:#fff;border-radius:22px;padding:18px 28px;box-shadow:0 12px 34px rgba(0,0,0,.3);"><img src="assets/foodland_logo.png" alt="Foodland" style="height:88px;display:block;"></div>
+      <div style="width:150px;height:150px;border-radius:50%;background:rgba(245,184,0,.16);display:flex;align-items:center;justify-content:center;margin-top:56px;"><svg width="84" height="84" viewBox="0 0 24 24" fill="none" stroke="#F5B800" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
+      <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:56px;margin-top:40px;">ปิดให้บริการชั่วคราว</div>
+      <div style="font-weight:700;font-size:32px;color:#C9B6AC;margin-top:6px;">Checkout temporarily unavailable</div>
+      <div style="font-weight:600;font-size:26px;color:#C9B6AC;margin-top:28px;max-width:760px;line-height:1.4;">ขออภัยในความไม่สะดวก กรุณาใช้เครื่องถัดไป หรือเคาน์เตอร์พนักงาน<br>Please use the next kiosk or a staffed lane.</div>
+      <button onClick="{{ openStaff }}" style="margin-top:56px;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.14);border:none;cursor:pointer;color:#fff;font-weight:800;font-size:22px;padding:18px 30px;border-radius:14px;font-family:'Rubik','Noto Sans Thai',sans-serif;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>เข้าสู่โหมดพนักงาน · Staff login</button>
+    </div>
+    </sc-if>
+
+    <!-- ================= STAFF — PIN GATE ================= -->
+    <sc-if value="{{ isStaffPin }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Staff PIN" style="position:absolute;inset:0;background:linear-gradient(168deg,#2A1D18,#15100d);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;padding:0 80px;">
+      <div style="width:104px;height:104px;border-radius:26px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#F5B800" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+      <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:42px;margin-top:26px;">โหมดพนักงาน</div>
+      <div style="font-weight:700;font-size:26px;color:#C9B6AC;">Staff mode · enter PIN</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:18px;height:96px;margin:34px 0 28px;min-width:340px;padding:0 40px;background:rgba(255,255,255,.08);border-radius:18px;font-family:'Rubik',sans-serif;font-weight:800;font-size:46px;letter-spacing:8px;color:#fff;">
+        <sc-if value="{{ pinHasDigits }}" hint-placeholder-val="{{ false }}">{{ pinMask }}</sc-if>
+        <sc-if value="{{ pinEmpty }}" hint-placeholder-val="{{ true }}"><span style="color:rgba(255,255,255,.35);letter-spacing:6px;">····</span></sc-if>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;width:430px;">
+        <button onClick="{{ k1 }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#fff;">1</button>
+        <button onClick="{{ k2 }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#fff;">2</button>
+        <button onClick="{{ k3 }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#fff;">3</button>
+        <button onClick="{{ k4 }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#fff;">4</button>
+        <button onClick="{{ k5 }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#fff;">5</button>
+        <button onClick="{{ k6 }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#fff;">6</button>
+        <button onClick="{{ k7 }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#fff;">7</button>
+        <button onClick="{{ k8 }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#fff;">8</button>
+        <button onClick="{{ k9 }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#fff;">9</button>
+        <button onClick="{{ kBack }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:30px;color:#C9B6AC;">⌫</button>
+        <button onClick="{{ k0 }}" style="height:96px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#fff;">0</button>
+        <button onClick="{{ staffEnter }}" style="height:96px;border-radius:16px;border:none;background:#1F8A4C;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></button>
+      </div>
+      <button onClick="{{ exitStaff }}" style="margin-top:30px;background:transparent;border:none;cursor:pointer;color:#C9B6AC;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;">ยกเลิก · Cancel</button>
+    </div>
+    </sc-if>
+
+    <!-- ================= STAFF — DASHBOARD ================= -->
+    <sc-if value="{{ isStaff }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Staff settings" style="position:absolute;inset:0;background:#F6F1EE;display:flex;flex-direction:column;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;">
+      <div style="background:#211B1A;color:#fff;padding:24px 40px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:18px;">
+          <div style="background:#fff;border-radius:12px;padding:8px 14px;"><img src="assets/foodland_logo.png" alt="Foodland" style="height:44px;display:block;"></div>
+          <div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:28px;">โหมดพนักงาน · Staff mode</div><div style="font-weight:700;font-size:18px;color:#C9B6AC;">Terminal SCO-42 · Branch 0021 · Attendant: ใจดี (1042)</div></div>
+        </div>
+        <button onClick="{{ exitStaff }}" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.14);border:none;cursor:pointer;border-radius:14px;padding:15px 24px;font-weight:800;font-size:21px;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>ออก · Exit</button>
+      </div>
+
+      <div style="flex:1;overflow:auto;padding:28px 40px;">
+        <!-- status row -->
+        <div style="display:flex;gap:16px;margin-bottom:24px;">
+          <div style="flex:1;background:{{ svcCardBg }};border:1px solid {{ svcCardBorder }};border-radius:18px;padding:22px 24px;"><div style="display:flex;align-items:center;gap:10px;"><span style="width:14px;height:14px;border-radius:50%;background:{{ svcDot }};"></span><span style="font-weight:800;font-size:19px;color:{{ svcText }};">{{ svcLabel }}</span></div><div style="font-weight:700;font-size:17px;color:#8A7E79;margin-top:8px;">สถานะเครื่อง · Terminal status</div></div>
+          <div style="flex:1;background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:22px 24px;"><div style="font-family:'Rubik',sans-serif;font-weight:800;font-size:30px;color:#211B1A;">฿48,920</div><div style="font-weight:700;font-size:17px;color:#8A7E79;margin-top:4px;">ยอดขายกะนี้ · Shift sales</div></div>
+          <div style="flex:1;background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:22px 24px;"><div style="font-family:'Rubik',sans-serif;font-weight:800;font-size:30px;color:#211B1A;">312</div><div style="font-weight:700;font-size:17px;color:#8A7E79;margin-top:4px;">จำนวนบิล · Transactions</div></div>
+          <div style="flex:1;background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:22px 24px;"><div style="font-family:'Rubik',sans-serif;font-weight:800;font-size:30px;color:#211B1A;">06:14</div><div style="font-weight:700;font-size:17px;color:#8A7E79;margin-top:4px;">เวลากะ · Shift time</div></div>
+        </div>
+
+        <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:22px;color:#8A7E79;margin-bottom:14px;letter-spacing:.5px;">การดำเนินการ · ACTIONS</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+          <button onClick="{{ staffPrintX }}" style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:26px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(33,27,26,.04);" style-active="background:#FDECEA;transform:scale(.98);"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg><div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;color:#211B1A;">พิมพ์รายงานยอดขาย</div><div style="font-weight:700;font-size:18px;color:#8A7E79;">Print X report</div></div></button>
+          <button onClick="{{ staffEndShift }}" style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:26px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(33,27,26,.04);" style-active="background:#FDECEA;transform:scale(.98);"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m17 11 2 2 4-4"/></svg><div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;color:#211B1A;">ปิดกะ (Z Report)</div><div style="font-weight:700;font-size:18px;color:#8A7E79;">End shift &amp; settle</div></div></button>
+          <button onClick="{{ toggleTerminal }}" style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:26px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(33,27,26,.04);" style-active="background:#FDECEA;transform:scale(.98);"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64A9 9 0 1 1 5.64 6.64"/><line x1="12" x2="12" y1="2" y2="12"/></svg><div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;color:#211B1A;">{{ svcAction }}</div><div style="font-weight:700;font-size:18px;color:#8A7E79;">Terminal availability</div></div></button>
+          <button onClick="{{ staffCash }}" style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:26px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(33,27,26,.04);" style-active="background:#FDECEA;transform:scale(.98);"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1F8A4C" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg><div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;color:#211B1A;">เปิดลิ้นชักเงินสด</div><div style="font-weight:700;font-size:18px;color:#8A7E79;">Open cash drawer</div></div></button>
+          <button onClick="{{ staffPickup }}" style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:26px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(33,27,26,.04);" style-active="background:#FDECEA;transform:scale(.98);"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1F8A4C" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M12 8v8"/></svg><div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;color:#211B1A;">เก็บเงิน (Pickup)</div><div style="font-weight:700;font-size:18px;color:#8A7E79;">Cash pickup</div></div></button>
+          <button onClick="{{ staffReprint }}" style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:26px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(33,27,26,.04);" style-active="background:#FDECEA;transform:scale(.98);"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg><div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;color:#211B1A;">พิมพ์ใบเสร็จล่าสุดซ้ำ</div><div style="font-weight:700;font-size:18px;color:#8A7E79;">Reprint last receipt</div></div></button>
+          <button onClick="{{ staffPaper }}" style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:26px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(33,27,26,.04);" style-active="background:#FDECEA;transform:scale(.98);"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#8A7E79" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z"/><path d="M14 2v6h6"/></svg><div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;color:#211B1A;">เปลี่ยนกระดาษ</div><div style="font-weight:700;font-size:18px;color:#8A7E79;">Receipt paper change</div></div></button>
+          <button onClick="{{ staffLang }}" style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:26px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(33,27,26,.04);" style-active="background:#FDECEA;transform:scale(.98);"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;color:#211B1A;">ตั้งค่าภาษาเริ่มต้น</div><div style="font-weight:700;font-size:18px;color:#8A7E79;">Default language</div></div></button>
+          <button onClick="{{ reset }}" style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:26px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 2px rgba(33,27,26,.04);" style-active="background:#FDECEA;transform:scale(.98);"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#8A7E79" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg><div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;color:#211B1A;">รีเซ็ตหน้าจอ</div><div style="font-weight:700;font-size:18px;color:#8A7E79;">Reset to idle</div></div></button>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ================= MEMBER-FIRST STEP (after START) ================= -->
+    <sc-if value="{{ isMemberFirst }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Member first" style="position:absolute;inset:0;background:#F6F1EE;display:flex;flex-direction:column;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding:30px 40px 0;overflow:auto;">
+        <div style="text-align:center;">
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:40px;color:#211B1A;">เป็นสมาชิก Foodland หรือไม่?</div>
+          <div style="font-weight:700;font-size:24px;color:#8A7E79;margin-top:4px;">Foodland member? · รับราคาสมาชิกและสะสมคะแนนทันที</div>
+        </div>
+
+        <div style="width:680px;max-width:100%;margin-top:26px;">
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:22px;color:#211B1A;">กรอกเบอร์โทรศัพท์ · Enter Phone Number</div>
+          <div style="background:#fff;border:2px solid #F3CFC9;border-radius:18px;height:94px;display:flex;align-items:center;padding:0 28px;margin-top:10px;font-family:'Rubik',sans-serif;font-weight:700;font-size:42px;letter-spacing:3px;color:{{ phoneColor }};">{{ phoneShown }}<span style="width:3px;height:46px;background:#E2231A;margin-left:6px;animation:scoBlink 1s infinite;"></span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-top:16px;">
+            <button onClick="{{ k1 }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#211B1A;box-shadow:0 2px 4px rgba(33,27,26,.04);">1</button>
+            <button onClick="{{ k2 }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#211B1A;box-shadow:0 2px 4px rgba(33,27,26,.04);">2</button>
+            <button onClick="{{ k3 }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#211B1A;box-shadow:0 2px 4px rgba(33,27,26,.04);">3</button>
+            <button onClick="{{ k4 }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#211B1A;box-shadow:0 2px 4px rgba(33,27,26,.04);">4</button>
+            <button onClick="{{ k5 }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#211B1A;box-shadow:0 2px 4px rgba(33,27,26,.04);">5</button>
+            <button onClick="{{ k6 }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#211B1A;box-shadow:0 2px 4px rgba(33,27,26,.04);">6</button>
+            <button onClick="{{ k7 }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#211B1A;box-shadow:0 2px 4px rgba(33,27,26,.04);">7</button>
+            <button onClick="{{ k8 }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#211B1A;box-shadow:0 2px 4px rgba(33,27,26,.04);">8</button>
+            <button onClick="{{ k9 }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#211B1A;box-shadow:0 2px 4px rgba(33,27,26,.04);">9</button>
+            <button onClick="{{ kBack }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#F6F1EE;cursor:pointer;display:flex;align-items:center;justify-content:center;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#8A7E79" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"/><line x1="18" x2="12" y1="9" y2="15"/><line x1="12" x2="18" y1="9" y2="15"/></svg></button>
+            <button onClick="{{ k0 }}" style="height:92px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:36px;color:#211B1A;box-shadow:0 2px 4px rgba(33,27,26,.04);">0</button>
+            <button onClick="{{ memberFirstApply }}" style="height:92px;border-radius:16px;border:none;background:#E2231A;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(226,35,26,.32);"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg></button>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:18px;margin:24px 0 16px;"><div style="flex:1;height:1px;background:#E0D4CC;"></div><span style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:21px;color:#8A7E79;">OR · หรือ</span><div style="flex:1;height:1px;background:#E0D4CC;"></div></div>
+
+          <button onClick="{{ memberFirstApply }}" style="width:100%;background:#F1ECE9;border:1px solid #E0D4CC;border-radius:20px;padding:24px 28px;cursor:pointer;display:flex;align-items:center;gap:24px;">
+            <div style="flex:none;width:112px;height:112px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(33,27,26,.08);"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2"/><rect width="4" height="4" x="8" y="6"/><rect width="2" height="2" x="14" y="6"/><path d="M8 12h2v2H8z"/><path d="M14 12h2v4h-2z"/><path d="M12 18h.01"/></svg></div>
+            <div style="text-align:left;"><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:30px;color:#E2231A;">Scan Member QR</div><div style="font-weight:700;font-size:22px;color:#8A7E79;">สแกนคิวอาร์โค้ดสมาชิก</div></div>
+          </button>
+        </div>
+      </div>
+
+      <div style="background:#fff;border-top:1px solid #ECE3DE;padding:20px 40px 26px;display:flex;justify-content:center;">
+        <button onClick="{{ memberSkip }}" style="background:none;border:none;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:26px;color:#8A7E79;text-decoration:underline;text-underline-offset:5px;">ข้ามขั้นตอนนี้ ไปสแกนสินค้า · Skip &amp; start scanning</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ================= SCREEN 2 — SCAN & CART ================= -->
+    <sc-if value="{{ isScan }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Scan and Cart" style="position:absolute;inset:0;background:#F6F1EE;display:flex;flex-direction:column;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;">
+
+      <sc-if value="{{ offline }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#FEF3C7;border-bottom:1px solid #FCD34D;color:#92400E;display:flex;align-items:center;gap:14px;padding:15px 40px;font-weight:800;font-size:21px;"><span style="width:16px;height:16px;border-radius:50%;background:#F59E0B;animation:scoBlink 1.4s infinite;"></span>กำลังทำงานออฟไลน์ — ระบบจะซิงค์อัตโนมัติ · Working offline — will sync automatically</div>
+      </sc-if>
+
+      <!-- PDPA-masked member bar -->
+      <sc-if value="{{ hasMember }}" hint-placeholder-val="{{ false }}">
+        <div style="background:linear-gradient(90deg,#FDECEA,#fff);border-bottom:1px solid #F3CFC9;padding:14px 40px;display:flex;align-items:center;gap:16px;">
+          <div style="width:46px;height:46px;border-radius:50%;background:#E2231A;display:flex;align-items:center;justify-content:center;flex:none;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div style="flex:1;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <span style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:23px;color:#211B1A;">สมาชิก · Member</span>
+            <span style="font-family:ui-monospace,monospace;font-weight:700;font-size:22px;color:#8A7E79;letter-spacing:1px;">{{ memberMasked }}</span>
+            <span style="background:#E8F6ED;color:#1A7A42;font-weight:800;font-size:19px;padding:5px 14px;border-radius:30px;">★ {{ memberPoints }} คะแนน · points</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;background:#F1ECE9;border-radius:30px;padding:8px 16px;flex:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A7E79" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span style="font-weight:700;font-size:16px;color:#8A7E79;">ปกปิดข้อมูลตาม PDPA</span></div>
+        </div>
+      </sc-if>
+
+      <!-- ADVERT RIBBON (header advert) -->
+      <div style="padding:14px 40px 0;">
+        <div style="height:82px;border-radius:16px;display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,#E2231A,#A21210);padding:0 18px 0 20px;color:#fff;position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(0,0,0,.14) 2.4px, transparent 2.8px);background-size:20px 20px;opacity:.5;"></div>
+          <span style="position:relative;background:#F5B800;color:#5b3a00;font-family:'Rubik',sans-serif;font-weight:800;font-size:22px;padding:6px 14px;border-radius:9px;flex:none;">1+1</span>
+          <div style="position:relative;flex:1;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:23px;line-height:1.2;">โปรโมชั่น ซื้อ 1 แถม 1 ฟรี สัปดาห์นี้<span style="opacity:.8;font-size:18px;"> · Buy 1 Get 1 Free this week at Foodland</span></div>
+          <div style="position:relative;flex:none;width:130px;height:58px;border-radius:10px;overflow:hidden;background:#1c100d;">
+            <img src="assets/ad1.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:{{ slideOp0 }};transition:opacity .8s ease;">
+            <img src="assets/ad2.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:{{ slideOp1 }};transition:opacity .8s ease;">
+            <img src="assets/ad3.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:{{ slideOp2 }};transition:opacity .8s ease;">
+            <img src="assets/ad4.png" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:{{ slideOp3 }};transition:opacity .8s ease;">
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVE SCAN STAGE -->
+      <div style="padding:24px 40px 8px;">
+        <button onClick="{{ scanNext }}" style="width:100%;border:none;cursor:pointer;text-align:left;border-radius:24px;overflow:hidden;background:{{ stageBg }};box-shadow:0 10px 30px rgba(33,27,26,.08);display:block;padding:0;">
+          <sc-if value="{{ stageFlash }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;align-items:center;gap:26px;padding:28px 32px;background:linear-gradient(120deg,#ECFAEF,#fff);animation:scoPop .3s ease;">
+              <div style="flex:none;width:96px;height:96px;border-radius:50%;background:#1F8A4C;display:flex;align-items:center;justify-content:center;"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-weight:800;font-size:22px;color:#1F8A4C;">เพิ่มลงตะกร้าแล้ว · Added to cart</div>
+                <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:34px;color:#211B1A;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ lastTh }}</div>
+                <div style="font-weight:600;font-size:22px;color:#8A7E79;">{{ lastEn }}</div>
+              </div>
+              <div style="text-align:right;flex:none;">
+                <div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:40px;color:#211B1A;">{{ lastPrice }}</div>
+                <sc-if value="{{ lastSaved }}" hint-placeholder-val="{{ false }}"><div style="font-weight:800;font-size:20px;color:#1F8A4C;">ประหยัด {{ lastSavedStr }}</div></sc-if>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ stagePrompt }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;display:flex;align-items:center;justify-content:center;gap:22px;padding:20px 32px;background:linear-gradient(135deg,#2A1D18,#3A2922);overflow:hidden;">
+              <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:200px;height:3px;background:#F5B800;border-radius:2px;box-shadow:0 0 16px 4px rgba(245,184,0,.7);animation:scoScanLine 1.8s ease-in-out infinite alternate;"></div>
+              <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#F5B800" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="position:relative;flex:none;animation:scoFloat 2.4s ease-in-out infinite;"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M3 12h18"/></svg>
+              <div style="position:relative;text-align:left;">
+                <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:28px;color:#fff;">นำบาร์โค้ดมาสแกน</div>
+                <div style="font-weight:700;font-size:20px;color:rgba(255,255,255,.6);">Place the barcode under the scanner</div>
+              </div>
+            </div>
+          </sc-if>
+        </button>
+      </div>
+
+      <!-- cart list -->
+      <div style="flex:1;overflow:auto;padding:14px 40px;">
+        <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="height:100%;min-height:380px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#B8A89F;">
+            <svg width="92" height="92" viewBox="0 0 24 24" fill="none" stroke="#CBB9AE" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+            <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:30px;color:#8A7E79;margin-top:22px;">ตะกร้ายังว่าง · Cart is empty</div>
+            <div style="font-weight:600;font-size:22px;margin-top:4px;">แตะปุ่มด้านบนเพื่อสแกนสินค้าชิ้นแรก</div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:13px;">
+            <sc-for list="{{ cartView }}" as="line" hint-placeholder-count="3">
+              <div style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:18px 22px;display:flex;align-items:center;gap:20px;box-shadow:0 1px 2px rgba(33,27,26,.04);">
+                <div style="flex:none;width:88px;height:88px;border-radius:14px;background:repeating-linear-gradient(135deg,#F1ECE9,#F1ECE9 8px,#E7DCD5 8px,#E7DCD5 16px);display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-size:13px;color:#B8A89F;">IMG</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="display:inline-block;background:{{ line.tagBg }};color:{{ line.tagColor }};font-weight:800;font-size:15px;letter-spacing:.5px;padding:4px 11px;border-radius:7px;">{{ line.tagLabel }}</span>
+                    <span style="font-family:ui-monospace,monospace;font-size:14px;color:#B8A89F;">{{ line.sku }}</span>
+                  </div>
+                  <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:26px;color:#211B1A;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ line.th }}</div>
+                  <div style="display:flex;align-items:center;gap:10px;margin-top:3px;">
+                    <sc-if value="{{ line.showStrike }}" hint-placeholder-val="{{ false }}"><span style="font-size:19px;color:#B8A89F;text-decoration:line-through;">{{ line.origStr }}</span></sc-if>
+                    <span style="font-weight:700;font-size:21px;color:{{ line.unitColor }};">{{ line.unitStr }}</span>
+                  </div>
+                </div>
+                <sc-if value="{{ line.isWeight }}" hint-placeholder-val="{{ false }}">
+                  <div style="text-align:center;background:#F1ECE9;border-radius:14px;padding:12px 20px;"><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">{{ line.qtyText }}</div><div style="font-size:15px;color:#8A7E79;">น้ำหนัก</div></div>
+                </sc-if>
+                <sc-if value="{{ line.isQty }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;align-items:center;gap:6px;background:#F1ECE9;border-radius:16px;padding:6px;">
+                    <button onClick="{{ line.dec }}" style="width:60px;height:60px;border-radius:12px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(33,27,26,.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#211B1A" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+                    <div style="min-width:50px;text-align:center;font-family:'Rubik',sans-serif;font-weight:700;font-size:28px;color:#211B1A;">{{ line.qty }}</div>
+                    <button onClick="{{ line.inc }}" style="width:60px;height:60px;border-radius:12px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(33,27,26,.08);"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#211B1A" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+                  </div>
+                </sc-if>
+                <div style="width:140px;text-align:right;font-family:'Rubik',sans-serif;font-weight:700;font-size:30px;color:#211B1A;">{{ line.lineStr }}</div>
+                <button onClick="{{ line.remove }}" style="width:58px;height:58px;border-radius:12px;border:1px solid #F3CFC9;background:#FDF2F1;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- secondary actions -->
+      <div style="padding:0 40px 14px;display:flex;gap:14px;">
+        <button onClick="{{ openKeypad }}" style="flex:1;height:78px;border-radius:16px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:21px;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#5C4F49" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/></svg>ใส่บาร์โค้ดเอง · Manual</button>
+        <button onClick="{{ goMember }}" style="flex:1;height:78px;border-radius:16px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:21px;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#5C4F49" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>สมาชิก · Member</button>
+        <button onClick="{{ callHelp }}" style="flex:1;height:78px;border-radius:16px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:21px;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#5C4F49" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>เรียกพนักงาน</button>
+      </div>
+
+      <!-- sticky summary -->
+      <div style="background:#fff;border-top:1px solid #ECE3DE;box-shadow:0 -8px 24px rgba(33,27,26,.06);padding:22px 40px 28px;">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+          <div>
+            <div style="font-size:21px;color:#8A7E79;font-weight:700;">ยอดรวมย่อย · Subtotal <span style="color:#211B1A;">฿{{ subtotalStr }}</span></div>
+            <sc-if value="{{ hasSaved }}" hint-placeholder-val="{{ true }}"><div style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;background:#E8F6ED;color:#1F8A4C;font-weight:800;font-size:22px;padding:7px 16px;border-radius:30px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1F8A4C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>คุณประหยัด ฿{{ savedStr }} · You saved</div></sc-if>
+            <div style="font-size:19px;color:#8A7E79;font-weight:700;margin-top:8px;">{{ itemCount }} ชิ้น · items</div>
+          </div>
+          <div style="text-align:right;"><div style="font-size:23px;color:#8A7E79;font-weight:700;">ยอดสุทธิ · Total</div><div style="font-family:'Rubik',sans-serif;font-weight:800;font-size:66px;line-height:1;color:#E2231A;">฿{{ totalStr }}</div></div>
+        </div>
+        <button onClick="{{ goPayment }}" style="margin-top:18px;width:100%;height:118px;border-radius:22px;border:none;cursor:pointer;background:linear-gradient(135deg,#E2231A,#B71C16);color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:38px;display:flex;align-items:center;justify-content:center;gap:18px;box-shadow:0 14px 34px rgba(226,35,26,.36);">ชำระเงิน · Pay ฿{{ totalStr }}<svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ================= SCREEN 4 — MEMBER & DISCOUNTS ================= -->
+    <sc-if value="{{ isMember }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Member and Discounts" style="position:absolute;inset:0;background:#F6F1EE;display:flex;flex-direction:column;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;">
+      <div style="background:#fff;border-bottom:1px solid #ECE3DE;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:26px;color:#211B1A;">สมาชิก &amp; ส่วนลด · Member &amp; Discounts</div>
+        <div style="text-align:right;"><div style="font-size:19px;color:#8A7E79;font-weight:700;">ยอดสุทธิ · Total</div><div style="font-family:'Rubik',sans-serif;font-weight:800;font-size:34px;color:#E2231A;">฿{{ totalStr }}</div></div>
+      </div>
+
+      <div style="padding:24px 40px 0;">
+        <div style="background:#fff;border:1px solid #ECE3DE;border-bottom:none;border-radius:16px 16px 0 0;height:80px;display:flex;align-items:center;gap:12px;padding:0 26px;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;color:#E2231A;"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>บัตรสมาชิก · Member card<span style="font-weight:700;font-size:18px;color:#8A7E79;margin-left:6px;">· คูปองใช้ได้ที่หน้าชำระเงิน · coupons at payment</span></div>
+      </div>
+
+      <div style="flex:1;overflow:auto;padding:28px 40px;">
+        <sc-if value="{{ showMemberTab }}" hint-placeholder-val="{{ true }}">
+          <sc-if value="{{ hasMember }}" hint-placeholder-val="{{ false }}">
+            <div style="background:linear-gradient(135deg,#E2231A,#B71C16);border-radius:22px;padding:38px 40px;color:#fff;box-shadow:0 16px 40px rgba(226,35,26,.3);">
+              <div style="display:flex;align-items:center;gap:12px;font-weight:800;font-size:22px;opacity:.92;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>ใช้ราคาสมาชิกแล้ว · Member price applied</div>
+              <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:44px;margin-top:16px;">{{ memberName }}</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:22px;">
+                <div><div style="opacity:.82;font-size:21px;">คะแนนสะสม · Points</div><div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:40px;">{{ memberPoints }}</div></div>
+                <div style="text-align:right;"><div style="opacity:.82;font-size:21px;">จะได้รับเพิ่ม · Earning</div><div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:40px;color:#F5B800;">+{{ pointsPreview }}</div></div>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ noMember }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;gap:32px;">
+              <div style="flex:1;">
+                <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:28px;color:#211B1A;">เบอร์โทร / รหัสสมาชิก</div>
+                <div style="font-weight:700;font-size:21px;color:#8A7E79;margin-bottom:16px;">Phone or member number</div>
+                <div style="background:#fff;border:1px solid #ECE3DE;border-radius:16px;height:94px;display:flex;align-items:center;padding:0 28px;font-family:'Rubik',sans-serif;font-weight:700;font-size:42px;color:#211B1A;letter-spacing:2px;">{{ keypadDisplay }}<span style="width:3px;height:46px;background:#E2231A;margin-left:4px;animation:scoBlink 1s infinite;"></span></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-top:16px;">
+                  <button onClick="{{ k1 }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:38px;color:#211B1A;">1</button>
+                  <button onClick="{{ k2 }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:38px;color:#211B1A;">2</button>
+                  <button onClick="{{ k3 }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:38px;color:#211B1A;">3</button>
+                  <button onClick="{{ k4 }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:38px;color:#211B1A;">4</button>
+                  <button onClick="{{ k5 }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:38px;color:#211B1A;">5</button>
+                  <button onClick="{{ k6 }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:38px;color:#211B1A;">6</button>
+                  <button onClick="{{ k7 }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:38px;color:#211B1A;">7</button>
+                  <button onClick="{{ k8 }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:38px;color:#211B1A;">8</button>
+                  <button onClick="{{ k9 }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:38px;color:#211B1A;">9</button>
+                  <button onClick="{{ kClear }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#F6F1EE;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#8A7E79;">ล้าง</button>
+                  <button onClick="{{ k0 }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:38px;color:#211B1A;">0</button>
+                  <button onClick="{{ kBack }}" style="height:100px;border-radius:16px;border:1px solid #ECE3DE;background:#F6F1EE;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Rubik',sans-serif;font-weight:700;font-size:30px;color:#8A7E79;">⌫</button>
+                </div>
+              </div>
+              <div style="flex:none;width:300px;display:flex;flex-direction:column;gap:18px;">
+                <div style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:28px;text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                  <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">รูดบัตรสมาชิก</div>
+                  <div style="font-weight:700;font-size:19px;color:#8A7E79;">Scan / swipe card</div>
+                </div>
+                <button onClick="{{ applyMember }}" style="height:104px;border-radius:18px;border:none;cursor:pointer;background:#E2231A;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:26px;">ค้นหา · Look up</button>
+              </div>
+            </div>
+          </sc-if>
+        </sc-if>
+      </div>
+
+      <div style="background:#fff;border-top:1px solid #ECE3DE;padding:22px 40px 28px;">
+        <button onClick="{{ goScan }}" style="width:100%;height:104px;border-radius:20px;border:none;cursor:pointer;background:#E2231A;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:32px;">เสร็จสิ้น · Done</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ================= SCREEN 5 — PAYMENT METHOD ================= -->
+    <sc-if value="{{ isPayment }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Payment method" style="position:absolute;inset:0;background:#F6F1EE;display:flex;flex-direction:column;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;">
+      <div style="padding:30px 40px 8px;text-align:center;">
+        <div style="font-size:25px;color:#8A7E79;font-weight:700;">ยอดที่ต้องชำระ · Amount due</div>
+        <div style="font-family:'Rubik',sans-serif;font-weight:800;font-size:74px;line-height:1;color:#E2231A;margin-top:4px;">฿{{ amountDueStr }}</div>
+      </div>
+      <div style="padding:0 40px 6px;display:flex;justify-content:center;">
+        <sc-if value="{{ couponNotApplied }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ openCoupon }}" style="display:flex;align-items:center;gap:12px;background:#FFF7E6;border:1.5px dashed #E7B84B;cursor:pointer;border-radius:14px;padding:13px 26px;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:22px;color:#92400E;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D69A00" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 11v2"/><path d="M13 17v2"/></svg>ใช้คูปองส่วนลด · Add coupon — key or scan</button>
+        </sc-if>
+        <sc-if value="{{ couponApplied }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;gap:12px;background:#E8F6ED;border:1px solid #BBE9CC;border-radius:14px;padding:13px 26px;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:22px;color:#1A7A42;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1F8A4C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>ใช้คูปองแล้ว · Coupon applied −฿20</div>
+        </sc-if>
+      </div>
+
+      <div style="flex:1;overflow:auto;padding:14px 40px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+          <button onClick="{{ payQR }}" style="height:196px;border-radius:20px;border:2px solid #E2231A;background:#FDECEA;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 8px rgba(226,35,26,.12);position:relative;" style-active="transform:scale(.97);"><span style="position:absolute;top:14px;right:14px;background:#E2231A;color:#fff;font-weight:800;font-size:15px;padding:4px 10px;border-radius:7px;">แนะนำ</span><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/></svg><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">QR PromptPay</div></button>
+          <button onClick="{{ payCash }}" style="height:196px;border-radius:20px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 6px rgba(33,27,26,.05);" style-active="background:#FDECEA;transform:scale(.97);"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#1F8A4C" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">เงินสด · Cash</div></button>
+          <button onClick="{{ payCard }}" style="height:196px;border-radius:20px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 6px rgba(33,27,26,.05);" style-active="background:#FDECEA;transform:scale(.97);"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#211B1A" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">บัตรเครดิต · Card</div></button>
+          <button onClick="{{ payTrue }}" style="height:196px;border-radius:20px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 6px rgba(33,27,26,.05);" style-active="background:#FDECEA;transform:scale(.97);"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#F97316" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 0 1-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">TrueMoney</div></button>
+          <button onClick="{{ payAlipay }}" style="height:196px;border-radius:20px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 6px rgba(33,27,26,.05);" style-active="background:#FDECEA;transform:scale(.97);"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="4"/><path d="M7 14c4 2 7 1 9-2"/><path d="M9 9h6"/></svg><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">Alipay</div></button>
+          <button onClick="{{ payWeChat }}" style="height:196px;border-radius:20px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 6px rgba(33,27,26,.05);" style-active="background:#FDECEA;transform:scale(.97);"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#1F8A4C" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3C5 3 2 5.7 2 9c0 1.8.9 3.4 2.3 4.5L3.5 16l2.8-1.3c.9.2 1.8.3 2.7.3"/><path d="M22 14.5c0-2.8-2.7-5-6-5s-6 2.2-6 5 2.7 5 6 5c.8 0 1.5-.1 2.2-.3L21 20l-.6-1.9c1-.9 1.6-2.2 1.6-3.6Z"/></svg><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">WeChat Pay</div></button>
+          <button onClick="{{ payGift }}" style="height:196px;border-radius:20px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 6px rgba(33,27,26,.05);" style-active="background:#FDECEA;transform:scale(.97);"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#DB2777" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/></svg><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">บัตรกำนัล · Gift</div></button>
+          <button onClick="{{ payVoucher }}" style="height:196px;border-radius:20px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 6px rgba(33,27,26,.05);" style-active="background:#FDECEA;transform:scale(.97);"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9V7a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v2a3 3 0 0 0 0 6v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2a3 3 0 0 0 0-6Z"/><path d="M9 9h6M9 13h6"/></svg><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">Voucher</div></button>
+          <button onClick="{{ payPoints }}" style="height:196px;border-radius:20px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;box-shadow:0 2px 6px rgba(33,27,26,.05);" style-active="background:#FDECEA;transform:scale(.97);"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#CA8A04" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/><path d="M7 6h1v4"/><path d="m16.71 13.88.7.71-2.82 2.82"/></svg><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;color:#211B1A;">คะแนนสะสม · Points</div></button>
+        </div>
+      </div>
+
+      <div style="background:#fff;border-top:1px solid #ECE3DE;padding:20px 40px 26px;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:12px;color:#8A7E79;font-weight:700;font-size:21px;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8A7E79" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>เลือกวิธีชำระเงิน แล้วทำตามเครื่อง · Pick a method, then follow the terminal</div>
+        <button onClick="{{ callHelp }}" style="display:flex;align-items:center;gap:10px;background:#F1ECE9;border:none;cursor:pointer;border-radius:14px;padding:16px 24px;font-weight:800;font-size:21px;color:#5C4F49;font-family:'Rubik','Noto Sans Thai',sans-serif;">เรียกพนักงาน</button>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ================= SCREEN 6 — PAYMENT IN PROGRESS / FAILED ================= -->
+    <sc-if value="{{ isPaying }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Payment in progress" style="position:absolute;inset:0;background:linear-gradient(180deg,#fff,#F6F1EE);display:flex;flex-direction:column;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;">
+      <sc-if value="{{ payProgress }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px 70px 0;">
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:52px;color:#E2231A;">กำลังดำเนินการชำระเงิน</div>
+          <div style="font-family:'Rubik',sans-serif;font-weight:800;font-size:34px;color:#211B1A;margin-top:2px;">Processing Payment</div>
+          <sc-if value="{{ payIsQR }}" hint-placeholder-val="{{ false }}">
+            <div style="margin-top:30px;width:350px;height:350px;background:#fff;border:1px solid #ECE3DE;border-radius:28px;padding:24px;box-shadow:0 16px 40px rgba(33,27,26,.12);"><div style="width:100%;height:100%;background:repeating-conic-gradient(#211B1A 0 25%,#fff 0 50%) 50%/38px 38px;border-radius:8px;position:relative;"><div style="position:absolute;inset:38%;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Rubik',sans-serif;font-weight:700;font-size:18px;color:#E2231A;">PP</div></div></div>
+            <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:32px;color:#211B1A;margin-top:24px;">สแกน QR นี้ด้วยแอปธนาคาร · Scan to pay</div>
+          </sc-if>
+          <sc-if value="{{ payNotQR }}" hint-placeholder-val="{{ true }}">
+            <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:32px;color:#211B1A;margin-top:14px;">แตะหรือสอดบัตร · Please tap or insert card</div>
+            <div style="margin-top:30px;display:flex;align-items:center;gap:30px;background:#fff;border:1px solid #ECE3DE;border-radius:28px;padding:40px 60px;box-shadow:0 14px 36px rgba(33,27,26,.1);">
+              <div style="position:relative;width:170px;height:200px;">
+                <div style="position:absolute;left:0;top:20px;width:120px;height:168px;border-radius:18px;background:#211B1A;"></div>
+                <div style="position:absolute;left:9px;top:29px;width:102px;height:150px;border-radius:12px;background:#F6F1EE;display:flex;align-items:center;justify-content:center;"><div style="width:52px;height:34px;border-radius:6px;background:#E2231A;"></div></div>
+                <div style="position:absolute;left:58px;top:0;width:118px;height:78px;border-radius:12px;background:linear-gradient(135deg,#94A3B8,#CBD5E1);transform:rotate(9deg);box-shadow:0 6px 16px rgba(0,0,0,.18);"><div style="position:absolute;left:12px;top:24px;width:28px;height:20px;border-radius:4px;background:#F5B800;"></div></div>
+              </div>
+              <svg width="58" height="40" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m4 6 6 6-6 6" opacity=".45"/><path d="m11 6 6 6-6 6"/></svg>
+              <svg width="140" height="180" viewBox="0 0 24 24" fill="none" stroke="#211B1A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14"/><rect x="5" y="2" width="14" height="20" rx="2"/><rect x="7.5" y="4" width="9" height="4" rx="1" fill="#E2231A" stroke="none"/><circle cx="9" cy="13" r="1"/><circle cx="12" cy="13" r="1"/><circle cx="15" cy="13" r="1"/><circle cx="9" cy="16" r="1"/><circle cx="12" cy="16" r="1"/><circle cx="15" cy="16" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="12" cy="19" r="1"/><circle cx="15" cy="19" r="1"/></svg>
+            </div>
+          </sc-if>
+          <div style="margin-top:32px;font-family:'Rubik',sans-serif;font-weight:800;font-size:48px;color:#E2231A;">฿{{ amountDueStr }}</div>
+          <div style="display:flex;align-items:center;gap:14px;margin-top:22px;color:#8A7E79;font-weight:700;font-size:26px;font-family:'Rubik','Noto Sans Thai',sans-serif;"><div style="width:32px;height:32px;border-radius:50%;border:5px solid #ECE3DE;border-top-color:#E2231A;animation:scoSpin 1s linear infinite;"></div>รอการชำระเงิน... · Waiting for payment...</div>
+        </div>
+        <div style="padding:22px 40px 30px;">
+          <button onClick="{{ payCancel }}" style="width:100%;height:104px;border-radius:20px;border:none;cursor:pointer;background:#E2231A;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:32px;box-shadow:0 12px 30px rgba(226,35,26,.3);">ยกเลิกการชำระเงิน · Cancel Payment</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{ payFailed }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 70px;">
+          <div style="width:180px;height:180px;border-radius:50%;background:#FDECEA;display:flex;align-items:center;justify-content:center;"><svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6m0-6 6 6"/></svg></div>
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:48px;color:#211B1A;margin-top:34px;">ชำระเงินไม่สำเร็จ</div>
+          <div style="font-weight:700;font-size:30px;color:#8A7E79;margin-top:4px;">Payment failed — no money was taken</div>
+        </div>
+        <div style="padding:18px 40px 30px;display:flex;flex-direction:column;gap:14px;">
+          <button onClick="{{ payRetry }}" style="height:100px;border-radius:18px;border:none;cursor:pointer;background:#E2231A;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:30px;">ลองอีกครั้ง · Try again</button>
+          <button onClick="{{ goPayment }}" style="height:100px;border-radius:18px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:26px;">เลือกวิธีอื่น · Choose another method</button>
+          <button onClick="{{ callHelp }}" style="height:86px;border-radius:18px;border:none;background:transparent;color:#8A7E79;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;">เรียกพนักงาน · Call staff</button>
+        </div>
+      </sc-if>
+    </div>
+    </sc-if>
+
+    <!-- ================= SCREEN 7 — RECEIPT / THANK YOU ================= -->
+    <sc-if value="{{ isReceipt }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Receipt" style="position:absolute;inset:0;background:#F6F1EE;display:flex;flex-direction:column;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;">
+      <div style="padding:44px 40px 20px;text-align:center;background:linear-gradient(180deg,#E8F6ED,#F6F1EE);">
+        <div style="width:128px;height:128px;border-radius:50%;background:#1F8A4C;display:flex;align-items:center;justify-content:center;margin:0 auto;box-shadow:0 14px 36px rgba(31,138,76,.4);animation:scoPop .4s ease;"><svg width="74" height="74" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></div>
+        <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:48px;color:#1A7A42;margin-top:22px;">ขอบคุณที่ใช้บริการ</div>
+        <div style="font-weight:700;font-size:30px;color:#1F8A4C;">Payment complete · Thank you</div>
+      </div>
+
+      <div style="flex:1;overflow:auto;padding:14px 40px 24px;display:flex;gap:28px;">
+        <div style="flex:none;width:540px;background:#fff;border-radius:6px;box-shadow:0 10px 30px rgba(33,27,26,.12);padding:32px 36px;font-family:ui-monospace,'SFMono-Regular',monospace;color:#211B1A;font-size:19px;line-height:1.55;">
+          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:24px;"><span>FOODLAND</span><span style="font-weight:400;font-size:17px;">Tel.02-1905-111</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:17px;color:#8A7E79;"><span>Branch</span><span>00{{ rBranch }}</span></div>
+          <div style="text-align:center;font-weight:700;margin:10px 0 2px;">TAX INVOICE (ABB.)</div>
+          <div style="text-align:center;font-size:17px;color:#8A7E79;">ใบกำกับภาษีอย่างย่อ</div>
+          <div style="display:flex;justify-content:space-between;font-size:16px;color:#8A7E79;margin-top:8px;"><span>Term 00{{ rTerminal }} · SCO</span><span>{{ rDateTime }}</span></div>
+          <div style="border-top:1px dashed #C9B6AC;margin:12px 0;"></div>
+          <sc-for list="{{ receiptLines }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex;justify-content:space-between;gap:10px;"><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.star }}{{ r.name }}</span><span style="flex:none;color:#8A7E79;font-size:16px;">{{ r.qtyPrice }}</span><span style="flex:none;width:92px;text-align:right;">{{ r.amount }}</span></div>
+          </sc-for>
+          <div style="border-top:1px dashed #C9B6AC;margin:12px 0;"></div>
+          <div style="display:flex;justify-content:space-between;"><span>Sub Reg</span><span>{{ rSubReg }}</span></div>
+          <div style="display:flex;justify-content:space-between;"><span>Sub Pro</span><span>{{ rSubPro }}</span></div>
+          <div style="display:flex;justify-content:space-between;color:#1F8A4C;"><span>Discount</span><span>-{{ rDis }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-weight:700;font-size:23px;margin-top:4px;"><span>TOTAL</span><span>{{ rTotal }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:16px;color:#8A7E79;"><span>VAT 7% incl.</span><span>{{ rVat }}</span></div>
+          <div style="border-top:1px dashed #C9B6AC;margin:12px 0;"></div>
+          <div style="display:flex;justify-content:space-between;"><span>{{ rTender }}</span><span>{{ rTotal }}</span></div>
+          <div style="display:flex;justify-content:space-between;font-weight:700;"><span>Points earned</span><span>+{{ rPoints }}</span></div>
+          <div style="text-align:center;font-size:15px;color:#B8A89F;margin-top:8px;">* = promotion / yellow-tag price</div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;gap:14px;">
+          <button onClick="{{ noop }}" style="height:112px;border-radius:18px;border:none;cursor:pointer;background:#E2231A;color:#fff;display:flex;align-items:center;justify-content:center;gap:16px;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:28px;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></svg>พิมพ์ใบเสร็จ · Print</button>
+          <div style="background:#fff;border:1px solid #ECE3DE;border-radius:18px;padding:22px;display:flex;align-items:center;gap:22px;">
+            <div style="flex:none;width:124px;height:124px;background:repeating-conic-gradient(#211B1A 0 25%,#fff 0 50%) 50%/22px 22px;border-radius:10px;"></div>
+            <div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:25px;color:#211B1A;">ใบเสร็จออนไลน์</div><div style="font-weight:700;font-size:20px;color:#8A7E79;">E-receipt — scan to save</div></div>
+          </div>
+          <button onClick="{{ noop }}" style="height:92px;border-radius:18px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:22px;">ขอใบกำกับภาษีเต็มรูป · Full tax invoice</button>
+          <div style="flex:1;"></div>
+          <div style="background:#FEF9C3;border:1px solid #FDE68A;border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:14px;color:#854D0E;font-weight:800;font-size:23px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#854D0E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>กรุณารับสินค้าของคุณ · Take your items</div>
+        </div>
+      </div>
+
+      <div style="background:#fff;border-top:1px solid #ECE3DE;padding:20px 40px 28px;display:flex;align-items:center;gap:18px;">
+        <div style="display:flex;align-items:center;gap:12px;background:#F1ECE9;border-radius:30px;padding:14px 26px;font-weight:800;font-size:22px;color:#8A7E79;"><span style="font-family:'Rubik',sans-serif;font-size:26px;color:#211B1A;">{{ countdown }}</span>เริ่มใหม่อัตโนมัติ · auto-reset</div>
+        <button onClick="{{ reset }}" style="flex:1;height:104px;border-radius:20px;border:none;cursor:pointer;background:#1F8A4C;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:32px;">เสร็จสิ้น · Done</button>
+      </div>
+    </div>
+    </sc-if>
+
+    </div>
+    <!-- ============ END CONTENT REGION ============ -->
+
+    <!-- ================= OVERLAYS ================= -->
+    <sc-if value="{{ anyOverlay }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;z-index:80;background:rgba(21,16,13,.58);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:60px;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;">
+
+      <sc-if value="{{ ovWeight }}" hint-placeholder-val="{{ false }}">
+        <div style="width:760px;background:#fff;border-radius:28px;padding:48px;text-align:center;animation:scoRise .25s ease;">
+          <svg width="84" height="84" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto;display:block;"><path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/></svg>
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:36px;color:#211B1A;margin-top:18px;">{{ pendName }}</div>
+          <div style="font-weight:700;font-size:24px;color:#8A7E79;margin-top:6px;">วางบนตาชั่ง · Place on scale</div>
+          <div style="background:#F6F1EE;border-radius:20px;padding:28px;margin:26px 0;display:flex;align-items:center;justify-content:space-around;">
+            <div><div style="font-size:20px;color:#8A7E79;font-weight:700;">น้ำหนัก · Weight</div><div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:48px;color:#211B1A;">{{ pendWeight }} กก.</div></div>
+            <div style="width:1px;height:70px;background:#D8C8BF;"></div>
+            <div><div style="font-size:20px;color:#8A7E79;font-weight:700;">ราคา · Price</div><div style="font-family:'Rubik',sans-serif;font-weight:700;font-size:48px;color:#1F8A4C;">฿{{ pendComputed }}</div></div>
+          </div>
+          <div style="display:flex;gap:16px;">
+            <button onClick="{{ cancelOverlay }}" style="flex:1;height:100px;border-radius:18px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:26px;">ยกเลิก · Cancel</button>
+            <button onClick="{{ confirmWeight }}" style="flex:2;height:100px;border-radius:18px;border:none;cursor:pointer;background:#E2231A;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:28px;">ยืนยัน · Confirm</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ovPrice }}" hint-placeholder-val="{{ false }}">
+        <div style="width:620px;background:#fff;border-radius:28px;padding:44px;text-align:center;animation:scoRise .25s ease;">
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">{{ pendName }}</div>
+          <div style="font-weight:700;font-size:22px;color:#8A7E79;margin-top:4px;">ใส่ราคา · Enter price</div>
+          <div style="background:#F6F1EE;border-radius:16px;height:96px;display:flex;align-items:center;justify-content:center;font-family:'Rubik',sans-serif;font-weight:700;font-size:48px;color:#211B1A;margin:24px 0;">฿{{ keypadDisplay }}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+            <button onClick="{{ k1 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">1</button>
+            <button onClick="{{ k2 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">2</button>
+            <button onClick="{{ k3 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">3</button>
+            <button onClick="{{ k4 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">4</button>
+            <button onClick="{{ k5 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">5</button>
+            <button onClick="{{ k6 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">6</button>
+            <button onClick="{{ k7 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">7</button>
+            <button onClick="{{ k8 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">8</button>
+            <button onClick="{{ k9 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">9</button>
+            <button onClick="{{ kClear }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#F6F1EE;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:22px;color:#8A7E79;">ล้าง</button>
+            <button onClick="{{ k0 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">0</button>
+            <button onClick="{{ kBack }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#F6F1EE;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:30px;color:#8A7E79;">⌫</button>
+          </div>
+          <div style="display:flex;gap:14px;margin-top:18px;">
+            <button onClick="{{ cancelOverlay }}" style="flex:1;height:92px;border-radius:16px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;">ยกเลิก</button>
+            <button onClick="{{ confirmPrice }}" style="flex:1;height:92px;border-radius:16px;border:none;cursor:pointer;background:#E2231A;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;">ตกลง · OK</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ovAttendant }}" hint-placeholder-val="{{ false }}">
+        <div style="width:720px;background:#fff;border-radius:28px;padding:48px;text-align:center;animation:scoRise .25s ease;border-top:10px solid #F5B800;">
+          <div style="width:120px;height:120px;border-radius:50%;background:#FEF6DC;display:flex;align-items:center;justify-content:center;margin:0 auto;"><svg width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="#D69A00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></div>
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:36px;color:#211B1A;margin-top:22px;">รอพนักงานยืนยัน</div>
+          <div style="font-weight:700;font-size:26px;color:#8A7E79;margin-top:6px;">Waiting for staff approval</div>
+          <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:14px;padding:18px 24px;margin:24px 0;color:#92400E;font-weight:800;font-size:22px;">{{ attendantReason }}</div>
+          <div style="display:flex;justify-content:center;gap:14px;margin-bottom:28px;"><span style="width:18px;height:18px;border-radius:50%;background:#F5B800;animation:scoDots 1.2s infinite;"></span><span style="width:18px;height:18px;border-radius:50%;background:#F5B800;animation:scoDots 1.2s infinite .2s;"></span><span style="width:18px;height:18px;border-radius:50%;background:#F5B800;animation:scoDots 1.2s infinite .4s;"></span></div>
+          <div style="display:flex;gap:16px;">
+            <button onClick="{{ cancelOverlay }}" style="flex:1;height:96px;border-radius:18px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;">ยกเลิก</button>
+            <button onClick="{{ approveAttendant }}" style="flex:1;height:96px;border-radius:18px;border:none;cursor:pointer;background:#1F8A4C;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:22px;">พนักงานอนุมัติ (จำลอง)</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ovUnknown }}" hint-placeholder-val="{{ false }}">
+        <div style="width:680px;background:#fff;border-radius:28px;padding:48px;text-align:center;animation:scoRise .25s ease;">
+          <div style="width:120px;height:120px;border-radius:50%;background:#FDECEA;display:flex;align-items:center;justify-content:center;margin:0 auto;"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><path d="m13.5 8.5-5 5m0-5 5 5"/></svg></div>
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:36px;color:#211B1A;margin-top:22px;">ไม่พบสินค้า</div>
+          <div style="font-weight:700;font-size:26px;color:#8A7E79;margin-top:6px;">Item not found</div>
+          <div style="font-family:ui-monospace,monospace;background:#F6F1EE;border-radius:12px;padding:16px;margin:24px 0;font-size:24px;color:#8A7E79;letter-spacing:2px;">{{ unknownBarcode }}</div>
+          <div style="display:flex;gap:16px;">
+            <button onClick="{{ cancelOverlay }}" style="flex:1;height:96px;border-radius:18px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;">ลองอีกครั้ง</button>
+            <button onClick="{{ callHelp }}" style="flex:1;height:96px;border-radius:18px;border:none;cursor:pointer;background:#E2231A;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;">เรียกพนักงาน</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ovHelp }}" hint-placeholder-val="{{ false }}">
+        <div style="width:720px;background:#fff;border-radius:28px;padding:48px;text-align:center;animation:scoRise .25s ease;">
+          <div style="width:120px;height:120px;border-radius:50%;background:#FDECEA;display:flex;align-items:center;justify-content:center;margin:0 auto;"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#E2231A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:36px;color:#211B1A;margin-top:22px;">พนักงานกำลังมา</div>
+          <div style="font-weight:700;font-size:26px;color:#8A7E79;margin-top:6px;">Staff are on the way</div>
+          <div style="display:flex;justify-content:center;gap:14px;margin:26px 0;"><span style="width:18px;height:18px;border-radius:50%;background:#E2231A;animation:scoDots 1.2s infinite;"></span><span style="width:18px;height:18px;border-radius:50%;background:#E2231A;animation:scoDots 1.2s infinite .2s;"></span><span style="width:18px;height:18px;border-radius:50%;background:#E2231A;animation:scoDots 1.2s infinite .4s;"></span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:28px;">
+            <span style="background:#F6F1EE;border-radius:30px;padding:14px 22px;font-weight:700;font-size:20px;color:#5C4F49;">ตรวจราคา · Price check</span>
+            <span style="background:#F6F1EE;border-radius:30px;padding:14px 22px;font-weight:700;font-size:20px;color:#5C4F49;">ยกเลิกรายการ · Void</span>
+            <span style="background:#F6F1EE;border-radius:30px;padding:14px 22px;font-weight:700;font-size:20px;color:#5C4F49;">ช่วยแพ็ค · Bagging</span>
+            <span style="background:#F6F1EE;border-radius:30px;padding:14px 22px;font-weight:700;font-size:20px;color:#5C4F49;">ตรวจอายุ · Age check</span>
+          </div>
+          <button onClick="{{ cancelOverlay }}" style="width:100%;height:96px;border-radius:18px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:26px;">ปิด · Close</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ovKeypad }}" hint-placeholder-val="{{ false }}">
+        <div style="width:620px;background:#fff;border-radius:28px;padding:44px;text-align:center;animation:scoRise .25s ease;">
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">ใส่บาร์โค้ดเอง</div>
+          <div style="font-weight:700;font-size:22px;color:#8A7E79;margin-top:4px;">Enter barcode manually</div>
+          <div style="background:#F6F1EE;border-radius:16px;height:92px;display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-weight:700;font-size:40px;color:#211B1A;margin:24px 0;letter-spacing:3px;">{{ keypadDisplay }}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+            <button onClick="{{ k1 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">1</button>
+            <button onClick="{{ k2 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">2</button>
+            <button onClick="{{ k3 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">3</button>
+            <button onClick="{{ k4 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">4</button>
+            <button onClick="{{ k5 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">5</button>
+            <button onClick="{{ k6 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">6</button>
+            <button onClick="{{ k7 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">7</button>
+            <button onClick="{{ k8 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">8</button>
+            <button onClick="{{ k9 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">9</button>
+            <button onClick="{{ kClear }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#F6F1EE;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:22px;color:#8A7E79;">ล้าง</button>
+            <button onClick="{{ k0 }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:34px;color:#211B1A;">0</button>
+            <button onClick="{{ kBack }}" style="height:92px;border-radius:14px;border:1px solid #ECE3DE;background:#F6F1EE;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:30px;color:#8A7E79;">⌫</button>
+          </div>
+          <div style="display:flex;gap:14px;margin-top:18px;">
+            <button onClick="{{ cancelOverlay }}" style="flex:1;height:92px;border-radius:16px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;">ยกเลิก</button>
+            <button onClick="{{ submitBarcode }}" style="flex:1;height:92px;border-radius:16px;border:none;cursor:pointer;background:#E2231A;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;">ค้นหา · Enter</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ovCoupon }}" hint-placeholder-val="{{ false }}">
+        <div style="width:640px;background:#fff;border-radius:28px;padding:44px;text-align:center;animation:scoRise .25s ease;">
+          <div style="width:104px;height:104px;border-radius:50%;background:#FFF7E6;display:flex;align-items:center;justify-content:center;margin:0 auto;"><svg width="58" height="58" viewBox="0 0 24 24" fill="none" stroke="#D69A00" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 11v2"/><path d="M13 17v2"/></svg></div>
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:32px;color:#211B1A;margin-top:16px;">ใส่รหัสคูปอง</div>
+          <div style="font-weight:700;font-size:21px;color:#8A7E79;margin-top:4px;">สแกนคูปอง หรือพิมพ์รหัส · Scan coupon or key the code</div>
+          <div style="background:#F6F1EE;border-radius:16px;height:90px;display:flex;align-items:center;justify-content:center;font-family:ui-monospace,monospace;font-weight:700;font-size:38px;color:#211B1A;margin:22px 0;letter-spacing:4px;">{{ keypadDisplay }}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+            <button onClick="{{ k1 }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">1</button>
+            <button onClick="{{ k2 }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">2</button>
+            <button onClick="{{ k3 }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">3</button>
+            <button onClick="{{ k4 }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">4</button>
+            <button onClick="{{ k5 }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">5</button>
+            <button onClick="{{ k6 }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">6</button>
+            <button onClick="{{ k7 }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">7</button>
+            <button onClick="{{ k8 }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">8</button>
+            <button onClick="{{ k9 }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">9</button>
+            <button onClick="{{ kClear }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#F6F1EE;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:22px;color:#8A7E79;">ล้าง</button>
+            <button onClick="{{ k0 }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#fff;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:32px;color:#211B1A;">0</button>
+            <button onClick="{{ kBack }}" style="height:86px;border-radius:14px;border:1px solid #ECE3DE;background:#F6F1EE;cursor:pointer;font-family:'Rubik',sans-serif;font-weight:700;font-size:28px;color:#8A7E79;">⌫</button>
+          </div>
+          <div style="display:flex;gap:14px;margin-top:18px;">
+            <button onClick="{{ cancelOverlay }}" style="flex:1;height:90px;border-radius:16px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;">ยกเลิก</button>
+            <button onClick="{{ submitCoupon }}" style="flex:1;height:90px;border-radius:16px;border:none;cursor:pointer;background:#E2231A;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:24px;">ใช้คูปอง · Apply</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ ovTimeout }}" hint-placeholder-val="{{ false }}">
+        <div style="width:680px;background:#fff;border-radius:28px;padding:48px;text-align:center;animation:scoRise .25s ease;">
+          <div style="width:120px;height:120px;border-radius:50%;background:#F6F1EE;display:flex;align-items:center;justify-content:center;margin:0 auto;"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#8A7E79" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+          <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:36px;color:#211B1A;margin-top:22px;">ยังอยู่ไหมคะ?</div>
+          <div style="font-weight:700;font-size:26px;color:#8A7E79;margin-top:6px;">Are you still there?</div>
+          <div style="display:flex;gap:16px;margin-top:32px;">
+            <button onClick="{{ reset }}" style="flex:1;height:100px;border-radius:18px;border:1px solid #E0D4CC;background:#fff;color:#5C4F49;cursor:pointer;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:700;font-size:24px;">เริ่มใหม่ · Start over</button>
+            <button onClick="{{ cancelOverlay }}" style="flex:2;height:100px;border-radius:18px;border:none;cursor:pointer;background:#E2231A;color:#fff;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:28px;">ยังอยู่ · Continue</button>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+    </sc-if>
+
+    <!-- ============ LOADING / TRANSITION ============ -->
+    <sc-if value="{{ isTransition }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;z-index:60;background:linear-gradient(168deg,#fff,#F6F1EE);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:'Nunito Sans','Noto Sans Thai',sans-serif;padding:0 90px;">
+      <div style="background:#fff;border-radius:24px;padding:18px 32px;box-shadow:0 14px 40px rgba(33,27,26,.12);"><img src="assets/foodland_logo.png" alt="Foodland" style="height:78px;display:block;"></div>
+      <div style="position:relative;width:170px;height:170px;margin-top:64px;">
+        <div style="position:absolute;inset:0;border-radius:50%;border:12px solid #F1ECE9;"></div>
+        <div style="position:absolute;inset:0;border-radius:50%;border:12px solid transparent;border-top-color:#E2231A;animation:scoSpin 1s linear infinite;"></div>
+      </div>
+      <div style="font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:44px;color:#211B1A;margin-top:54px;">{{ transMsg }}</div>
+      <div style="font-weight:700;font-size:28px;color:#8A7E79;margin-top:6px;">{{ transSub }}</div>
+      <div style="display:flex;gap:12px;margin-top:34px;">
+        <span style="width:16px;height:16px;border-radius:50%;background:#E2231A;animation:scoDots 1.2s infinite;"></span>
+        <span style="width:16px;height:16px;border-radius:50%;background:#E2231A;animation:scoDots 1.2s infinite .2s;"></span>
+        <span style="width:16px;height:16px;border-radius:50%;background:#E2231A;animation:scoDots 1.2s infinite .4s;"></span>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- GLOBAL TOAST (staff / coupon confirmations) -->
+    <sc-if value="{{ staffToastShow }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:50%;bottom:60px;transform:translateX(-50%);z-index:50;background:#211B1A;color:#fff;border-radius:16px;padding:22px 34px;font-family:'Rubik','Noto Sans Thai',sans-serif;font-weight:800;font-size:26px;box-shadow:0 18px 44px rgba(0,0,0,.4);display:flex;align-items:center;gap:14px;animation:scoRise .28s ease;max-width:840px;text-align:center;">{{ staffToast }}</div>
+    </sc-if>
+
+   </div>
+  </div>
+</div>
+<template id="__bundler_thumbnail" data-bg-color="#E2231A">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#E2231A"/>
+    <rect x="470" y="300" width="260" height="200" rx="40" fill="#ffffff"/>
+    <text x="600" y="438" font-family="sans-serif" font-size="120" font-weight="800" fill="#E2231A" text-anchor="middle">F</text>
+    <text x="600" y="600" font-family="sans-serif" font-size="50" font-weight="800" fill="#ffffff" text-anchor="middle">SELF CHECKOUT</text>
+  </svg>
+</template></x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.state = {
+      screen:'idle', overlay:null, online:true, lang:'th', reach:false,
+      cart:[], scanIndex:0, payMethod:null, payStatus:'progress', payFailNext:false,
+      member:null, memTab:'member', keypad:'', pending:null, attendantReason:'',
+      unknownBarcode:'', countdown:30, slide:0,
+      lastItem:null, flash:false, terminalDown:false, staffToast:'', couponApplied:false, transition:null, scale:this.calcScale()
+    };
+    this.catalog = [
+      {id:'p1', sku:'8850001234567', th:'นมยูเอชที จืด 2 ลิตร', en:'UHT Milk Plain 2L', reg:89, sale:89, tag:'REG'},
+      {id:'p2', sku:'8851777000012', th:'ข้าวหอมมะลิ 5 กก.', en:'Jasmine Rice 5kg', reg:245, sale:199, tag:'PROMO'},
+      {id:'p3', sku:'8859001230055', th:'ผงซักฟอก 3 กก.', en:'Laundry Powder 3kg', reg:159, sale:129, tag:'MEMBER'},
+      {id:'p4', sku:'2900045200008', th:'ผักกาดหอม', en:'Lettuce (loose)', reg:59, sale:26.67, tag:'WEIGHT', weight:0.452, perKg:59},
+      {id:'p5', sku:'8850999100016', th:'เบียร์สิงห์ 320 มล. x6', en:'Singha Beer 320ml x6', reg:204, sale:204, tag:'ALCOHOL'}
+    ];
+    this.scanScript = ['p1','p2','p3','p4','p5'];
+  }
+  calcScale(){ const s = Math.min((window.innerWidth-300)/1080, (window.innerHeight-48)/1920); return s>0?Math.min(s,1):0.42; }
+  componentDidMount(){
+    this._rs=()=>this.setState({scale:this.calcScale()}); window.addEventListener('resize', this._rs);
+    this._slideTimer=setInterval(()=>this.setState(s=>({slide:(s.slide+1)%4})),5000);
+  }
+  componentWillUnmount(){ window.removeEventListener('resize', this._rs); if(this._slideTimer) clearInterval(this._slideTimer); this.clearTimers(); if(this._flashT) clearTimeout(this._flashT); }
+  clearTimers(){ if(this._pay) clearTimeout(this._pay); if(this._fail) clearTimeout(this._fail); if(this._cd) clearInterval(this._cd); }
+  m(n){ return Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  goSlide(i){ if(this._slideTimer) clearInterval(this._slideTimer); this._slideTimer=setInterval(()=>this.setState(s=>({slide:(s.slide+1)%4})),5000); this.setState({slide:i}); }
+
+  goto(s){ this.setState({screen:s, overlay:null}); }
+  loadThen(msg, sub, fn, delay){ if(this._trans) clearTimeout(this._trans); this.setState({transition:{msg, sub}}); this._trans=setTimeout(()=>{ this.setState({transition:null}); fn(); }, delay||1500); }
+  start = ()=> this.setState({screen:'memberfirst', overlay:null, keypad:''});
+  memberSkip = ()=> this.loadThen('กำลังเริ่มรายการ','Starting your transaction', ()=>this.setState({screen:'scan', overlay:null, keypad:''}), 1100);
+  memberFirstApply = ()=>{ const phone=(this.state.keypad||'0926291042'); this.loadThen('กำลังตรวจสอบสมาชิก','Verifying membership…', ()=>this.setState({member:{name:'คุณ สมชาย ใจดี · S. Jaidee', points:1240, masked:this.maskMember(phone)}, screen:'scan', overlay:null, keypad:''}), 1700); };
+  maskMember(phone){ const p=(phone||'').replace(/\D/g,'').padEnd(10,'0').slice(0,10); const masked=p.slice(0,6)+'xxxx'; return masked+' · สมชาย xxxx'; }
+  openCoupon = ()=> this.setState({overlay:'coupon', keypad:''});
+  submitCoupon = ()=>{ this.setState({overlay:null, keypad:''}); this.loadThen('กำลังตรวจสอบคูปอง','Validating coupon…', ()=>{ this.setState({couponApplied:true}); this.toast('🎟️ ใช้คูปองแล้ว · Coupon applied −฿20'); }, 1300); };
+  goIdle = ()=> this.goto('idle');
+  goScan = ()=> this.goto('scan');
+  goMember = ()=> this.setState({screen:'member', overlay:null, keypad:''});
+  goPayment = ()=>{ this.clearTimers(); this.loadThen('กำลังเตรียมการชำระเงิน','Preparing payment…', ()=>this.setState({screen:'payment', overlay:null, payStatus:'progress'}), 1200); };
+  goReceipt = ()=> this.finishPay('T019');
+  reset = ()=>{ this.clearTimers(); this._scanN=0; this.setState({screen:'idle', overlay:null, cart:[], scanIndex:0, member:null, payMethod:null, keypad:'', countdown:30, lastItem:null, flash:false, couponApplied:false}); };
+  noop = ()=>{};
+
+  setTH = ()=> this.setState({lang:'th'});
+  setEN = ()=> this.setState({lang:'en'});
+  setCN = ()=> this.setState({lang:'cn'});
+  toggleOnline = ()=> this.setState(s=>({online:!s.online}));
+  togglePayFail = ()=> this.setState(s=>({payFailNext:!s.payFailNext}));
+  toggleReach = ()=> this.setState(s=>({reach:!s.reach}));
+
+  flashItem(disp){
+    this.setState({lastItem:disp, flash:true});
+    if(this._flashT) clearTimeout(this._flashT);
+    this._flashT=setTimeout(()=>this.setState({flash:false}), 2600);
+  }
+  addLine(item, overrides){
+    const merged={...item, ...(overrides||{})};
+    this.setState(s=>{
+      const cart=[...s.cart];
+      if(item.tag!=='WEIGHT' && !overrides){
+        const ex=cart.find(l=>l.id===item.id);
+        if(ex){ return {cart: cart.map(l=> l===ex? {...l, qty:l.qty+1}:l)}; }
+      }
+      cart.push({...merged, lineId: item.id+'_'+Date.now()+'_'+cart.length, qty:1});
+      return {cart};
+    });
+    const saved=merged.reg-merged.sale;
+    this.flashItem({th:merged.th, en:merged.en, price:'฿'+this.m(merged.sale), saved:saved>0.005, savedStr:'฿'+this.m(saved)});
+  }
+  scanNext = ()=>{
+    if(this._scanN==null) this._scanN=this.state.scanIndex;
+    const id=this.scanScript[this._scanN % this.scanScript.length];
+    this._scanN++;
+    const item=this.catalog.find(c=>c.id===id);
+    this.setState({scanIndex:this._scanN});
+    if(item.tag==='WEIGHT'){ this.setState({pending:item, overlay:'weight'}); }
+    else if(item.tag==='ALCOHOL'){ this.setState({pending:item, overlay:'attendant', attendantReason:'สินค้าควบคุมอายุ (แอลกอฮอล์) · Age-restricted (alcohol)'}); }
+    else { this.addLine(item); }
+  };
+  changeQty(lineId, d){ this.setState(s=>({cart: s.cart.map(l=> l.lineId===lineId? {...l, qty:Math.max(1,l.qty+d)}:l)})); }
+  removeLine(lineId){ this.setState(s=>({cart: s.cart.filter(l=>l.lineId!==lineId)})); }
+
+  kp(d){ this.setState(s=>({keypad:(s.keypad+d).slice(0,16)})); }
+  kBack = ()=> this.setState(s=>({keypad:s.keypad.slice(0,-1)}));
+  kClear = ()=> this.setState({keypad:''});
+  openKeypad = ()=> this.setState({overlay:'keypad', keypad:''});
+  submitBarcode = ()=> this.setState(s=>({overlay:'unknown', unknownBarcode: s.keypad||'8855 0000 0000', keypad:''}));
+  confirmWeight = ()=>{ const p=this.state.pending; if(p) this.addLine(p, {sale:+(p.perKg*p.weight).toFixed(2)}); this.setState({overlay:null, pending:null}); };
+  confirmPrice = ()=>{ const p=this.state.pending, v=Number(this.state.keypad)||0; if(p) this.addLine(p, {reg:v, sale:v}); this.setState({overlay:null, pending:null, keypad:''}); };
+  approveAttendant = ()=>{ const p=this.state.pending; if(p) this.addLine(p); this.setState({overlay:null, pending:null}); };
+  cancelOverlay = ()=> this.setState({overlay:null, pending:null, keypad:''});
+  callHelp = ()=> this.setState({overlay:'help'});
+
+  ovWeightBtn = ()=>{ const p=this.catalog.find(c=>c.id==='p4'); this.setState({screen:'scan', pending:p, overlay:'weight'}); };
+  ovPriceBtn = ()=>{ this.setState({screen:'scan', pending:{id:'pp', sku:'2999999', th:'สินค้าตั้งราคาเอง', en:'Price-required item', tag:'REG'}, overlay:'price', keypad:''}); };
+  ovAttendantBtn = ()=>{ const p=this.catalog.find(c=>c.id==='p5'); this.setState({screen:'scan', pending:p, overlay:'attendant', attendantReason:'สินค้าควบคุมอายุ (แอลกอฮอล์) · Age-restricted (alcohol)'}); };
+  ovUnknownBtn = ()=> this.setState({screen:'scan', overlay:'unknown', unknownBarcode:'8855 1234 9087'});
+  ovHelpBtn = ()=> this.setState({screen:'scan', overlay:'help'});
+  ovTimeoutBtn = ()=> this.setState({screen:'scan', overlay:'timeout'});
+
+  memTabMember = ()=> this.setState({memTab:'member'});
+  memTabCoupon = ()=> this.setState({memTab:'coupon'});
+  applyMember = ()=>{ const phone=(this.state.keypad||'0926291042'); this.loadThen('กำลังตรวจสอบสมาชิก','Verifying membership…', ()=>this.setState({member:{name:'คุณ สมชาย ใจดี · S. Jaidee', points:1240, masked:this.maskMember(phone)}}), 1600); };
+  applyCoupon = ()=>{};
+
+  pick(id){
+    this.clearTimers();
+    this.setState({screen:'paying', payMethod:id, payStatus:'progress'});
+    if(this.state.payFailNext){
+      this._fail=setTimeout(()=>{ this.setState({payStatus:'failed', payFailNext:false}); }, 2200);
+    } else {
+      this._pay=setTimeout(()=>{ this.finishPay(id); }, id==='T019'?3200:2600);
+    }
+  }
+  payCash=()=>this.pick('T001'); payCard=()=>this.pick('T002'); payQR=()=>this.pick('T019');
+  payTrue=()=>this.pick('T009'); payAlipay=()=>this.pick('T016'); payWeChat=()=>this.pick('T021');
+  payGift=()=>this.pick('T004'); payVoucher=()=>this.pick('T010'); payPoints=()=>this.pick('T007');
+  payCancel = ()=>{ this.clearTimers(); this.goto('payment'); };
+  payRetry = ()=> this.pick(this.state.payMethod||'T019');
+  finishPay(id){
+    this.clearTimers();
+    const now=new Date();
+    const dt = String(now.getDate()).padStart(2,'0')+'/'+String(now.getMonth()+1).padStart(2,'0')+'/'+now.getFullYear()+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+    this.setState({screen:'receipt', payMethod:id, txnTime:dt, countdown:30});
+    this._cd=setInterval(()=>{
+      this.setState(s=>{ if(s.countdown<=1){ this.clearTimers(); this._scanN=0; return {screen:'idle', overlay:null, cart:[], scanIndex:0, member:null, payMethod:null, countdown:30, lastItem:null, flash:false, couponApplied:false}; } return {countdown:s.countdown-1}; });
+    },1000);
+  }
+
+  // ---- staff mode ----
+  openStaff = ()=> this.setState({screen:'staffpin', overlay:null, keypad:''});
+  staffEnter = ()=>{ if((this.state.keypad||'').length>=4) this.setState({screen:'staff', keypad:''}); };
+  exitStaff = ()=> this.setState({screen: this.state.terminalDown?'idle':'idle', overlay:null, keypad:''});
+  toast(msg){ this.setState({staffToast:msg}); if(this._toastT) clearTimeout(this._toastT); this._toastT=setTimeout(()=>this.setState({staffToast:''}),2800); }
+  staffPrintX = ()=> this.toast('🧾 กำลังพิมพ์รายงานยอดขาย (X) · Printing X report…');
+  staffEndShift = ()=> this.toast('✅ ปิดกะแล้ว · Shift closed — Z report printed');
+  staffReprint = ()=> this.toast('🧾 พิมพ์ใบเสร็จล่าสุดซ้ำ · Reprinting last receipt…');
+  staffCash = ()=> this.toast('💵 เปิดลิ้นชักเก็บเงิน · Cash drawer opened');
+  staffPickup = ()=> this.toast('💰 บันทึกการเก็บเงิน · Cash pickup recorded');
+  staffPaper = ()=> this.toast('🧻 แจ้งเปลี่ยนกระดาษ · Paper roll change logged');
+  staffLang = ()=> this.toast('🌐 บันทึกการตั้งค่าภาษา · Default language saved');
+  toggleTerminal = ()=>{ const d=!this.state.terminalDown; this.setState({terminalDown:d}); this.toast(d?'⛔ ตั้งเป็นปิดให้บริการ · Terminal set OUT OF SERVICE':'🟢 เปิดให้บริการแล้ว · Terminal back IN SERVICE'); };
+
+  tenderLabel(id){
+    const map={T001:'Cash · เงินสด',T002:'Credit Card',T004:'Gift Voucher',T007:'Member Points',T009:'TrueMoney Wallet',T010:'Voucher',T016:'Alipay',T019:'QR PromptPay',T021:'WeChat Pay'};
+    return map[id]||'QR PromptPay';
+  }
+
+  renderVals(){
+    const st=this.state;
+    const sc=st.scale;
+    const ow = Math.round(1080*sc), oh = Math.round(1920*sc);
+    const tag={
+      REG:{label:'ปกติ',bg:'#F1ECE9',color:'#5C4F49'},
+      PROMO:{label:'โปรโม',bg:'#F5B800',color:'#5b3a00'},
+      MEMBER:{label:'สมาชิก',bg:'#FDE0DD',color:'#B71C16'},
+      WEIGHT:{label:'ชั่ง',bg:'#E8F6ED',color:'#1A7A42'},
+      ALCOHOL:{label:'21+',bg:'#FEF6DC',color:'#92400E'}
+    };
+    let grossReg=0, net=0, subReg=0, subPro=0, count=0;
+    const cartView = st.cart.map(l=>{
+      const lineNet=l.sale*l.qty, lineGross=l.reg*l.qty;
+      net+=lineNet; grossReg+=lineGross; count+=l.qty;
+      if(l.tag==='PROMO') subPro+=lineNet; else subReg+=lineNet;
+      const t=tag[l.tag]||tag.REG;
+      const isWeight=l.tag==='WEIGHT';
+      return {
+        id:l.lineId, th:l.th, en:l.en, sku:l.sku,
+        tagLabel:t.label, tagBg:t.bg, tagColor:t.color,
+        qty:l.qty, isWeight, isQty:!isWeight,
+        qtyText:isWeight?(l.weight+' กก.'):String(l.qty),
+        unitStr:isWeight?('฿'+this.m(l.perKg)+'/กก.'):('฿'+this.m(l.sale)),
+        unitColor:(l.sale<l.reg)?'#1F8A4C':'#8A7E79',
+        lineStr:'฿'+this.m(lineNet),
+        showStrike:l.sale<l.reg, origStr:'฿'+this.m(l.reg),
+        dec:()=>this.changeQty(l.lineId,-1), inc:()=>this.changeQty(l.lineId,1), remove:()=>this.removeLine(l.lineId)
+      };
+    });
+    const couponVal = st.couponApplied?20:0;
+    const amountDue = Math.max(0, net - couponVal);
+    const saved=(grossReg-net)+couponVal, vat=amountDue*7/107, pts=Math.floor(amountDue/25);
+
+    const receiptLines = st.cart.map(l=>({
+      name:(l.en||l.th).slice(0,22),
+      qtyPrice:(l.tag==='WEIGHT')?(l.weight+'kg x'+this.m(l.perKg)):(l.qty+' x '+this.m(l.sale)),
+      amount:this.m(l.sale*l.qty),
+      star:(l.tag==='PROMO')?'*':' '
+    }));
+
+    const on=st.online;
+    const ov=st.overlay;
+    const li=st.lastItem;
+
+    // ---- persistent header / step tracker ----
+    const stepMap={idle:0,memberfirst:0,scan:1,member:1,payment:2,paying:2,receipt:3};
+    const activeStep=stepMap[st.screen]||0;
+    const showHeader=st.screen==='memberfirst'||st.screen==='scan'||st.screen==='member'||st.screen==='payment'||st.screen==='receipt';
+    const stepSty=(i)=>{ const done=i<activeStep, active=i===activeStep; return {
+      done, num:!done,
+      bg: done?'#1F8A4C':(active?'#E2231A':'#ECE3DE'),
+      col:(done||active)?'#fff':'#8A7E79',
+      lab: active?'#211B1A':(done?'#1A7A42':'#A99C95') }; };
+    const _s1=stepSty(1), _s2=stepSty(2), _s3=stepSty(3);
+    const showFlash = st.flash && st.cart.length>0;
+
+    return {
+      deviceOuterStyle:`flex:none;position:relative;width:${ow}px;height:${oh}px;`,
+      deviceInnerStyle:`position:absolute;top:0;left:0;width:1080px;height:1920px;transform:scale(${sc});transform-origin:top left;background:#F6F1EE;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.5);display:flex;flex-direction:column;`,
+
+      isIdle:st.screen==='idle', isScan:st.screen==='scan', isMember:st.screen==='member',
+      isPayment:st.screen==='payment', isPaying:st.screen==='paying', isReceipt:st.screen==='receipt',
+      idleNormal:st.screen==='idle' && !st.terminalDown, idleDown:st.screen==='idle' && st.terminalDown,
+      isStaffPin:st.screen==='staffpin', isStaff:st.screen==='staff',
+      showHeader: showHeader && !st.transition,
+      isTransition:!!st.transition, transMsg:st.transition?st.transition.msg:'', transSub:st.transition?st.transition.sub:'',
+      canBack:(st.screen==='member'||st.screen==='payment'),
+      s1Bg:_s1.bg, s1Col:_s1.col, s1Lab:_s1.lab, s1Done:_s1.done, s1Num:_s1.num,
+      s2Bg:_s2.bg, s2Col:_s2.col, s2Lab:_s2.lab, s2Done:_s2.done, s2Num:_s2.num,
+      s3Bg:_s3.bg, s3Col:_s3.col, s3Lab:_s3.lab, s3Done:_s3.done, s3Num:_s3.num,
+      conn1Bg: activeStep>1?'#1F8A4C':'#ECE3DE', conn2Bg: activeStep>2?'#1F8A4C':'#ECE3DE',
+      pinMask:'●'.repeat((st.keypad||'').length)||'', pinHasDigits:(st.keypad||'').length>0,
+      terminalDown:st.terminalDown,
+      terminalBtnLabel:st.terminalDown?'OUT':'IN',
+      terminalBtnColor:st.terminalDown?'#FBBF24':'#6EE7A8',
+      svcCardBg:st.terminalDown?'#FEF3C7':'#E8F6ED', svcCardBorder:st.terminalDown?'#FCD34D':'#BBE9CC',
+      svcDot:st.terminalDown?'#F59E0B':'#1F8A4C', svcText:st.terminalDown?'#92400E':'#1A7A42',
+      svcLabel:st.terminalDown?'ปิดให้บริการ · OUT OF SERVICE':'พร้อมให้บริการ · IN SERVICE',
+      svcAction:st.terminalDown?'เปิดให้บริการ · Set in service':'ปิดให้บริการ · Set out of service',
+      staffToast:st.staffToast||'', staffToastShow:!!st.staffToast,
+      openStaff:this.openStaff, staffEnter:this.staffEnter, exitStaff:this.exitStaff,
+      staffPrintX:this.staffPrintX, staffEndShift:this.staffEndShift, staffReprint:this.staffReprint,
+      staffCash:this.staffCash, staffPickup:this.staffPickup, staffPaper:this.staffPaper, staffLang:this.staffLang,
+      toggleTerminal:this.toggleTerminal,
+
+      anyOverlay:!!ov, ovWeight:ov==='weight', ovPrice:ov==='price', ovAttendant:ov==='attendant',
+      ovUnknown:ov==='unknown', ovHelp:ov==='help', ovKeypad:ov==='keypad', ovTimeout:ov==='timeout',
+
+      online:on, offline:!on,
+      statusBg:on?'#E8F6ED':'#FEF3C7', statusDot:on?'#1F8A4C':'#F59E0B',
+      statusText:on?'#1A7A42':'#92400E', statusLabel:on?'ONLINE':'OFFLINE',
+      onlineColor:on?'#6EE7A8':'#FBBF24', onlineLabel:on?'ONLINE':'OFFLINE',
+      payFailColor:st.payFailNext?'#FBBF24':'#6EE7A8', payFailLabel:st.payFailNext?'WILL FAIL':'OK',
+      reachColor:st.reach?'#6EE7A8':'#9c857a', reachLabel:st.reach?'ON':'OFF',
+
+      slideOp0:(st.slide%4)===0?'1':'0', slideOp1:(st.slide%4)===1?'1':'0', slideOp2:(st.slide%4)===2?'1':'0', slideOp3:(st.slide%4)===3?'1':'0',
+      adTrackTransform:`translateX(-${(st.slide%4)*100}%)`,
+      adDotBg0:st.slide===0?'#E2231A':'#D8C8BF', adDotBg1:st.slide===1?'#E2231A':'#D8C8BF', adDotBg2:st.slide===2?'#E2231A':'#D8C8BF', adDotBg3:st.slide===3?'#E2231A':'#D8C8BF', adDotBg4:st.slide===4?'#E2231A':'#D8C8BF',
+      adDotW0:st.slide===0?'40px':'14px', adDotW1:st.slide===1?'40px':'14px', adDotW2:st.slide===2?'40px':'14px', adDotW3:st.slide===3?'40px':'14px', adDotW4:st.slide===4?'40px':'14px',
+      goSlide0:()=>this.goSlide(0), goSlide1:()=>this.goSlide(1), goSlide2:()=>this.goSlide(2), goSlide3:()=>this.goSlide(3), goSlide4:()=>this.goSlide(4),
+
+      idleTHcol:st.lang==='th'?'#fff':'rgba(255,255,255,.55)', idleENcol:st.lang==='en'?'#fff':'rgba(255,255,255,.55)', idleCNcol:st.lang==='cn'?'#fff':'rgba(255,255,255,.55)',
+      setCN:this.setCN,
+      thPillBg:st.lang==='th'?'#fff':'transparent', thPillColor:st.lang==='th'?'#E2231A':'#fff',
+      enPillBg:st.lang==='en'?'#fff':'transparent', enPillColor:st.lang==='en'?'#E2231A':'#fff',
+      thPillBg2:st.lang==='th'?'#E2231A':'transparent', thPillColor2:st.lang==='th'?'#fff':'#8A7E79',
+      enPillBg2:st.lang==='en'?'#E2231A':'transparent', enPillColor2:st.lang==='en'?'#fff':'#8A7E79',
+
+      idleBtnBg:st.screen==='idle'?'#5b2018':'#241a15',
+      scanBtnBg:st.screen==='scan'?'#5b2018':'#241a15',
+      memberBtnBg:st.screen==='member'?'#5b2018':'#241a15',
+      payBtnBg:(st.screen==='payment'||st.screen==='paying')?'#5b2018':'#241a15',
+      receiptBtnBg:st.screen==='receipt'?'#5b2018':'#241a15',
+
+      // scan stage
+      stageFlash:showFlash, stagePrompt:!showFlash,
+      stageBg:showFlash?'#ECFAEF':'#2A1D18',
+      lastTh:li?li.th:'', lastEn:li?li.en:'', lastPrice:li?li.price:'', lastSaved:li?li.saved:false, lastSavedStr:li?li.savedStr:'',
+
+      cartEmpty:st.cart.length===0, cartHasItems:st.cart.length>0, cartView,
+      itemCount:count, subtotalStr:this.m(grossReg), savedStr:this.m(saved), hasSaved:saved>0.005,
+      totalStr:this.m(net),
+
+      memTabBg:st.memTab==='member'?'#fff':'#ECE3DE', memTabColor:st.memTab==='member'?'#E2231A':'#8A7E79',
+      coupTabBg:st.memTab==='coupon'?'#fff':'#ECE3DE', coupTabColor:st.memTab==='coupon'?'#E2231A':'#8A7E79',
+      showMemberTab:st.memTab==='member', showCouponTab:st.memTab==='coupon',
+      hasMember:!!st.member, noMember:!st.member,
+      memberName:st.member?st.member.name:'', memberPoints:st.member?st.member.points.toLocaleString():'',
+      memberMasked:st.member?(st.member.masked||'092629xxxx · สมชาย xxxx'):'',
+      pointsPreview:pts.toLocaleString(),
+      discounts:[
+        {label:'บัตรสมาชิก', type:'Member Card', amt:'-฿30.00'},
+        {label:'ส่วนลดท้ายบิล', type:'Transaction Discount', amt:'-฿20.00'}
+      ],
+
+      keypadDisplay:st.keypad||'',
+      phoneShown:st.keypad||'0XX-XXXXXXX', phoneColor:st.keypad?'#211B1A':'#C9B6AC',
+
+      pendName:st.pending?(st.pending.th+' · '+st.pending.en):'',
+      pendWeight:st.pending&&st.pending.weight?st.pending.weight:'0.452',
+      pendComputed:st.pending&&st.pending.perKg?this.m(st.pending.perKg*st.pending.weight):'26.67',
+      attendantReason:st.attendantReason||'',
+      unknownBarcode:st.unknownBarcode||'8855 0000 0000',
+
+      payProgress:st.payStatus==='progress', payFailed:st.payStatus==='failed',
+      payIsQR:st.payMethod==='T019', payNotQR:st.payMethod!=='T019',
+      payMethodLabel:this.tenderLabel(st.payMethod),
+
+      receiptLines, rSubReg:this.m(subReg), rSubPro:this.m(subPro), rDis:this.m(saved),
+      rTotal:this.m(amountDue), rVat:this.m(vat), rPoints:pts, rTender:this.tenderLabel(st.payMethod),
+      amountDueStr:this.m(amountDue), couponApplied:st.couponApplied, couponNotApplied:!st.couponApplied,
+      isMemberFirst:st.screen==='memberfirst', pinEmpty:(st.keypad||'').length===0,
+      memberSkip:this.memberSkip, memberFirstApply:this.memberFirstApply,
+      openCoupon:this.openCoupon, submitCoupon:this.submitCoupon, ovCoupon:ov==='coupon',
+      rDateTime:st.txnTime||'', rBranch:'21', rTerminal:'42', countdown:st.countdown,
+
+      start:this.start, beginTxn:this.start, goIdle:this.goIdle, goScan:this.goScan, goMember:this.goMember,
+      goPayment:this.goPayment, goReceipt:this.goReceipt, reset:this.reset, noop:this.noop,
+      setTH:this.setTH, setEN:this.setEN, toggleOnline:this.toggleOnline, togglePayFail:this.togglePayFail, toggleReach:this.toggleReach,
+      scanNext:this.scanNext, openKeypad:this.openKeypad, submitBarcode:this.submitBarcode,
+      confirmWeight:this.confirmWeight, confirmPrice:this.confirmPrice, approveAttendant:this.approveAttendant,
+      cancelOverlay:this.cancelOverlay, callHelp:this.callHelp,
+      ovWeightBtn:this.ovWeightBtn, ovPriceBtn:this.ovPriceBtn, ovAttendantBtn:this.ovAttendantBtn,
+      ovUnknownBtn:this.ovUnknownBtn, ovHelpBtn:this.ovHelpBtn, ovTimeoutBtn:this.ovTimeoutBtn,
+      memTabMember:this.memTabMember, memTabCoupon:this.memTabCoupon, applyMember:this.applyMember, applyCoupon:this.applyCoupon,
+      payCash:this.payCash, payCard:this.payCard, payQR:this.payQR, payTrue:this.payTrue, payAlipay:this.payAlipay,
+      payWeChat:this.payWeChat, payGift:this.payGift, payVoucher:this.payVoucher, payPoints:this.payPoints,
+      payCancel:this.payCancel, payRetry:this.payRetry,
+      k0:()=>this.kp('0'),k1:()=>this.kp('1'),k2:()=>this.kp('2'),k3:()=>this.kp('3'),k4:()=>this.kp('4'),
+      k5:()=>this.kp('5'),k6:()=>this.kp('6'),k7:()=>this.kp('7'),k8:()=>this.kp('8'),k9:()=>this.kp('9'),
+      kBack:this.kBack, kClear:this.kClear
+    };
+  }
+}
+</script>
+</body>
+</html>

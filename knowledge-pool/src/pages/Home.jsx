@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Server, DatabaseZap, Code, ShieldCheck, Activity, Database, Layers, ArrowRight, Network, Sparkles } from 'lucide-react'
+import { Server, DatabaseZap, Code, ShieldCheck, Activity, Database, ArrowRight, Network, Sparkles, ScanLine } from 'lucide-react'
 import StatCounter from '../components/primitives/StatCounter'
 import ArchitectureGraph from '../components/diagrams/ArchitectureGraph'
 import './pages.css'
@@ -16,18 +16,18 @@ function Home() {
     <div className="home">
       <div className="bento">
         <section className="cell cell--hero">
-          <span className="cell__tag">OVERVIEW</span>
-          <h1>ServiceTransfer</h1>
-          <p>Interactive knowledge portal for the reverse-engineering &amp; revamp of the legacy VB6 background sync agent.</p>
+          <span className="cell__tag">PROJECT SCO</span>
+          <h1>Foodland Self-Checkout</h1>
+          <p>Building Foodland&apos;s new self-checkout kiosk on the Fujitsu POS API Center — grounded on a fully reverse-engineered, verified POS foundation.</p>
           <div className="hero-chips">
-            <span className="chip">VB6 → Modern</span>
-            <span className="chip">Event-Driven</span>
-            <span className="chip">API Gateway</span>
+            <span className="chip">Self-Checkout</span>
+            <span className="chip">ไทย / EN / 中文</span>
+            <span className="chip">Offline-first</span>
           </div>
           <div className="hero-cta">
-            <Link to="/flows" className="btn primary"><Network size={16} /> Explore Flows</Link>
-            <Link to="/methodology" className="btn ghost"><Sparkles size={15} /> How we did it</Link>
-            <Link to="/docs/architecture-srs" className="btn ghost">Read the SRS <ArrowRight size={15} /></Link>
+            <Link to="/sco" className="btn primary"><ScanLine size={16} /> Open SCO Kiosk</Link>
+            <Link to="/flows" className="btn ghost"><Network size={15} /> POS foundation</Link>
+            <Link to="/methodology" className="btn ghost"><Sparkles size={15} /> The method <ArrowRight size={15} /></Link>
           </div>
         </section>
 
@@ -47,12 +47,12 @@ function Home() {
 
         <section className="cell cell--about">
           <span className="cell__tag">ABOUT</span>
-          <h3>What it does</h3>
-          <p>A background agent on every branch POS that pushes pending sales (flagged <code>FTStaSentOnOff='0'</code>) to the central server, tokenizes card data via SafeNet, and accrues member loyalty points — all on a 500ms timer.</p>
+          <h3>What it is</h3>
+          <p>An interactive self-checkout kiosk (ไทย/EN/中文, offline-first) that reads SKU, promo, member &amp; points from the POS and writes finished sales back — the SCO lane is treated as one POS terminal on the store network.</p>
         </section>
 
         <section className="cell cell--live">
-          <span className="cell__tag">LIVE DIAGRAM</span>
+          <span className="cell__tag">POS FOUNDATION · LIVE</span>
           <ArchitectureGraph />
         </section>
 
@@ -65,12 +65,12 @@ function Home() {
           </Link>
         ))}
 
-        <Link to="/flows" className="cell cell--link cell--flows">
-          <span className="cell__tag">SYSTEM FLOWS</span>
-          <span className="flows-icon"><Layers size={28} /></span>
+        <Link to="/sco" className="cell cell--link cell--flows">
+          <span className="cell__tag">SCO KIOSK</span>
+          <span className="flows-icon"><ScanLine size={28} /></span>
           <div>
-            <h3>Interactive Diagrams</h3>
-            <p>Step through the sync cycle, tokenization, member points, and the ER schema — all clickable.</p>
+            <h3>Interactive kiosk demo</h3>
+            <p>Tap through the full shopper loop — idle → scan → member → payment → receipt — plus edge cases and staff mode.</p>
           </div>
           <ArrowRight size={22} color="var(--accent)" style={{ marginLeft: 'auto' }} />
         </Link>

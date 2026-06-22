@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Home, FileText, Database, ShieldCheck, Download, Code, X, Network, Layers, Presentation } from 'lucide-react'
+import { Home, FileText, Database, ShieldCheck, Download, Code, X, Network, Layers, Presentation, ScanLine } from 'lucide-react'
 
 const docLinks = [
   { to: '/docs/architecture-srs', icon: FileText, label: 'Architecture & SRS' },
@@ -20,10 +20,10 @@ function Sidebar({ isOpen, onClose }) {
       <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar__header">
           <div className="sidebar__brand">
-            <span className="sidebar__brand-mark"><Network size={18} /></span>
+            <span className="sidebar__brand-mark"><ScanLine size={18} /></span>
             <span className="sidebar__brand-text">
-              <strong>ServiceTransfer</strong>
-              <span>Documentation Portal</span>
+              <strong>Project SCO</strong>
+              <span>Foodland Self-Checkout</span>
             </span>
           </div>
           <button className="sidebar__close" onClick={onClose} aria-label="Close menu">
@@ -33,16 +33,19 @@ function Sidebar({ isOpen, onClose }) {
 
         <nav className="sidebar__nav">
           <NavLink to="/" end className={navClass} onClick={closeOnMobile}>
-            <Home size={18} /> Introduction
+            <Home size={18} /> Overview
           </NavLink>
+          <NavLink to="/sco" className={navClass} onClick={closeOnMobile}>
+            <ScanLine size={18} /> SCO Kiosk
+          </NavLink>
+          <NavLink to="/methodology" className={navClass} onClick={closeOnMobile}>
+            <Presentation size={18} /> Modernization Method
+          </NavLink>
+
+          <div className="nav-group">POS Foundation</div>
           <NavLink to="/flows" className={navClass} onClick={closeOnMobile}>
             <Network size={18} /> System Flows & Diagrams
           </NavLink>
-          <NavLink to="/methodology" className={navClass} onClick={closeOnMobile}>
-            <Presentation size={18} /> Pitch Presentation
-          </NavLink>
-
-          <div className="nav-group">Documents</div>
           {docLinks.map(({ to, icon: Icon, label }) => (
             <NavLink key={to} to={to} className={navClass} onClick={closeOnMobile}>
               <Icon size={18} /> {label}
