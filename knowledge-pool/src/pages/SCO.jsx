@@ -4,12 +4,14 @@ import {
   ScanLine, Smartphone, Users, CreditCard, Receipt, Wifi, Globe, Boxes,
   ShieldCheck, ArrowRight, ExternalLink, Sparkles, Network, Database, Server,
   Loader, Tag, LayoutGrid, Plug, ListChecks, Wrench, CircleDot,
+  SlidersHorizontal, Palette, Layers,
 } from 'lucide-react'
 import './pages.css'
 import './sco.css'
 
 // Served from knowledge-pool/public/sco-kiosk/ — base-relative for GitHub Pages.
 const DEMO = `${import.meta.env.BASE_URL}sco-kiosk/index.html`
+const CONFIG = `${import.meta.env.BASE_URL}sco-kiosk/config.html`
 
 // The real state machine from the prototype: idle → member-first → scan → pay → processing → receipt.
 const FLOW = [
@@ -62,19 +64,21 @@ const NEXT = ['Decide platform — keep DC-HTML or port to React/TS (same state 
 
 function SCO() {
   const [loaded, setLoaded] = useState(false)
+  const [cfgLoaded, setCfgLoaded] = useState(false)
 
   return (
     <div className="sco">
       {/* hero */}
       <section className="sco-hero glass">
         <div className="sco-hero__main">
-          <span className="sco-badge"><Sparkles size={14} /> PROJECT SCO · FOODLAND</span>
-          <h1>Self-Checkout, reimagined</h1>
+          <span className="sco-badge"><Sparkles size={14} /> PROJECT SCO · WHITE-LABEL</span>
+          <h1>One engine, any brand</h1>
           <p>
-            An interactive self-checkout kiosk for <strong>Foodland Supermarket</strong>, proposed on the
-            <strong> Fujitsu POS API Center</strong> (TMG × Fujitsu kickoff, Feb 2024). The SCO lane is
-            treated as <strong>one POS terminal</strong> — it pulls SKU, promotions, member &amp; loyalty
-            from the existing POS, and writes finished sales straight back into it.
+            A <strong>modular, white-label</strong> self-checkout platform. One standard engine that any
+            retailer can <strong>recolor, rebrand and trim</strong> — integrated through a single
+            <strong> POS API</strong>, so the lane is just one more POS terminal that pulls SKU, promotions
+            &amp; loyalty and writes sales back. The live demo is configured for <strong>Foodland</strong>,
+            the reference tenant.
           </p>
           <div className="sco-hero__cta">
             <a className="btn primary" href={DEMO} target="_blank" rel="noreferrer">
@@ -106,6 +110,37 @@ function SCO() {
             loading="lazy"
             onLoad={() => setLoaded(true)}
             className={loaded ? 'is-loaded' : ''}
+          />
+        </div>
+      </section>
+
+      {/* modular & configurable */}
+      <section className="sco-demo glass">
+        <div className="sco-section-head">
+          <h2><SlidersHorizontal size={20} color="var(--accent)" /> Modular &amp; configurable</h2>
+          <a className="sco-open" href={CONFIG} target="_blank" rel="noreferrer">Open configurator <ExternalLink size={14} /></a>
+        </div>
+        <p className="sco-demo__hint">One standard engine, skinned and trimmed per retailer. Pick a tenant, recolor / rebrand, and toggle standard functions on/off — the kiosk, the flow and the payment options update live.</p>
+        <div className="sco-twocol" style={{ marginBottom: '1rem' }}>
+          <div className="sco-cap glass" style={{ '--c': 'var(--accent)' }}>
+            <span className="sco-cap__icon"><Layers size={20} /></span>
+            <h3>Modular</h3>
+            <p>Switch any standard function off and the shopper flow gets shorter — each retailer ships only what they need.</p>
+          </div>
+          <div className="sco-cap glass" style={{ '--c': 'var(--accent-2)' }}>
+            <span className="sco-cap__icon"><Palette size={20} /></span>
+            <h3>Configurable</h3>
+            <p>Recolor, re-image and rebrand every screen per tenant — Foodland today, Lotus&apos;s tomorrow — keeping the same standard functions.</p>
+          </div>
+        </div>
+        <div className="sco-frame">
+          {!cfgLoaded && <div className="sco-frame__loading">Loading configurator…</div>}
+          <iframe
+            title="SCO configurator"
+            src={CONFIG}
+            loading="lazy"
+            onLoad={() => setCfgLoaded(true)}
+            className={cfgLoaded ? 'is-loaded' : ''}
           />
         </div>
       </section>

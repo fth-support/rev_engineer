@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project SCO — Configurator (modular + white-label demo)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=Kanit:wght@400;500;600;700&family=Prompt:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Nunito Sans','Noto Sans Thai',sans-serif;background:#0d0a08;color:#e9ded7;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:'Rubik','Noto Sans Thai',sans-serif}
+  .wrap{display:grid;grid-template-columns:340px 1fr;min-height:100vh}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr}}
+
+  /* ---------- control panel ---------- */
+  .panel{background:#15100d;border-right:1px solid #2c211b;padding:20px;overflow:auto;max-height:100vh}
+  .panel__title{font-size:16px;font-weight:800;color:#fff}
+  .panel__sub{font-size:11.5px;color:#9c857a;margin-top:3px;line-height:1.45}
+  .grp{margin-top:18px}
+  .grp__h{font-size:10.5px;text-transform:uppercase;letter-spacing:1.2px;color:#7a655b;margin-bottom:9px;font-weight:800}
+  .presets{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .preset{padding:9px 8px;border-radius:10px;border:1px solid #3a2c24;background:#211a15;color:#f1e6df;font-size:12.5px;font-weight:700;cursor:pointer;text-align:left;transition:.15s;display:flex;align-items:center;gap:7px}
+  .preset:hover{border-color:#5c4f49}
+  .preset.on{border-color:var(--p,#e2231a);box-shadow:0 0 0 1px var(--p,#e2231a) inset;color:#fff}
+  .preset .dot{width:11px;height:11px;border-radius:50%;flex:none}
+
+  .field{margin-bottom:11px}
+  .field label{display:block;font-size:11.5px;color:#c9b6ac;margin-bottom:5px;font-weight:700}
+  .field input[type=text],.field select{width:100%;padding:9px 10px;border-radius:8px;border:1px solid #3a2c24;background:#0f0b09;color:#f1e6df;font:inherit;font-size:13px}
+  .colors{display:flex;gap:8px}
+  .colorpick{flex:1}
+  .colorpick span{display:block;font-size:10.5px;color:#9c857a;margin-bottom:4px}
+  .colorpick input[type=color]{width:100%;height:34px;border:1px solid #3a2c24;border-radius:8px;background:#0f0b09;cursor:pointer;padding:2px}
+  .seg{display:flex;gap:6px}
+  .seg button{flex:1;padding:8px;border-radius:8px;border:1px solid #3a2c24;background:#211a15;color:#cbb6aa;font-weight:700;font-size:12px;cursor:pointer}
+  .seg button.on{background:var(--p,#e2231a);color:#fff;border-color:var(--p,#e2231a)}
+  .uploads{display:flex;gap:8px}
+  .uploads label.up{flex:1;text-align:center;padding:9px;border-radius:8px;border:1px dashed #4a382e;background:#1a1310;color:#cbb6aa;font-size:11.5px;font-weight:700;cursor:pointer}
+  .uploads label.up:hover{border-color:var(--p,#e2231a)}
+  .uploads input{display:none}
+  .imgrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .imgopt{width:48px;height:36px;border-radius:7px;border:2px solid #3a2c24;cursor:pointer;background-size:cover;background-position:center;opacity:.75;transition:.15s;font-size:9px;color:#cbb;display:flex;align-items:center;justify-content:center;text-align:center;background-color:#241a15}
+  .imgopt.on{opacity:1;border-color:var(--p,#e2231a)}
+
+  .toggle{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:8px;background:#1d1612;border:1px solid #2c211b;margin-bottom:6px;font-size:12.5px;font-weight:600;color:#e9ded7;cursor:pointer}
+  .toggle small{display:block;color:#8a766b;font-size:10.5px;font-weight:600}
+  .sw{flex:none;width:38px;height:21px;border-radius:999px;background:#3a2c24;position:relative;transition:.18s}
+  .sw::after{content:'';position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:#cbb6aa;transition:.18s}
+  .toggle.on .sw{background:var(--p,#e2231a)}
+  .toggle.on .sw::after{transform:translateX(17px);background:#fff}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .langs{display:flex;gap:6px;flex-wrap:wrap}
+  .langbtn{flex:1;min-width:54px;padding:8px 6px;border-radius:8px;border:1px solid #3a2c24;background:#211a15;color:#cbb6aa;font-weight:700;font-size:12px;cursor:pointer}
+  .langbtn.on{background:var(--p,#e2231a);color:#fff;border-color:var(--p,#e2231a)}
+  .actions{display:flex;gap:7px;margin-top:8px}
+  .actions button{flex:1;padding:10px;border-radius:9px;border:1px solid #3a2c24;background:#211a15;color:#f1e6df;font-weight:700;font-size:12px;cursor:pointer}
+  .actions button.dl{background:var(--p,#e2231a);color:#fff;border-color:var(--p,#e2231a)}
+  .resetbtn{width:100%;margin-top:8px;padding:10px;border-radius:9px;border:1px solid #7f1d1d;background:#3b1414;color:#fca5a5;font-weight:800;font-size:12.5px;cursor:pointer}
+
+  /* ---------- stage ---------- */
+  .stage{padding:24px clamp(16px,3vw,38px);overflow:auto;max-height:100vh;background:radial-gradient(900px 500px at 80% -10%,#241712,#0d0a08 70%)}
+  .stage__head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:5px}
+  .stage__head h1{font-size:clamp(19px,2.6vw,26px);color:#fff}
+  .badge{font-size:10.5px;font-weight:800;letter-spacing:.1em;color:#0d0a08;background:linear-gradient(120deg,var(--p,#e2231a),var(--a,#f5b800));padding:4px 10px;border-radius:999px}
+  .stage__sub{color:#a78f83;font-size:13px;margin-bottom:18px;max-width:74ch;line-height:1.5}
+  .layout{display:grid;grid-template-columns:380px 1fr;gap:22px;align-items:start}
+  @media(max-width:1200px){.layout{grid-template-columns:1fr}}
+
+  .screentabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .screentab{padding:7px 14px;border-radius:9px;border:1px solid #2c211b;background:#1a1310;color:#cbb6aa;font-weight:700;font-size:12.5px;cursor:pointer}
+  .screentab.on{background:var(--p,#e2231a);color:#fff;border-color:var(--p,#e2231a)}
+
+  /* themed kiosk — all screens use these vars */
+  .kiosk{--p:#e2231a;--a:#f5b800;--bg:#201611;--ink:#f6f1ee;--muted:#c9b6ac;--font:'Rubik';
+    --surface:color-mix(in srgb,var(--bg) 86%,var(--ink));--card:color-mix(in srgb,var(--bg) 78%,var(--ink));--line:color-mix(in srgb,var(--ink) 16%,transparent)}
+  .device{width:100%;max-width:380px;aspect-ratio:9/16;border-radius:26px;border:10px solid #2a211c;background:var(--bg);position:relative;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);margin:0 auto}
+  .device__bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.3}
+  .device__veil{position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 30%,transparent),var(--bg) 80%)}
+  .device__in{position:absolute;inset:0;color:var(--ink);display:flex;flex-direction:column}
+  .kfont{font-family:var(--font),'Noto Sans Thai',sans-serif}
+
+  /* idle */
+  .s-idle{align-items:center;justify-content:space-between;padding:30px 22px;text-align:center}
+  .k-logo{font-family:var(--font),sans-serif;font-weight:800;font-size:30px;letter-spacing:-.5px;color:#fff;background:var(--p);padding:8px 18px;border-radius:12px;box-shadow:0 10px 30px -10px var(--p)}
+  .k-logo img{max-height:54px;max-width:200px;display:block}
+  .k-open{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--a);margin-top:8px}
+  .k-tagline{font-size:13px;color:var(--muted);margin-bottom:14px}
+  .k-start{width:150px;height:150px;border-radius:50%;background:var(--p);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font);font-weight:800;font-size:18px;text-align:center;line-height:1.15;box-shadow:0 0 0 10px color-mix(in srgb,var(--p) 22%,transparent),0 20px 50px -12px var(--p);animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{50%{box-shadow:0 0 0 22px transparent,0 20px 50px -12px var(--p)}}
+  .k-langs{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+  .k-lang{font-size:12px;font-weight:700;color:var(--ink);background:color-mix(in srgb,var(--ink) 12%,transparent);border:1px solid var(--line);padding:4px 11px;border-radius:999px}
+  .k-help{font-size:11.5px;font-weight:700;color:var(--ink);opacity:.8}
+
+  /* generic screen chrome */
+  .s-head{padding:16px 18px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+  .s-head .nm{font-family:var(--font);font-weight:800;font-size:16px;color:#fff;background:var(--p);padding:4px 11px;border-radius:8px}
+  .s-head .ttl{font-size:13px;font-weight:700;color:var(--ink)}
+  .s-body{flex:1;overflow:hidden;padding:14px 16px;display:flex;flex-direction:column;gap:9px}
+  .s-foot{padding:14px 16px;border-top:1px solid var(--line)}
+  .bigbtn{width:100%;padding:15px;border-radius:14px;background:var(--p);color:#fff;font-family:var(--font);font-weight:800;font-size:17px;text-align:center;box-shadow:0 14px 30px -12px var(--p)}
+
+  /* scan rows */
+  .row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:10px}
+  .row .thumb{width:38px;height:38px;border-radius:9px;background:color-mix(in srgb,var(--p) 18%,transparent);flex:none}
+  .row .info{flex:1;min-width:0}
+  .row .nm{font-size:12.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .sub{font-size:10.5px;color:var(--muted)}
+  .row .pr{text-align:right;font-weight:800;font-size:13px;color:var(--ink)}
+  .row .pr s{display:block;font-weight:600;font-size:10px;color:var(--muted)}
+  .tg{font-size:8.5px;font-weight:800;letter-spacing:.04em;padding:2px 6px;border-radius:6px;text-transform:uppercase;display:inline-block;margin-top:2px}
+  .tg.promo{background:var(--a);color:#3a2c00}.tg.member{background:color-mix(in srgb,var(--p) 20%,transparent);color:var(--ink)}.tg.reg{background:color-mix(in srgb,var(--ink) 14%,transparent);color:var(--ink)}.tg.weigh{background:color-mix(in srgb,var(--ink) 14%,transparent);color:var(--ink)}
+  .totline{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px}
+  .totline .lab{font-size:12px;color:var(--muted)}.totline .save{color:#34d399;font-weight:800;font-size:12px}
+  .totline .tot{font-family:var(--font);font-weight:800;font-size:26px;color:var(--ink)}
+
+  /* payment */
+  .amtdue{text-align:center;padding:18px 0 6px}.amtdue .l{font-size:12px;color:var(--muted)}.amtdue .v{font-family:var(--font);font-weight:800;font-size:30px;color:var(--ink)}
+  .paygrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:6px 16px 16px;overflow:auto}
+  .paytile{padding:14px 8px;border-radius:13px;background:var(--surface);border:1px solid var(--line);text-align:center;font-size:12px;font-weight:700;color:var(--ink)}
+  .paytile .ic{width:40px;height:40px;border-radius:11px;margin:0 auto 7px;background:color-mix(in srgb,var(--p) 16%,transparent);color:var(--p);display:flex;align-items:center;justify-content:center;font-family:var(--font);font-weight:800;font-size:14px}
+
+  /* receipt */
+  .s-receipt{align-items:center;justify-content:center;text-align:center;padding:26px 22px;gap:14px}
+  .rcheck{width:78px;height:78px;border-radius:50%;background:#1f8a4c;color:#fff;display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 0 0 8px color-mix(in srgb,#1f8a4c 22%,transparent)}
+  .rttl{font-family:var(--font);font-weight:800;font-size:21px;color:var(--ink)}
+  .rsum{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .rsum .r{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink);padding:3px 0}
+  .rsum .r b{font-weight:800}
+  .rbtns{display:flex;gap:8px;width:100%}
+  .rbtns div{flex:1;padding:11px;border-radius:11px;border:1px solid var(--line);font-size:11.5px;font-weight:700;color:var(--ink);background:var(--surface)}
+  .rbtns div.pri{background:var(--p);color:#fff;border-color:var(--p)}
+
+  /* right cards */
+  .cards{display:flex;flex-direction:column;gap:16px}
+  .card{background:#16100d;border:1px solid #2c211b;border-radius:16px;padding:18px}
+  .card h3{font-size:13.5px;color:#fff;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .card h3 .pill{font-size:10.5px;font-weight:800;color:#0d0a08;background:var(--a,#f5b800);padding:2px 8px;border-radius:999px}
+  .flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .flow .step{display:flex;align-items:center;gap:6px;padding:9px 13px;border-radius:10px;background:#1d1612;border:1px solid #2c211b;font-size:12.5px;font-weight:700;color:#e9ded7}
+  .flow .step b{width:20px;height:20px;border-radius:50%;background:var(--p,#e2231a);color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center}
+  .flow .arr{color:var(--p,#e2231a);font-weight:800}
+  .flowmeta{margin-top:10px;font-size:11.5px;color:#8a766b}
+  .tenders{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  @media(max-width:560px){.tenders{grid-template-columns:repeat(2,1fr)}}
+  .tender{padding:11px 8px;border-radius:11px;background:#1d1612;border:1px solid #2c211b;text-align:center;font-size:11px;font-weight:700;color:#e9ded7}
+  .tender .ic{width:32px;height:32px;border-radius:9px;margin:0 auto 6px;background:color-mix(in srgb,var(--p,#e2231a) 18%,transparent);color:var(--a,#f5b800);display:flex;align-items:center;justify-content:center;font-family:'Rubik';font-weight:800;font-size:12px}
+  pre.json{background:#0c0907;border:1px solid #2c211b;border-radius:12px;padding:14px;font:12px/1.5 ui-monospace,Consolas,monospace;color:#c9b6ac;overflow:auto;max-height:300px}
+  .json .k{color:#f5b800}.json .s{color:#6ee7a8}.json .b{color:#fca5a5}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1f8a4c;color:#fff;font-weight:700;font-size:13px;padding:10px 18px;border-radius:999px;opacity:0;transition:.2s;pointer-events:none}
+  .toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- ================= CONTROL PANEL ================= -->
+  <aside class="panel">
+    <div class="panel__title">SCO Configurator</div>
+    <div class="panel__sub">One standard engine, skinned &amp; trimmed per retailer. Toggle modules to shorten the flow; recolor / rebrand for any tenant; preview every screen.</div>
+
+    <div class="grp"><div class="grp__h">Tenant preset</div><div class="presets" id="presets"></div></div>
+
+    <div class="grp">
+      <div class="grp__h">Brand</div>
+      <div class="field"><label>Store name</label><input type="text" id="name"></div>
+      <div class="field"><label>Logo &amp; idle image (upload your own)</label>
+        <div class="uploads">
+          <label class="up">Upload logo<input type="file" id="logo" accept="image/*"></label>
+          <label class="up">Upload background<input type="file" id="bgup" accept="image/*"></label>
+        </div>
+        <div class="imgrow" id="images"></div>
+      </div>
+      <div class="field colors">
+        <div class="colorpick"><span>Primary</span><input type="color" id="c-primary"></div>
+        <div class="colorpick"><span>Accent</span><input type="color" id="c-accent"></div>
+        <div class="colorpick"><span>Background</span><input type="color" id="c-bg"></div>
+      </div>
+      <div class="field"><label>Theme mode</label><div class="seg" id="mode"><button data-mode="dark">Dark</button><button data-mode="light">Light</button></div></div>
+      <div class="field"><label>Heading font</label><select id="font"></select></div>
+    </div>
+
+    <div class="grp"><div class="grp__h">Modules (toggle to trim the flow)</div><div id="modules"></div></div>
+    <div class="grp"><div class="grp__h">Payment methods</div><div class="grid2" id="tenders"></div></div>
+    <div class="grp"><div class="grp__h">Languages</div><div class="langs" id="langs"></div></div>
+
+    <div class="grp">
+      <div class="grp__h">Config</div>
+      <div class="actions"><button class="dl" id="download">Download JSON</button><button id="copy">Copy</button></div>
+      <button class="resetbtn" id="reset">Reset everything</button>
+    </div>
+  </aside>
+
+  <!-- ================= STAGE ================= -->
+  <main class="stage">
+    <div class="stage__head"><span class="badge">PROJECT SCO</span><h1>Modular &amp; configurable — one engine, any brand</h1></div>
+    <p class="stage__sub">The same standard self-checkout, reconfigured live. Pick a tenant, recolor / rebrand / upload a logo, switch the theme mode, and toggle standard functions — every screen, the flow and the payment options update. Below is the config that would drive a real lane.</p>
+
+    <div class="layout">
+      <div>
+        <div class="screentabs" id="screentabs"></div>
+        <div class="kiosk" id="kiosk">
+          <div class="device">
+            <div class="device__bg" id="kbg"></div>
+            <div class="device__veil"></div>
+            <div class="device__in" id="screen"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cards">
+        <div class="card"><h3>Shopper flow <span class="pill" id="stepcount">6 steps</span></h3><div class="flow" id="flow"></div><div class="flowmeta" id="flowmeta"></div></div>
+        <div class="card"><h3>Payment methods <span class="pill" id="tendercount">7</span></h3><div class="tenders" id="tendergrid"></div></div>
+        <div class="card"><h3>Configuration</h3><pre class="json" id="json"></pre></div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const PRESETS = {
+  foodland: { label:'Foodland', primary:'#e2231a', accent:'#f5b800', bg:'#201611', ink:'#f6f1ee', muted:'#c9b6ac', tagline:'Fresh market, every day', image:'assets/ads1_snack.png' },
+  lotus:    { label:"Lotus's", primary:'#19a85a', accent:'#ffd400', bg:'#0a2417', ink:'#eafff2', muted:'#a7d8bd', tagline:'Low prices, every day', image:'' },
+  bigc:     { label:'Big C', primary:'#7ab51d', accent:'#e6007e', bg:'#13210a', ink:'#f1ffe0', muted:'#bcd69a', tagline:'Big choices, big savings', image:'' },
+  makro:    { label:'Makro', primary:'#1e58a8', accent:'#f7a600', bg:'#0a1626', ink:'#e7f0ff', muted:'#9db8d8', tagline:'For pros & everyone', image:'' },
+  seven:    { label:'7-Eleven', primary:'#f47216', accent:'#138a4e', bg:'#241408', ink:'#fff3e8', muted:'#e0bda0', tagline:'Always open, always near', image:'' },
+  maxvalu:  { label:'Maxvalu', primary:'#009a93', accent:'#ff6f3c', bg:'#06211f', ink:'#e3fffb', muted:'#9ad6cf', tagline:'Everyday fresh value', image:'' },
+  tops:     { label:'Tops', primary:'#d6006c', accent:'#ffce00', bg:'#23061a', ink:'#ffe9f4', muted:'#d79bbd', tagline:'Eat well, live well', image:'' },
+  generic:  { label:'Your Store', primary:'#2f6bff', accent:'#ff8a3d', bg:'#0e1626', ink:'#eef2fb', muted:'#9fb0cc', tagline:'Self-checkout, your way', image:'' },
+};
+const MODULES = [
+  { id:'member',  label:'Member & points',  hint:'adds a member step', flow:true },
+  { id:'coupon',  label:'Coupons',          hint:'scan / enter codes' },
+  { id:'promo',   label:'Promotions display',hint:'deal & yellow-tag' },
+  { id:'weighed', label:'Weighed produce',  hint:'scale-priced items' },
+  { id:'age',     label:'Age-restricted',   hint:'staff approval' },
+  { id:'ereceipt',label:'E-receipt',        hint:'QR e-receipt' },
+  { id:'staff',   label:'Staff mode',       hint:'PIN settings' },
+];
+const TENDERS = [
+  { id:'cash', label:'Cash', g:'฿' }, { id:'card', label:'Credit Card', g:'CC' },
+  { id:'promptpay', label:'QR PromptPay', g:'QR' }, { id:'alipay', label:'Alipay', g:'AL' },
+  { id:'wechat', label:'WeChat', g:'WX' }, { id:'voucher', label:'Voucher', g:'VC' },
+  { id:'points', label:'Member Points', g:'PT' }, { id:'fx', label:'Foreign Cur.', g:'FX' },
+];
+const IMAGES = [ { id:'', label:'Auto' }, { id:'assets/ads1_snack.png', label:'' }, { id:'assets/ads2_milk.png', label:'' }, { id:'assets/ads3_sauce.png', label:'' } ];
+const FONTS = ['Rubik','Kanit','Prompt','Sarabun','IBM Plex Sans Thai'];
+const LANGS = {
+  th:{ label:'ไทย', start:'แตะเพื่อ<br>เริ่ม', pay:'ชำระเงิน', done:'ชำระเงินสำเร็จ' },
+  en:{ label:'EN', start:'Touch<br>to start', pay:'Pay', done:'Payment complete' },
+  zh:{ label:'中文', start:'触摸<br>开始', pay:'支付', done:'支付完成' },
+  ja:{ label:'日本語', start:'タッチ<br>して開始', pay:'支払う', done:'支払い完了' },
+  ar:{ label:'العربية', start:'المس<br>للبدء', pay:'ادفع', done:'اكتمل الدفع' },
+};
+const CART = [
+  { th:'นมสดออร์แกนิค', en:'Organic Fresh Milk', qty:1, price:79, was:89, tag:'member' },
+  { th:'ขนมรวมมิตร', en:'Mixed Snacks', qty:2, price:35, was:45, tag:'promo' },
+  { th:'ผักกาดหอม (ชั่ง)', en:'Lettuce (weighed)', qty:1, price:42, tag:'weigh' },
+  { th:'น้ำดื่ม ×6', en:'Water Pack ×6', qty:1, price:55, tag:'reg' },
+];
+
+const DEFAULTS = () => ({
+  preset:'foodland', name:'Foodland', primary:'', accent:'', bg:'', ink:'', muted:'', tagline:'', image:'',
+  logoImage:'', mode:'dark', font:'Rubik', screen:'idle',
+  modules:{ member:true, coupon:true, promo:true, weighed:true, age:true, ereceipt:true, staff:true },
+  tenders:{ cash:true, card:true, promptpay:true, alipay:true, wechat:true, voucher:true, points:true, fx:false },
+  langs:{ th:true, en:true, zh:true, ja:false, ar:false },
+});
+let state = DEFAULTS();
+
+function applyPreset(key){ const p=PRESETS[key]; Object.assign(state,{ preset:key, name:p.label, primary:p.primary, accent:p.accent, bg:p.bg, ink:p.ink, muted:p.muted, tagline:p.tagline, image:p.image, logoImage:'' }); }
+const $ = s => document.querySelector(s);
+const activeLangs = () => Object.keys(LANGS).filter(l=>state.langs[l]);
+const baht = n => '฿'+n.toLocaleString();
+
+/* ---------- build controls ---------- */
+function buildControls(){
+  $('#presets').innerHTML = Object.entries(PRESETS).map(([k,p])=>`<button class="preset" data-preset="${k}" style="--p:${p.primary}"><span class="dot" style="background:${p.primary}"></span>${p.label}</button>`).join('');
+  $('#images').innerHTML = IMAGES.map(im=>`<div class="imgopt" data-img="${im.id}" style="${im.id?`background-image:url(${im.id})`:''}">${im.id?'':'Auto'}</div>`).join('');
+  $('#font').innerHTML = FONTS.map(f=>`<option value="${f}">${f}</option>`).join('');
+  $('#modules').innerHTML = MODULES.map(m=>`<div class="toggle" data-mod="${m.id}"><div>${m.label}<small>${m.hint}</small></div><span class="sw"></span></div>`).join('');
+  $('#tenders').innerHTML = TENDERS.map(t=>`<div class="toggle" data-tender="${t.id}"><div>${t.label}</div><span class="sw"></span></div>`).join('');
+  $('#langs').innerHTML = Object.entries(LANGS).map(([k,l])=>`<button class="langbtn" data-lang="${k}">${l.label}</button>`).join('');
+
+  $('#presets').onclick = e=>{ const b=e.target.closest('[data-preset]'); if(b){ applyPreset(b.dataset.preset); sync(); render(); } };
+  $('#images').onclick = e=>{ const b=e.target.closest('[data-img]'); if(b){ state.image=b.dataset.img; render(); } };
+  $('#modules').onclick = e=>{ const b=e.target.closest('[data-mod]'); if(b){ state.modules[b.dataset.mod]=!state.modules[b.dataset.mod]; render(); } };
+  $('#tenders').onclick = e=>{ const b=e.target.closest('[data-tender]'); if(b){ state.tenders[b.dataset.tender]=!state.tenders[b.dataset.tender]; render(); } };
+  $('#langs').onclick = e=>{ const b=e.target.closest('[data-lang]'); if(b){ if(state.langs[b.dataset.lang]&&activeLangs().length<=1) return; state.langs[b.dataset.lang]=!state.langs[b.dataset.lang]; render(); } };
+  $('#mode').onclick = e=>{ const b=e.target.closest('[data-mode]'); if(b){ state.mode=b.dataset.mode; render(); } };
+  $('#screentabs').onclick = e=>{ const b=e.target.closest('[data-screen]'); if(b){ state.screen=b.dataset.screen; render(); } };
+  $('#name').oninput = e=>{ state.name=e.target.value; render(); };
+  $('#font').onchange = e=>{ state.font=e.target.value; render(); };
+  $('#c-primary').oninput = e=>{ state.primary=e.target.value; mark(); render(); };
+  $('#c-accent').oninput  = e=>{ state.accent=e.target.value; mark(); render(); };
+  $('#c-bg').oninput      = e=>{ state.bg=e.target.value; mark(); render(); };
+  $('#logo').onchange = e=>readImg(e,'logoImage');
+  $('#bgup').onchange = e=>readImg(e,'image');
+  $('#download').onclick = downloadCfg;
+  $('#copy').onclick = ()=>{ navigator.clipboard?.writeText(JSON.stringify(buildCfg(),null,2)); toast('Config copied'); };
+  $('#reset').onclick = ()=>{ localStorage.removeItem('sco-cfg'); state=DEFAULTS(); applyPreset('foodland'); sync(); render(); };
+}
+function mark(){ state.preset='custom'; document.querySelectorAll('[data-preset]').forEach(b=>b.classList.remove('on')); }
+function readImg(e,key){ const f=e.target.files&&e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ state[key]=r.result; render(); }; r.readAsDataURL(f); }
+function sync(){
+  document.querySelectorAll('[data-preset]').forEach(b=>b.classList.toggle('on', b.dataset.preset===state.preset));
+  $('#name').value=state.name; $('#c-primary').value=state.primary; $('#c-accent').value=state.accent; $('#c-bg').value=state.bg; $('#font').value=state.font;
+}
+
+/* ---------- screen renderers ---------- */
+function L(){ return LANGS[activeLangs()[0]] || LANGS.en; }
+function logoHTML(){ return state.logoImage ? `<img src="${state.logoImage}" alt="logo">` : (state.name||'Your Store'); }
+function cartTotals(){ let sub=0,save=0; CART.forEach(c=>{ sub+=c.price*c.qty; if(c.was) save+=(c.was-c.price)*c.qty; }); return { sub, save, total:sub }; }
+
+function idleHTML(){
+  const langs = activeLangs().map(k=>`<span class="k-lang">${LANGS[k].label}</span>`).join('');
+  return `<div class="device__in s-idle" style="position:static;height:100%">
+    <div><div class="k-logo">${logoHTML()}</div><div class="k-open">● OPEN 24 HOURS</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <div class="k-tagline">${state.tagline||''}</div>
+      <div class="k-start" id="kstart">${L().start}</div>
+      <div class="k-langs">${langs}</div>
+    </div>
+    <div class="k-help">Need help? · เรียกพนักงาน</div></div>`;
+}
+function scanHTML(){
+  const t=cartTotals();
+  const rows=CART.map(c=>{
+    const showTag = (c.tag==='promo'&&state.modules.promo)||(c.tag==='member'&&state.modules.member)||(c.tag==='weigh'&&state.modules.weighed)||c.tag==='reg';
+    const tag = showTag?`<span class="tg ${c.tag}">${c.tag==='promo'?'PROMO':c.tag==='member'?'MEMBER':c.tag==='weigh'?'WEIGH':'REG'}</span>`:'';
+    return `<div class="row"><div class="thumb"></div><div class="info"><div class="nm">${c.en}</div><div class="sub">${c.th} · ×${c.qty}</div>${tag}</div>
+      <div class="pr">${c.was?`<s>${baht(c.was)}</s>`:''}${baht(c.price*c.qty)}</div></div>`;
+  }).join('');
+  return `<div class="s-head"><span class="nm">${state.logoImage?'<img src="'+state.logoImage+'" style="max-height:22px">':(state.name||'Store')}</span><span class="ttl">Scan · สแกนสินค้า</span></div>
+    <div class="s-body">${rows}</div>
+    <div class="s-foot"><div class="totline"><div><div class="lab">${CART.length} items${t.save?` · <span class="save">save ${baht(t.save)}</span>`:''}</div><div class="tot">${baht(t.total)}</div></div></div>
+    <div class="bigbtn">${L().pay} · ${baht(t.total)}</div></div>`;
+}
+function paymentHTML(){
+  const t=cartTotals();
+  const tiles=TENDERS.filter(x=>state.tenders[x.id]).map(x=>`<div class="paytile"><div class="ic">${x.g}</div>${x.label}</div>`).join('') || '<div style="color:var(--muted);font-size:12px">No methods enabled</div>';
+  return `<div class="s-head"><span class="nm">${state.name||'Store'}</span><span class="ttl">Payment · ชำระเงิน</span></div>
+    <div class="amtdue"><div class="l">Amount due · ยอดที่ต้องชำระ</div><div class="v">${baht(t.total)}</div></div>
+    <div class="paygrid">${tiles}</div>`;
+}
+function receiptHTML(){
+  const t=cartTotals();
+  const pts = state.modules.member?`<div class="r"><span>Points earned</span><b>+${Math.round(t.total/10)}</b></div>`:'';
+  const er = state.modules.ereceipt?'<div>E-receipt QR</div>':'';
+  return `<div class="device__in s-receipt" style="position:static;height:100%">
+    <div class="rcheck">✓</div><div class="rttl">${L().done}</div>
+    <div class="rsum"><div class="r"><span>Total paid</span><b>${baht(t.total)}</b></div>${pts}<div class="r"><span>Tax invoice (ABB)</span><b>00${Math.floor(Math.random()*900+100)}</b></div></div>
+    <div class="rbtns"><div class="pri">Print receipt</div>${er}</div>
+    <div class="k-help" style="margin-top:4px">Please take your items · กรุณารับสินค้า</div></div>`;
+}
+
+/* ---------- render ---------- */
+let rotTimer=null, rotIdx=0;
+function render(){
+  document.querySelectorAll('[data-img]').forEach(b=>b.classList.toggle('on', b.dataset.img===state.image));
+  document.querySelectorAll('[data-mod]').forEach(b=>b.classList.toggle('on', state.modules[b.dataset.mod]));
+  document.querySelectorAll('[data-tender]').forEach(b=>b.classList.toggle('on', state.tenders[b.dataset.tender]));
+  document.querySelectorAll('[data-lang]').forEach(b=>b.classList.toggle('on', state.langs[b.dataset.lang]));
+  document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('on', b.dataset.mode===state.mode));
+  document.documentElement.style.setProperty('--p', state.primary);
+  document.documentElement.style.setProperty('--a', state.accent);
+
+  // theme vars on kiosk
+  const k=$('#kiosk');
+  const ink = state.mode==='light' ? '#1b1512' : state.ink;
+  const bg  = state.mode==='light' ? '#f6f3ef' : state.bg;
+  const muted = state.mode==='light' ? '#7a6e66' : state.muted;
+  k.style.setProperty('--p',state.primary); k.style.setProperty('--a',state.accent);
+  k.style.setProperty('--bg',bg); k.style.setProperty('--ink',ink); k.style.setProperty('--muted',muted);
+  k.style.setProperty('--font',`'${state.font}'`);
+  $('#kbg').style.backgroundImage = state.image ? `url(${state.image})` : `radial-gradient(circle at 50% 28%, ${state.primary}, transparent 62%)`;
+  $('#kbg').style.opacity = state.mode==='light' ? .14 : .3;
+
+  // screen tabs
+  const TABS=[['idle','Idle'],['scan','Scan'],['payment','Payment'],['receipt','Receipt']];
+  $('#screentabs').innerHTML = TABS.map(([id,l])=>`<button class="screentab ${state.screen===id?'on':''}" data-screen="${id}">${l}</button>`).join('');
+  $('#screen').innerHTML = state.screen==='idle'?idleHTML():state.screen==='scan'?scanHTML():state.screen==='payment'?paymentHTML():receiptHTML();
+
+  // flow (modular)
+  const steps=['Idle']; if(state.modules.member) steps.push('Member'); steps.push('Scan','Payment','Processing','Receipt');
+  $('#flow').innerHTML = steps.map((s,i)=>`<span class="step"><b>${i+1}</b>${s}</span>${i<steps.length-1?'<span class="arr">→</span>':''}`).join('');
+  $('#stepcount').textContent = steps.length+' steps';
+  const off=MODULES.filter(m=>!state.modules[m.id]).map(m=>m.label);
+  $('#flowmeta').textContent = off.length?('Trimmed: '+off.join(', ')):'All standard modules on.';
+
+  // tenders card
+  const on=TENDERS.filter(t=>state.tenders[t.id]);
+  $('#tendergrid').innerHTML = on.map(t=>`<div class="tender"><div class="ic">${t.g}</div>${t.label}</div>`).join('')||'<div style="color:#8a766b;font-size:12px">Select at least one.</div>';
+  $('#tendercount').textContent = on.length;
+
+  // json
+  $('#json').innerHTML = JSON.stringify(buildCfg(),null,2).replace(/"([^"]+)":/g,'<span class="k">"$1"</span>:').replace(/: "([^"]*)"/g,': <span class="s">"$1"</span>').replace(/: (true|false|\d+)/g,': <span class="b">$1</span>');
+
+  // rotate idle start text through languages
+  clearInterval(rotTimer);
+  if(state.screen==='idle' && activeLangs().length>1){
+    rotTimer=setInterval(()=>{ const ls=activeLangs(); rotIdx=(rotIdx+1)%ls.length; const el=$('#kstart'); if(el) el.innerHTML=LANGS[ls[rotIdx]].start; else clearInterval(rotTimer); },2200);
+  }
+  persist();
+}
+function buildCfg(){
+  const steps=['Idle']; if(state.modules.member) steps.push('Member'); steps.push('Scan','Payment','Processing','Receipt');
+  return { tenant:state.preset, brand:{ name:state.name, primary:state.primary, accent:state.accent, background:state.bg, themeMode:state.mode, headingFont:state.font, logo:state.logoImage?'custom-upload':'wordmark', idleImage:state.image||'auto' },
+    languages:activeLangs(), modules:Object.fromEntries(MODULES.map(m=>[m.id,!!state.modules[m.id]])), tenders:TENDERS.filter(t=>state.tenders[t.id]).map(t=>t.id), flowSteps:steps.length };
+}
+function downloadCfg(){ const cfg=buildCfg(); const blob=new Blob([JSON.stringify(cfg,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(state.name||'store').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-sco-config.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); toast('Downloaded config.json'); }
+let toastTimer=null;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('on'),1600); }
+function persist(){ try{ localStorage.setItem('sco-cfg', JSON.stringify(state)); }catch(e){} }
+function restore(){ try{ const s=localStorage.getItem('sco-cfg'); if(s){ const d=DEFAULTS(); const p=JSON.parse(s); state=Object.assign(d,p,{ modules:Object.assign(d.modules,p.modules||{}), tenders:Object.assign(d.tenders,p.tenders||{}), langs:Object.assign(d.langs,p.langs||{}) }); return true; } }catch(e){} return false; }
+
+buildControls();
+if(!restore()) applyPreset('foodland');
+sync();
+render();
+</script>
+</body>
+</html>

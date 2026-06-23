@@ -17,11 +17,11 @@ function Home() {
       <div className="bento">
         <section className="cell cell--hero">
           <span className="cell__tag">PROJECT SCO</span>
-          <h1>Foodland Self-Checkout</h1>
-          <p>Building Foodland&apos;s new self-checkout kiosk on the Fujitsu POS API Center — grounded on a fully reverse-engineered, verified POS foundation.</p>
+          <h1>Self-Checkout, your way</h1>
+          <p>A modular, white-label self-checkout platform — one standard engine any retailer can recolor, rebrand and trim, integrated through a single POS API. Foodland is the reference tenant.</p>
           <div className="hero-chips">
-            <span className="chip">Self-Checkout</span>
-            <span className="chip">ไทย / EN / 中文</span>
+            <span className="chip">White-label</span>
+            <span className="chip">Modular</span>
             <span className="chip">Offline-first</span>
           </div>
           <div className="hero-cta">

@@ -23,7 +23,7 @@ function Sidebar({ isOpen, onClose }) {
             <span className="sidebar__brand-mark"><ScanLine size={18} /></span>
             <span className="sidebar__brand-text">
               <strong>Project SCO</strong>
-              <span>Foodland Self-Checkout</span>
+              <span>Self-Checkout Platform</span>
             </span>
           </div>
           <button className="sidebar__close" onClick={onClose} aria-label="Close menu">
